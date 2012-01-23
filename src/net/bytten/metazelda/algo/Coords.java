@@ -52,10 +52,10 @@ public class Coords implements Comparable<Coords> {
         int dx = x - other.x,
             dy = y - other.y;
         assert dx == 0 || dy == 0;
-        if (dx > 0) return Direction.E;
-        if (dx < 0) return Direction.W;
-        if (dy > 0) return Direction.S;
-        if (dy < 0) return Direction.N;
+        if (dx < 0) return Direction.E;
+        if (dx > 0) return Direction.W;
+        if (dy < 0) return Direction.S;
+        if (dy > 0) return Direction.N;
         throw new RuntimeException("Coords do not align in one dimension, or are equal");
     }
     

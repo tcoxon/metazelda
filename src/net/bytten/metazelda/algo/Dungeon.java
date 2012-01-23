@@ -1,5 +1,6 @@
 package net.bytten.metazelda.algo;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
@@ -8,9 +9,19 @@ public class Dungeon {
 
     protected int elementCount;
     protected Map<Coords, Room> rooms;
+    protected Bounds bounds;
     
     public Dungeon() {
         rooms = new TreeMap<Coords, Room>();
+        bounds = new Bounds(0,0,0,0);
+    }
+    
+    public Bounds getBounds() {
+        return bounds;
+    }
+    
+    public Collection<Room> getRooms() {
+        return rooms.values();
     }
     
     public Element makeNewElement() {
@@ -27,6 +38,23 @@ public class Dungeon {
     
     public void add(Room room) {
         rooms.put(room.coords, room);
+        
+        if (room.coords.x < bounds.left) {
+            bounds = new Bounds(room.coords.x, bounds.top,
+                    bounds.right, bounds.bottom);
+        }
+        if (room.coords.x > bounds.right) {
+            bounds = new Bounds(bounds.left, bounds.top,
+                    room.coords.x, bounds.bottom);
+        }
+        if (room.coords.y < bounds.top) {
+            bounds = new Bounds(bounds.left, room.coords.y,
+                    bounds.right, bounds.bottom);
+        }
+        if (room.coords.y > bounds.bottom) {
+            bounds = new Bounds(bounds.left, bounds.top,
+                    bounds.right, room.coords.y);
+        }
     }
     
     public void linkOneWay(Room room1, Room room2) {
@@ -38,12 +66,14 @@ public class Dungeon {
     }
     
     public void linkOneWay(Room room1, Room room2, Condition cond) {
+        assert rooms.values().contains(room1) && rooms.values().contains(room2);
         assert room1.coords.isAdjacent(room2.coords);
         int d = room1.coords.getDirectionTo(room2.coords);
         room1.getEdges()[d] = new Edge(cond);
     }
     
     public void link(Room room1, Room room2, Condition cond) {
+        assert rooms.values().contains(room1) && rooms.values().contains(room2);
         assert room1.coords.isAdjacent(room2.coords);
         int d = room1.coords.getDirectionTo(room2.coords);
         room1.getEdges()[d] = new Edge(cond);
@@ -85,21 +115,26 @@ public class Dungeon {
         
         Room room2 = new Room(-1,-1);
         room2.setItem(feather);
+        dungeon.add(room2);
         dungeon.link(room1, room2, new Condition(key));
         
         room2 = new Room(1,-1);
+        dungeon.add(room2);
         dungeon.link(room1,room2);
         
         room1 = new Room(2,-1);
         room1.setItem(key);
+        dungeon.add(room1);
         dungeon.link(room2,room1);
         
         room1 = new Room(1,-2);
         room1.setItem(boss);
+        dungeon.add(room1);
         dungeon.link(room2,room1, new Condition(feather));
         
         room2 = new Room(0,-2);
         room2.setItem(goal);
+        dungeon.add(room2);
         dungeon.link(room1, room2, new Condition(boss));
         
         return dungeon;

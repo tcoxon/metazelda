@@ -9,11 +9,12 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import net.bytten.metazelda.algo.Dungeon;
 
 
-public class Main extends JFrame {
+public class Main extends JPanel {
     private static final long serialVersionUID = 1L;
 
     protected BufferedImage buffer;
@@ -24,19 +25,10 @@ public class Main extends JFrame {
     protected DungeonView dungeonView;
     
     public Main() {
-        super("Metazelda demo");
+        super();
         dungeon = Dungeon.makeTestDungeon();
         dungeonView = new DungeonView();
         
-        this.addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
-                    System.exit(0);
-            }
-
-        });
     }
     
     @Override
@@ -72,9 +64,22 @@ public class Main extends JFrame {
 
     // main -------------------------------------------------------------------
     public static void main(String[] args) {
-        JFrame frame = new Main();
-        frame.setSize(640, 480);
+        JFrame frame = new JFrame();
+        frame.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+                    System.exit(0);
+            }
+
+        });
+
+        JPanel panel = new Main();
+        panel.setPreferredSize(new Dimension(640, 480));
+        frame.setContentPane(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
         frame.setVisible(true);
     }
 

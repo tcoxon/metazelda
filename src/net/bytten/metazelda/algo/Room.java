@@ -31,8 +31,8 @@ public class Room {
         return edges;
     }
     
-    public Edge getEdge(int i) {
-        return edges[i];
+    public Edge getEdge(int d) {
+        return edges[d];
     }
     
     public boolean isStart() {

@@ -11,4 +11,18 @@ public class Condition {
         this.element = e;
     }
     
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof Condition) {
+            return element == ((Condition)other).element;
+        } else {
+            return super.equals(other);
+        }
+    }
+    
+    @Override
+    public String toString() {
+        return element.toString();
+    }
+    
 }

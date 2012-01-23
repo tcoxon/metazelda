@@ -20,4 +20,14 @@ public class Edge {
         return condition;
     }
     
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof Edge) {
+            Edge o = (Edge)other;
+            return condition == o.condition || condition.equals(o.condition);
+        } else {
+            return super.equals(other);
+        }
+    }
+    
 }

@@ -39,8 +39,12 @@ public class Element {
     
     @Override
     public String toString() {
+        if (value == START)
+            return "Start";
+        if (value == GOAL)
+            return "Goal";
         if (value < 26)
-            Character.toString((char)((int)'A' + value));
+            return Character.toString((char)((int)'A' + value));
         return Integer.toString(value);
     }
     
