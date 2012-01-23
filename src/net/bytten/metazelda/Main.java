@@ -25,7 +25,7 @@ public class Main extends JFrame {
     
     public Main() {
         super("Metazelda demo");
-        dungeon = new Dungeon();
+        dungeon = Dungeon.makeTestDungeon();
         dungeonView = new DungeonView();
         
         this.addKeyListener(new KeyAdapter() {
