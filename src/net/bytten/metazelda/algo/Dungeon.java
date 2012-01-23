@@ -1,8 +1,13 @@
 package net.bytten.metazelda.algo;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class Dungeon {
@@ -10,10 +15,20 @@ public class Dungeon {
     protected int elementCount;
     protected Map<Coords, Room> rooms;
     protected Bounds bounds;
+    protected Set<Element> placedElements;
+    
+    // Used for getting external rooms:
+    protected Map<Integer, Integer> minX, maxX, minY, maxY;
     
     public Dungeon() {
         rooms = new TreeMap<Coords, Room>();
         bounds = new Bounds(0,0,0,0);
+        placedElements = new HashSet<Element>();
+        
+        minX = new HashMap<Integer,Integer>();
+        maxX = new HashMap<Integer,Integer>();
+        minY = new HashMap<Integer,Integer>();
+        maxY = new HashMap<Integer,Integer>();
     }
     
     public Bounds getBounds() {
@@ -27,6 +42,18 @@ public class Dungeon {
     public Element makeNewElement() {
         return new Element(elementCount++);
     }
+    public int elementCount() {
+        return elementCount;
+    }
+    public Element getRandomPlacedElement(Random rand) {
+        if (placedElements.size() == 0) return null;
+        return new ArrayList<Element>(placedElements)
+            .get(rand.nextInt(placedElements.size()));
+    }
+    
+    public int roomCount() {
+        return rooms.size();
+    }
     
     public Room get(Coords coords) {
         return rooms.get(coords);
@@ -36,8 +63,15 @@ public class Dungeon {
         return get(new Coords(x,y));
     }
     
+    public void placeElement(Element e) {
+        if (e != null && !e.isGoal() && !e.isStart())
+            placedElements.add(e);
+    }
+    
     public void add(Room room) {
         rooms.put(room.coords, room);
+        
+        placeElement(room.getItem());
         
         if (room.coords.x < bounds.left) {
             bounds = new Bounds(room.coords.x, bounds.top,
@@ -54,6 +88,55 @@ public class Dungeon {
         if (room.coords.y > bounds.bottom) {
             bounds = new Bounds(bounds.left, bounds.top,
                     bounds.right, room.coords.y);
+        }
+        
+        updateBoundaryMin(minX, room.coords.y, room.coords.x);
+        updateBoundaryMax(maxX, room.coords.y, room.coords.x);
+        updateBoundaryMin(minY, room.coords.x, room.coords.y);
+        updateBoundaryMax(maxY, room.coords.x, room.coords.y);
+    }
+    
+    private void updateBoundaryMin(Map<Integer,Integer> minMap, int k, int v) {
+        Integer cv = minMap.get(k);
+        if (cv == null || v < cv) {
+            minMap.put(k,v);
+        }
+    }
+    
+    private void updateBoundaryMax(Map<Integer,Integer> maxMap, int k, int v) {
+        Integer cv = maxMap.get(k);
+        if (cv == null || v > cv) {
+            maxMap.put(k,v);
+        }
+    }
+    
+    private Room randBoundaryX(Random rand, Map<Integer,Integer> xmap) {
+        List<Integer> keys = new ArrayList<Integer>(xmap.keySet());
+        int y = keys.get(rand.nextInt(keys.size())),
+            x = xmap.get(y);
+        return get(x,y);
+    }
+    
+    private Room randBoundaryY(Random rand, Map<Integer,Integer> ymap) {
+        List<Integer> keys = new ArrayList<Integer>(ymap.keySet());
+        int x = keys.get(rand.nextInt(keys.size())),
+            y = ymap.get(x);
+        return get(x,y);
+    }
+    
+    public Room getRandomExternalRoom(Random rand) {
+        // All this boundary stuff is a big hack.
+        // Min and Max of each dimension are kept in maps. A random map is
+        // selected, and from that a random key,value pair that represents a
+        // pair of coordinates.
+        if (roomCount() <= 0) return null;
+        switch (rand.nextInt(4)) {
+        case 0: return randBoundaryX(rand, minX);
+        case 1: return randBoundaryX(rand, maxX);
+        case 2: return randBoundaryY(rand, minY);
+        case 3: return randBoundaryY(rand, maxY);
+        default:
+            throw new RuntimeException("The laws of probability have been rewritten");
         }
     }
     
@@ -105,35 +188,31 @@ public class Dungeon {
             goal = new Element(Element.GOAL),
             start = new Element(Element.START);
     
-        Room room0 = new Room(0,0);
+        Room room0 = new Room(0,0, null);
         room0.setItem(start);
         dungeon.add(room0);
         
-        Room room1 = new Room(0,-1);
+        Room room1 = new Room(0,-1, null);
         dungeon.add(room1);
         dungeon.link(room0, room1);
         
-        Room room2 = new Room(-1,-1);
-        room2.setItem(feather);
+        Room room2 = new Room(-1,-1, feather);
         dungeon.add(room2);
         dungeon.link(room1, room2, new Condition(key));
         
-        room2 = new Room(1,-1);
+        room2 = new Room(1,-1, null);
         dungeon.add(room2);
         dungeon.link(room1,room2);
         
-        room1 = new Room(2,-1);
-        room1.setItem(key);
+        room1 = new Room(2,-1, key);
         dungeon.add(room1);
         dungeon.link(room2,room1);
         
-        room1 = new Room(1,-2);
-        room1.setItem(boss);
+        room1 = new Room(1,-2, boss);
         dungeon.add(room1);
         dungeon.link(room2,room1, new Condition(feather));
         
-        room2 = new Room(0,-2);
-        room2.setItem(goal);
+        room2 = new Room(0,-2, goal);
         dungeon.add(room2);
         dungeon.link(room1, room2, new Condition(boss));
         

@@ -7,11 +7,13 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import net.bytten.metazelda.algo.Dungeon;
+import net.bytten.metazelda.algo.DungeonGenerator;
 
 
 public class Main extends JPanel {
@@ -26,9 +28,13 @@ public class Main extends JPanel {
     
     public Main() {
         super();
-        dungeon = Dungeon.makeTestDungeon();
+        regenerate();
         dungeonView = new DungeonView();
         
+    }
+    
+    public void regenerate() {
+        dungeon = DungeonGenerator.generate(new Random());
     }
     
     @Override
@@ -64,22 +70,27 @@ public class Main extends JPanel {
 
     // main -------------------------------------------------------------------
     public static void main(String[] args) {
-        JFrame frame = new JFrame();
+        final JFrame frame = new JFrame();
+        final Main panel = new Main();
+        panel.setPreferredSize(new Dimension(640, 480));
+        frame.setContentPane(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        
         frame.addKeyListener(new KeyAdapter() {
 
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
                     System.exit(0);
+                else if (e.getKeyCode() == KeyEvent.VK_F5) {
+                    panel.regenerate();
+                    panel.repaint();
+                }
             }
 
         });
 
-        JPanel panel = new Main();
-        panel.setPreferredSize(new Dimension(640, 480));
-        frame.setContentPane(panel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
         frame.setVisible(true);
     }
 

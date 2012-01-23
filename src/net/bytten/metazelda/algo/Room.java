@@ -8,15 +8,15 @@ public class Room {
     protected Element item;
     protected Edge[] edges; // index with Direction.{N,E,S,W}
     
-    public Room(Coords coords) {
+    public Room(Coords coords, Element item) {
         this.coords = coords;
-        this.item = null;
+        this.item = item;
         this.edges = new Edge[Direction.NUM_DIRS];
         // all edges initially null
     }
     
-    public Room(int x, int y) {
-        this(new Coords(x,y));
+    public Room(int x, int y, Element item) {
+        this(new Coords(x,y), item);
     }
 
     public Element getItem() {
