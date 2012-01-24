@@ -26,15 +26,16 @@ public class Main extends JPanel {
     protected Dungeon dungeon;
     protected DungeonView dungeonView;
     
-    public Main() {
+    public Main(long seed) {
         super();
-        regenerate();
+        regenerate(seed);
         dungeonView = new DungeonView();
         
     }
     
-    public void regenerate() {
-        dungeon = DungeonGenerator.generate(new Random());
+    public void regenerate(long seed) {
+        System.out.println("Seed: "+seed);
+        dungeon = DungeonGenerator.generate(seed);
     }
     
     @Override
@@ -71,7 +72,7 @@ public class Main extends JPanel {
     // main -------------------------------------------------------------------
     public static void main(String[] args) {
         final JFrame frame = new JFrame();
-        final Main panel = new Main();
+        final Main panel = new Main(getSeed(args));
         panel.setPreferredSize(new Dimension(640, 480));
         frame.setContentPane(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -84,7 +85,7 @@ public class Main extends JPanel {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
                     System.exit(0);
                 else if (e.getKeyCode() == KeyEvent.VK_F5) {
-                    panel.regenerate();
+                    panel.regenerate(new Random().nextLong());
                     panel.repaint();
                 }
             }
@@ -93,5 +94,26 @@ public class Main extends JPanel {
 
         frame.setVisible(true);
     }
+    
+    private static long parseSeed(String seed) {
+        try {
+            return Long.parseLong(seed);
+        } catch (NumberFormatException ex) {
+            return seed.hashCode();
+        }
+    }
 
+    private static long getSeed(String[] args) {
+        for (int i = 0; i < args.length; ++i) {
+            if ("-seed".equals(args[i])) {
+                ++i;
+                if (i < args.length) {
+                    return parseSeed(args[i]);
+                }
+            } else if ("-seed=".equals(args[i].substring(0,6))) {
+                return parseSeed(args[i].substring(6));
+            }
+        }
+        return new Random().nextLong();
+    }
 }

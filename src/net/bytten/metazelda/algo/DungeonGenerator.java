@@ -59,8 +59,9 @@ public class DungeonGenerator {
         return room;
     }
     
-    public static Dungeon generate(Random rand) {
-        Dungeon dungeon = new Dungeon();
+    public static Dungeon generate(long seed) {
+        Random rand = new Random(seed);
+        Dungeon dungeon = new Dungeon(seed);
         Room startRoom = new Room(0,0, null);
         startRoom.setItem(new Element(Element.START));
         dungeon.add(startRoom);
