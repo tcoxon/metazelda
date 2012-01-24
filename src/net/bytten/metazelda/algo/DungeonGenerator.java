@@ -7,7 +7,7 @@ public class DungeonGenerator {
     public static final int MAX_ELEMS = 26;
 
     // The actual core algorithm from
-    // http://bytten.net/devlog/2012/01/21/procedural-dungeon-generation-part-i/
+    //     http://bytten.net/devlog/tag/metazelda/
     // Lines marked with XXX are where tweakable probabilities are. Play around
     // with them to see if you can generate better dungeons.
     public static Room addItemPath(Random rand, Dungeon dungeon, Symbol item) {
