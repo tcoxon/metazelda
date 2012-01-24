@@ -2,3 +2,12 @@ Implementation of an algorithm for procedurally-generating dungeons with Zelda-
 like item-based puzzles.
 
 See http://bytten.net/devlog/2012/01/21/procedural-dungeon-generation-part-i/
+
+
+To run after building:
+    java -cp bin net.bytten.metazelda.Main
+
+It will randomly generate a graph and show it in the viewer.
+
+F5 to generate a new dungeon.
+Pass -seed=X to generate a dungeon from a specific seed.
