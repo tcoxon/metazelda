@@ -153,11 +153,11 @@ public class Dungeon {
     }
     
     public void linkOneWay(Room room1, Room room2) {
-        linkOneWay(room1, room2, null);
+        linkOneWay(room1, room2, new Condition());
     }
     
     public void link(Room room1, Room room2) {
-        link(room1, room2, null);
+        link(room1, room2, new Condition());
     }
     
     public void linkOneWay(Room room1, Room room2, Condition cond) {

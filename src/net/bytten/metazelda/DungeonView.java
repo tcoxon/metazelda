@@ -43,7 +43,7 @@ public class DungeonView {
         g.drawLine((int)x1,(int)y1,(int)x2,(int)y2);
         
         double len = 0.1*Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1)),
-            rot = Math.atan2(x2-x1,y2-y1);
+            rot = Math.atan2(x2-x1,y1-y2);
         g.translate(x2, y2);
         g.rotate(rot);
         g.drawLine(0,0, (int)(-len*2/3), (int)(len));

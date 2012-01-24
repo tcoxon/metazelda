@@ -18,7 +18,7 @@ public class DungeonGenerator {
         
         // Choose condition to enter the room
         float r = rand.nextFloat();
-        if (dungeon.itemCount() < MAX_ELEMS && r < 0.2) {    // XXX
+        if (dungeon.itemCount() < MAX_ELEMS && r < 0.2) {       // XXX
             // create a new condition and item for it
             Symbol elem = dungeon.makeNewItem();
             cond = new Condition(elem);
@@ -65,7 +65,33 @@ public class DungeonGenerator {
         dungeon.add(room);
         dungeon.link(locRoom, room, cond);
         
+        linkNeighbors(rand, dungeon, room);
+        
         return room;
+    }
+    
+    private static void linkNeighbors(Random rand, Dungeon dungeon, Room room) {
+        Condition precond = room.getPrecond();
+        
+        // for each neighboring room:
+        for (int d = 0; d < Direction.NUM_DIRS; ++d) {
+            Room neighbor = dungeon.get(room.coords.nextInDirection(d));
+            if (neighbor == null) continue;
+            
+            if (precond.equals(neighbor.getPrecond())) {
+                // these two rooms have equivalent preconditions -- linking both
+                // ways will not break any puzzles
+                dungeon.link(room, neighbor);
+            } else if (precond.implies(neighbor.getPrecond())) {
+                if (rand.nextFloat() < 0.3) {                // XXX
+                    // link from the new room to the neighbor. A link that way
+                    // won't break any puzzles, but a link back the other way
+                    // would!
+                    dungeon.linkOneWay(room, neighbor);
+                }
+            }
+        }
+        
     }
     
     public static Dungeon generate(long seed) {
