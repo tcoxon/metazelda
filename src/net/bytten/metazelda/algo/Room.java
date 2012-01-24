@@ -5,25 +5,25 @@ import java.util.Random;
 public class Room {
 
     public final Coords coords;
-    protected Element item;
+    protected Symbol item;
     protected Edge[] edges; // index with Direction.{N,E,S,W}
     
-    public Room(Coords coords, Element item) {
+    public Room(Coords coords, Symbol item) {
         this.coords = coords;
         this.item = item;
         this.edges = new Edge[Direction.NUM_DIRS];
         // all edges initially null
     }
     
-    public Room(int x, int y, Element item) {
+    public Room(int x, int y, Symbol item) {
         this(new Coords(x,y), item);
     }
 
-    public Element getItem() {
+    public Symbol getItem() {
         return item;
     }
 
-    public void setItem(Element item) {
+    public void setItem(Symbol item) {
         this.item = item;
     }
 

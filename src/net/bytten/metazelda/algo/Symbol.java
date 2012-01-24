@@ -1,20 +1,20 @@
 package net.bytten.metazelda.algo;
 
-public class Element {
+public class Symbol {
     public static final int
         START = -1,
         GOAL = -2;
 
     protected final int value;
     
-    public Element(int x) {
+    public Symbol(int x) {
         value = x;
     }
     
     @Override
     public boolean equals(Object other) {
-        if (other instanceof Element) {
-            return value == ((Element)other).value;
+        if (other instanceof Symbol) {
+            return value == ((Symbol)other).value;
         } else {
             return super.equals(other);
         }

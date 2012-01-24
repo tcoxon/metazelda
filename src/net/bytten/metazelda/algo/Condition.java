@@ -2,19 +2,19 @@ package net.bytten.metazelda.algo;
 
 public class Condition {
 
-    protected Element element;
+    protected Symbol symbol;
     
-    // For the moment, implements only one element per condition.
+    // For the moment, implements only one symbol per condition.
     // It would make sense to make Condition a set of Elements that the player
     // must have.
-    public Condition(Element e) {
-        this.element = e;
+    public Condition(Symbol e) {
+        this.symbol = e;
     }
     
     @Override
     public boolean equals(Object other) {
         if (other instanceof Condition) {
-            return element == ((Condition)other).element;
+            return symbol == ((Condition)other).symbol;
         } else {
             return super.equals(other);
         }
@@ -22,7 +22,7 @@ public class Condition {
     
     @Override
     public String toString() {
-        return element.toString();
+        return symbol.toString();
     }
     
 }

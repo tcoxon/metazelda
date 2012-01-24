@@ -11,7 +11,7 @@ public class DungeonGenerator {
     // Lines marked with XXX are where tweakable probabilities are. Play around
     // with them to see if you can generate better dungeons.
     // TODO backedges
-    public static Room addItemPath(Random rand, Dungeon dungeon, Element item) {
+    public static Room addItemPath(Random rand, Dungeon dungeon, Symbol item) {
         // Add a new room to the dungeon containing the given item. Conditions
         // to enter the room are randomly generated, and if requiring a new item
         // in the dungeon, will cause other rooms to be added, too.
@@ -19,14 +19,14 @@ public class DungeonGenerator {
         
         // Choose condition to enter the room
         float r = rand.nextFloat();
-        if (dungeon.elementCount() < MAX_ELEMS && r < 0.2) {    // XXX
+        if (dungeon.itemCount() < MAX_ELEMS && r < 0.2) {    // XXX
             // create a new condition and item for it
-            Element elem = dungeon.makeNewElement();
+            Symbol elem = dungeon.makeNewItem();
             cond = new Condition(elem);
             addItemPath(rand, dungeon, elem);
         } else if (r < 0.6) {                                   // XXX
             // make the condition one which we've used before
-            Element elem = dungeon.getRandomPlacedElement(rand);
+            Symbol elem = dungeon.getRandomPlacedElement(rand);
             if (elem != null)
                 cond = new Condition(elem);
         }
@@ -63,10 +63,10 @@ public class DungeonGenerator {
         Random rand = new Random(seed);
         Dungeon dungeon = new Dungeon(seed);
         Room startRoom = new Room(0,0, null);
-        startRoom.setItem(new Element(Element.START));
+        startRoom.setItem(new Symbol(Symbol.START));
         dungeon.add(startRoom);
         
-        addItemPath(rand, dungeon, new Element(Element.GOAL));
+        addItemPath(rand, dungeon, new Symbol(Symbol.GOAL));
         
         return dungeon;
     }

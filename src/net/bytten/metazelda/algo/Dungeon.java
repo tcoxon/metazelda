@@ -13,10 +13,10 @@ import java.util.TreeMap;
 public class Dungeon {
 
     protected long seed;
-    protected int elementCount;
+    protected int itemCount;
     protected Map<Coords, Room> rooms;
     protected Bounds bounds;
-    protected Set<Element> placedElements;
+    protected Set<Symbol> placedItems;
     
     // Used for getting external rooms:
     protected Map<Integer, Integer> minX, maxX, minY, maxY;
@@ -24,7 +24,7 @@ public class Dungeon {
     public Dungeon(long seed) {
         rooms = new TreeMap<Coords, Room>();
         bounds = new Bounds(0,0,0,0);
-        placedElements = new HashSet<Element>();
+        placedItems = new HashSet<Symbol>();
         this.seed = seed;
         
         minX = new HashMap<Integer,Integer>();
@@ -41,16 +41,16 @@ public class Dungeon {
         return rooms.values();
     }
     
-    public Element makeNewElement() {
-        return new Element(elementCount++);
+    public Symbol makeNewItem() {
+        return new Symbol(itemCount++);
     }
-    public int elementCount() {
-        return elementCount;
+    public int itemCount() {
+        return itemCount;
     }
-    public Element getRandomPlacedElement(Random rand) {
-        if (placedElements.size() == 0) return null;
-        return new ArrayList<Element>(placedElements)
-            .get(rand.nextInt(placedElements.size()));
+    public Symbol getRandomPlacedElement(Random rand) {
+        if (placedItems.size() == 0) return null;
+        return new ArrayList<Symbol>(placedItems)
+            .get(rand.nextInt(placedItems.size()));
     }
     
     public int roomCount() {
@@ -65,15 +65,15 @@ public class Dungeon {
         return get(new Coords(x,y));
     }
     
-    public void placeElement(Element e) {
+    public void placeItem(Symbol e) {
         if (e != null && !e.isGoal() && !e.isStart())
-            placedElements.add(e);
+            placedItems.add(e);
     }
     
     public void add(Room room) {
         rooms.put(room.coords, room);
         
-        placeElement(room.getItem());
+        placeItem(room.getItem());
         
         if (room.coords.x < bounds.left) {
             bounds = new Bounds(room.coords.x, bounds.top,
@@ -184,11 +184,11 @@ public class Dungeon {
     public static Dungeon makeTestDungeon() {
         Dungeon dungeon = new Dungeon(0);
         
-        Element key = dungeon.makeNewElement(),
-            feather = dungeon.makeNewElement(),
-            boss = dungeon.makeNewElement(),
-            goal = new Element(Element.GOAL),
-            start = new Element(Element.START);
+        Symbol key = dungeon.makeNewItem(),
+            feather = dungeon.makeNewItem(),
+            boss = dungeon.makeNewItem(),
+            goal = new Symbol(Symbol.GOAL),
+            start = new Symbol(Symbol.START);
     
         Room room0 = new Room(0,0, null);
         room0.setItem(start);
