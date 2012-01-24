@@ -4,19 +4,21 @@ import java.util.Random;
 
 public class Room {
 
+    public Condition precond;
     public final Coords coords;
     protected Symbol item;
     protected Edge[] edges; // index with Direction.{N,E,S,W}
     
-    public Room(Coords coords, Symbol item) {
+    public Room(Coords coords, Symbol item, Condition precond) {
         this.coords = coords;
         this.item = item;
         this.edges = new Edge[Direction.NUM_DIRS];
+        this.precond = precond;
         // all edges initially null
     }
     
-    public Room(int x, int y, Symbol item) {
-        this(new Coords(x,y), item);
+    public Room(int x, int y, Symbol item, Condition precond) {
+        this(new Coords(x,y), item, precond);
     }
 
     public Symbol getItem() {
@@ -54,5 +56,9 @@ public class Room {
         if (edges[d] == null)
             return d;
         return null;
+    }
+
+    public Condition getPrecond() {
+        return precond;
     }
 }

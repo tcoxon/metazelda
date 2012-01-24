@@ -10,7 +10,6 @@ public class DungeonGenerator {
     // http://bytten.net/devlog/2012/01/21/procedural-dungeon-generation-part-i/
     // Lines marked with XXX are where tweakable probabilities are. Play around
     // with them to see if you can generate better dungeons.
-    // TODO backedges
     public static Room addItemPath(Random rand, Dungeon dungeon, Symbol item) {
         // Add a new room to the dungeon containing the given item. Conditions
         // to enter the room are randomly generated, and if requiring a new item
@@ -26,7 +25,7 @@ public class DungeonGenerator {
             addItemPath(rand, dungeon, elem);
         } else if (r < 0.6) {                                   // XXX
             // make the condition one which we've used before
-            Symbol elem = dungeon.getRandomPlacedElement(rand);
+            Symbol elem = dungeon.getRandomPlacedItem(rand);
             if (elem != null)
                 cond = new Condition(elem);
         }
@@ -51,8 +50,18 @@ public class DungeonGenerator {
             locD = dungeon.getRandomAdjacentSpaceDirection(rand, locRoom);
         }
         
+        // Compute the new room's preconditions
+        // (NB. cond is the condition to enter the room along the ingoing edge,
+        // while precond is the set of all symbols that the player must be
+        // holding to have reached the room)
+        Condition precond = locRoom.getPrecond();
+        if (cond != null) {
+            precond = precond.and(dungeon.precondClosure(cond));
+        }
+        
         // Finally create the new room and link it to the parent room
-        Room room = new Room(locRoom.coords.nextInDirection(locD), item);
+        Room room = new Room(locRoom.coords.nextInDirection(locD),
+                item, precond);
         dungeon.add(room);
         dungeon.link(locRoom, room, cond);
         
@@ -62,7 +71,7 @@ public class DungeonGenerator {
     public static Dungeon generate(long seed) {
         Random rand = new Random(seed);
         Dungeon dungeon = new Dungeon(seed);
-        Room startRoom = new Room(0,0, null);
+        Room startRoom = new Room(0,0, null, new Condition());
         startRoom.setItem(new Symbol(Symbol.START));
         dungeon.add(startRoom);
         

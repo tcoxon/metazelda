@@ -3,11 +3,9 @@ package net.bytten.metazelda.algo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeMap;
 
 public class Dungeon {
@@ -16,7 +14,7 @@ public class Dungeon {
     protected int itemCount;
     protected Map<Coords, Room> rooms;
     protected Bounds bounds;
-    protected Set<Symbol> placedItems;
+    protected Map<Symbol, Condition> placedItems;
     
     // Used for getting external rooms:
     protected Map<Integer, Integer> minX, maxX, minY, maxY;
@@ -24,7 +22,7 @@ public class Dungeon {
     public Dungeon(long seed) {
         rooms = new TreeMap<Coords, Room>();
         bounds = new Bounds(0,0,0,0);
-        placedItems = new HashSet<Symbol>();
+        placedItems = new HashMap<Symbol, Condition>();
         this.seed = seed;
         
         minX = new HashMap<Integer,Integer>();
@@ -47,9 +45,9 @@ public class Dungeon {
     public int itemCount() {
         return itemCount;
     }
-    public Symbol getRandomPlacedElement(Random rand) {
+    public Symbol getRandomPlacedItem(Random rand) {
         if (placedItems.size() == 0) return null;
-        return new ArrayList<Symbol>(placedItems)
+        return new ArrayList<Symbol>(placedItems.keySet())
             .get(rand.nextInt(placedItems.size()));
     }
     
@@ -65,15 +63,27 @@ public class Dungeon {
         return get(new Coords(x,y));
     }
     
-    public void placeItem(Symbol e) {
+    public void placeItem(Symbol e, Condition precond) {
+        assert precond != null;
         if (e != null && !e.isGoal() && !e.isStart())
-            placedItems.add(e);
+            placedItems.put(e, precond);
+    }
+    
+    public Condition getItemPrecond(Symbol item) {
+        // return the precondition to getting the given item in the dungeon
+        return placedItems.get(item);
+    }
+    
+    public Condition precondClosure(Condition cond) {
+        // return the entire set of symbols that must be held by the player
+        // for cond to be true.
+        return cond.closure(placedItems);
     }
     
     public void add(Room room) {
         rooms.put(room.coords, room);
         
-        placeItem(room.getItem());
+        placeItem(room.getItem(), room.getPrecond());
         
         if (room.coords.x < bounds.left) {
             bounds = new Bounds(room.coords.x, bounds.top,
@@ -190,31 +200,31 @@ public class Dungeon {
             goal = new Symbol(Symbol.GOAL),
             start = new Symbol(Symbol.START);
     
-        Room room0 = new Room(0,0, null);
+        Room room0 = new Room(0,0, null, new Condition());
         room0.setItem(start);
         dungeon.add(room0);
         
-        Room room1 = new Room(0,-1, null);
+        Room room1 = new Room(0,-1, null, new Condition());
         dungeon.add(room1);
         dungeon.link(room0, room1);
         
-        Room room2 = new Room(-1,-1, feather);
+        Room room2 = new Room(-1,-1, feather, new Condition(key));
         dungeon.add(room2);
         dungeon.link(room1, room2, new Condition(key));
         
-        room2 = new Room(1,-1, null);
+        room2 = new Room(1,-1, null, new Condition());
         dungeon.add(room2);
         dungeon.link(room1,room2);
         
-        room1 = new Room(2,-1, key);
+        room1 = new Room(2,-1, key, new Condition());
         dungeon.add(room1);
         dungeon.link(room2,room1);
         
-        room1 = new Room(1,-2, boss);
+        room1 = new Room(1,-2, boss, new Condition(key).and(feather));
         dungeon.add(room1);
         dungeon.link(room2,room1, new Condition(feather));
         
-        room2 = new Room(0,-2, goal);
+        room2 = new Room(0,-2, goal, new Condition(key).and(feather).and(boss));
         dungeon.add(room2);
         dungeon.link(room1, room2, new Condition(boss));
         
