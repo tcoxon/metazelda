@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -156,22 +155,6 @@ public class Dungeon {
         int d = room1.coords.getDirectionTo(room2.coords);
         room1.getEdges()[d] = new Edge(cond);
         room2.getEdges()[Direction.oppositeDirection(d)] = new Edge(cond);
-    }
-    
-    public Integer getRandomAdjacentSpaceDirection(Random rand, Room room) {
-        // Return a random direction of travel from room to an adjacent empty
-        // space, or null if there are no nearby spaces
-        int d = rand.nextInt(Direction.NUM_DIRS),
-            tries = 0;
-        Coords xy = room.coords.nextInDirection(d);
-        while (get(xy) != null && tries < Direction.NUM_DIRS) {
-            d = (d+1) % Direction.NUM_DIRS;
-            ++tries;
-            xy = room.coords.nextInDirection(d);
-        }
-        if (get(xy) == null)
-            return d;
-        return null;
     }
     
     public static Dungeon makeTestDungeon() {

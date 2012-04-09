@@ -31,7 +31,6 @@ public class DungeonGenerator {
         // to enter the room are randomly generated, and if requiring a new item
         // in the dungeon, will cause other rooms to be added, too.
         Condition cond = null;
-        Random rand = getRandom();
         
         // Choose condition to enter the room
         if (chooseCreateNewItem()) {
@@ -53,7 +52,7 @@ public class DungeonGenerator {
             // Add padding rooms (and potentially more conditions and branches
             // along the way)
             locRoom = addItemPath(null);
-            locD = dungeon.getRandomAdjacentSpaceDirection(rand, locRoom);
+            locD = chooseAdjacentSpace(locRoom);
             // addItemPath can create a room with no adjacent spaces, so
             // loc.second (the direction to add the new room in) might still be
             // null.
@@ -62,7 +61,7 @@ public class DungeonGenerator {
         if (locRoom == null || locD == null) {
             // Choose an existing room with a free edge
             locRoom  = chooseExistingRoom();
-            locD = dungeon.getRandomAdjacentSpaceDirection(rand, locRoom);
+            locD = chooseAdjacentSpace(locRoom);
         }
         
         // Compute the new room's preconditions
@@ -113,6 +112,22 @@ public class DungeonGenerator {
     public Room chooseExistingRoom() {
         List<Room> rooms = dungeon.computeBoundaryRooms();
         return rooms.get(getRandom().nextInt(rooms.size()));
+    }
+    
+    public Integer chooseAdjacentSpace(Room room) {
+        // Return a random direction of travel from room to an adjacent empty
+        // space, or null if there are no nearby spaces
+        int d = getRandom().nextInt(Direction.NUM_DIRS),
+            tries = 0;
+        Coords xy = room.coords.nextInDirection(d);
+        while (dungeon.get(xy) != null && tries < Direction.NUM_DIRS) {
+            d = (d+1) % Direction.NUM_DIRS;
+            ++tries;
+            xy = room.coords.nextInDirection(d);
+        }
+        if (dungeon.get(xy) == null)
+            return d;
+        return null;
     }
     
     protected void linkNeighbors(Room room) {
