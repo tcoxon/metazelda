@@ -16,6 +16,7 @@ If you're hacking on this, you'll want to start by understanding how
 DungeonGenerator (the reference implementation) works.
 
 LennasDungeonGenerator (enabled by passing -lenna on the command line) extends
-DungeonGenerator in a few ways to produce more interesting dungeons. I plan to
-use this in my game, Lenna's Inception:
+DungeonGenerator in a few ways to produce more consistently interesting
+dungeons. I plan to use this in my game, Lenna's Inception:
     http://bytten.net/devlog/tag/lennasinception/
+
