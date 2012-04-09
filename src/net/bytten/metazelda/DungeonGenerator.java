@@ -26,7 +26,10 @@ public class DungeonGenerator {
     //     http://bytten.net/devlog/tag/metazelda/
     // The choose* methods below control the decisions the algorithm makes.
     // Try tweaking the probabilities to see if you can produce better dungeons.
-    public Room addItemPath(Symbol item) {
+    // 'depth' is a count of how many rooms in the current chain have been
+    // generated without any keys or locks. Subclasses may use this count to
+    // optimize dungeons.
+    public Room addItemPath(Symbol item, int depth) {
         // Add a new room to the dungeon containing the given item. Conditions
         // to enter the room are randomly generated, and if requiring a new item
         // in the dungeon, will cause other rooms to be added, too.
@@ -37,21 +40,22 @@ public class DungeonGenerator {
             // create a new condition and item for it
             Symbol elem = dungeon.makeNewItem();
             cond = new Condition(elem);
-            addItemPath(elem);
+            addItemPath(elem, 0);
         } else if (chooseReuseItem()) {
             // make the condition one which we've used before
             Symbol elem = choosePlacedItem();
             if (elem != null)
                 cond = new Condition(elem);
+            depth = 0;
         }
         
         // Choose where to place the new room
         Room locRoom = null;
         Integer locD = null;
-        if (chooseCreatePaddingRoom()) {
+        if (chooseCreatePaddingRoom(depth)) {
             // Add padding rooms (and potentially more conditions and branches
             // along the way)
-            locRoom = addItemPath(null);
+            locRoom = addItemPath(null, depth+1);
             locD = chooseAdjacentSpace(locRoom);
             // addItemPath can create a room with no adjacent spaces, so
             // loc.second (the direction to add the new room in) might still be
@@ -125,7 +129,7 @@ public class DungeonGenerator {
         return getRandom().nextFloat() < 0.3;
     }
     
-    protected boolean chooseCreatePaddingRoom() {
+    protected boolean chooseCreatePaddingRoom(int depth) {
         return dungeon.roomCount() < 20 && getRandom().nextFloat() < 0.7;
     }
     
@@ -171,7 +175,7 @@ public class DungeonGenerator {
         startRoom.setItem(new Symbol(Symbol.START));
         dungeon.add(startRoom);
         
-        addItemPath(new Symbol(Symbol.GOAL));
+        addItemPath(new Symbol(Symbol.GOAL), 0);
         
         return dungeon;
     }

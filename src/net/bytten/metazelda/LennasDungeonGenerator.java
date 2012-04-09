@@ -26,8 +26,8 @@ public class LennasDungeonGenerator extends DungeonGenerator {
     }
     
     @Override
-    protected boolean chooseCreatePaddingRoom() {
-        return getRandom().nextFloat() <
+    protected boolean chooseCreatePaddingRoom(int depth) {
+        return depth < 3 && getRandom().nextFloat() <
             1.0f - (float)dungeon.roomCount() / (float)getTargetRoomCount();
     }
 
@@ -46,7 +46,8 @@ public class LennasDungeonGenerator extends DungeonGenerator {
 
     @Override
     protected boolean chooseLinkNeighborOneWay(Room room, Room neighbor) {
-        return super.chooseLinkNeighborOneWay(room, neighbor);
+        return !room.isGoal() && !neighbor.isGoal() &&
+                super.chooseLinkNeighborOneWay(room, neighbor);
     }
 
     @Override
