@@ -4,7 +4,7 @@ like item-based puzzles.
 See http://bytten.net/devlog/tag/metazelda/
 
 To run after building:
-    java -cp bin net.bytten.metazelda.Main
+    java -cp bin:viewer-bin net.bytten.metazelda.viewer.Main
 
 It will randomly generate a graph and show it in the viewer.
 

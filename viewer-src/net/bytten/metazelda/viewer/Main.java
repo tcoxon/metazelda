@@ -1,4 +1,4 @@
-package net.bytten.metazelda;
+package net.bytten.metazelda.viewer;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,8 +12,8 @@ import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import net.bytten.metazelda.algo.Dungeon;
-import net.bytten.metazelda.algo.DungeonGenerator;
+import net.bytten.metazelda.Dungeon;
+import net.bytten.metazelda.DungeonGenerator;
 
 
 public class Main extends JPanel {

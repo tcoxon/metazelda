@@ -1,16 +1,16 @@
-package net.bytten.metazelda;
+package net.bytten.metazelda.viewer;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
-import net.bytten.metazelda.algo.Bounds;
-import net.bytten.metazelda.algo.Coords;
-import net.bytten.metazelda.algo.Direction;
-import net.bytten.metazelda.algo.Dungeon;
-import net.bytten.metazelda.algo.Edge;
-import net.bytten.metazelda.algo.Room;
+import net.bytten.metazelda.Bounds;
+import net.bytten.metazelda.Coords;
+import net.bytten.metazelda.Direction;
+import net.bytten.metazelda.Dungeon;
+import net.bytten.metazelda.Edge;
+import net.bytten.metazelda.Room;
 
 public class DungeonView {
 

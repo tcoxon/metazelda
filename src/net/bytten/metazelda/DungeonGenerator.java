@@ -1,4 +1,4 @@
-package net.bytten.metazelda.algo;
+package net.bytten.metazelda;
 
 import java.util.Random;
 
