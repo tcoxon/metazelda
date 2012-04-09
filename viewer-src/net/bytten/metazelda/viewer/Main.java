@@ -8,11 +8,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import net.bytten.metazelda.Dungeon;
 import net.bytten.metazelda.DungeonGenerator;
 import net.bytten.metazelda.LennasDungeonGenerator;
 
@@ -24,8 +25,11 @@ public class Main extends JPanel {
     protected Graphics2D bufferG;
     protected Dimension bufferDim;
     
-    protected Dungeon dungeon;
+    protected DungeonGenerator dungeonGen;
     protected DungeonView dungeonView;
+    
+    protected Thread generatorThread;
+    protected Timer repaintTimer;
     
     protected String[] args;
     
@@ -34,6 +38,14 @@ public class Main extends JPanel {
         this.args = args;
         regenerate(getSeed(args));
         dungeonView = new DungeonView();
+        
+        repaintTimer = new Timer();
+        repaintTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                repaint();
+            }
+        }, 0, 200);
     }
     
     protected DungeonGenerator makeDungeonGenerator(long seed) {
@@ -45,10 +57,18 @@ public class Main extends JPanel {
         return new DungeonGenerator(seed);
     }
     
-    public void regenerate(long seed) {
-        System.out.println("Seed: "+seed);
-        DungeonGenerator gen = makeDungeonGenerator(seed);
-        dungeon = gen.generate();
+    public void regenerate(final long seed) {
+        if (generatorThread == null) {
+            generatorThread = new Thread() {
+                public void run() {
+                    System.out.println("Seed: "+seed);
+                    dungeonGen = makeDungeonGenerator(seed);
+                    dungeonGen.generate();
+                    generatorThread = null;
+                }
+            };
+            generatorThread.start();
+        }
     }
     
     @Override
@@ -58,7 +78,9 @@ public class Main extends JPanel {
         bufferG.setColor(Color.WHITE);
         bufferG.fillRect(0, 0, bufferDim.width, bufferDim.height);
         
-        dungeonView.draw(bufferG, bufferDim, dungeon);
+        if (dungeonGen != null && dungeonGen.getDungeon() != null) {
+            dungeonView.draw(bufferG, bufferDim, dungeonGen.getDungeon());
+        }
         
         // Double-buffered drawing
         g.drawImage(buffer, 0, 0, this);
@@ -99,12 +121,11 @@ public class Main extends JPanel {
                     System.exit(0);
                 else if (e.getKeyCode() == KeyEvent.VK_F5) {
                     panel.regenerate(new Random().nextLong());
-                    panel.repaint();
                 }
             }
 
         });
-
+        
         frame.setVisible(true);
     }
     

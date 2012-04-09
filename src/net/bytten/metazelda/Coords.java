@@ -59,4 +59,7 @@ public class Coords implements Comparable<Coords> {
         throw new RuntimeException("Coords do not align in one dimension, or are equal");
     }
     
+    public String toString() {
+        return x+","+y;
+    }
 }
