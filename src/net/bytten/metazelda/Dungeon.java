@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class Dungeon {
@@ -40,13 +41,13 @@ public class Dungeon {
     public Symbol makeNewItem() {
         return new Symbol(itemCount++);
     }
+    
     public int itemCount() {
         return itemCount;
     }
-    public Symbol getRandomPlacedItem(Random rand) {
-        if (placedItems.size() == 0) return null;
-        return new ArrayList<Symbol>(placedItems.keySet())
-            .get(rand.nextInt(placedItems.size()));
+    
+    public Set<Symbol> getPlacedItems() {
+        return placedItems.keySet();
     }
     
     public int roomCount() {
@@ -120,34 +121,18 @@ public class Dungeon {
         }
     }
     
-    private Room randBoundaryX(Random rand, Map<Integer,Integer> xmap) {
-        List<Integer> keys = new ArrayList<Integer>(xmap.keySet());
-        int y = keys.get(rand.nextInt(keys.size())),
-            x = xmap.get(y);
-        return get(x,y);
-    }
-    
-    private Room randBoundaryY(Random rand, Map<Integer,Integer> ymap) {
-        List<Integer> keys = new ArrayList<Integer>(ymap.keySet());
-        int x = keys.get(rand.nextInt(keys.size())),
-            y = ymap.get(x);
-        return get(x,y);
-    }
-    
-    public Room getRandomExternalRoom(Random rand) {
-        // All this boundary stuff is a big hack.
-        // Min and Max of each dimension are kept in maps. A random map is
-        // selected, and from that a random key,value pair that represents a
-        // pair of coordinates.
-        if (roomCount() <= 0) return null;
-        switch (rand.nextInt(4)) {
-        case 0: return randBoundaryX(rand, minX);
-        case 1: return randBoundaryX(rand, maxX);
-        case 2: return randBoundaryY(rand, minY);
-        case 3: return randBoundaryY(rand, maxY);
-        default:
-            throw new RuntimeException("The laws of probability have been rewritten");
-        }
+    public List<Room> computeBoundaryRooms() {
+        List<Room> result = new ArrayList<Room>(
+                minX.size()+maxX.size()+minY.size()+maxY.size());
+        for (int y: minX.keySet())
+            result.add(get(minX.get(y), y));
+        for (int y: maxX.keySet())
+            result.add(get(maxX.get(y), y));
+        for (int x: minY.keySet())
+            result.add(get(x, minY.get(x)));
+        for (int x: maxY.keySet())
+            result.add(get(x, maxY.get(x)));
+        return result;
     }
     
     public void linkOneWay(Room room1, Room room2) {

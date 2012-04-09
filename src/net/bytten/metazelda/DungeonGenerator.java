@@ -1,6 +1,9 @@
 package net.bytten.metazelda;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class DungeonGenerator {
     
@@ -38,7 +41,7 @@ public class DungeonGenerator {
             addItemPath(elem);
         } else if (chooseReuseItem()) {
             // make the condition one which we've used before
-            Symbol elem = dungeon.getRandomPlacedItem(rand);
+            Symbol elem = choosePlacedItem();
             if (elem != null)
                 cond = new Condition(elem);
         }
@@ -58,7 +61,7 @@ public class DungeonGenerator {
         
         if (locRoom == null || locD == null) {
             // Choose an existing room with a free edge
-            locRoom  = dungeon.getRandomExternalRoom(rand);
+            locRoom  = chooseExistingRoom();
             locD = dungeon.getRandomAdjacentSpaceDirection(rand, locRoom);
         }
         
@@ -98,6 +101,18 @@ public class DungeonGenerator {
     
     protected boolean chooseLinkNeighborOneWay(Room room, Room neighbor) {
         return getRandom().nextFloat() < 0.3;
+    }
+    
+    public Symbol choosePlacedItem() {
+        Set<Symbol> placedItems = dungeon.getPlacedItems();
+        if (placedItems.size() == 0) return null;
+        return new ArrayList<Symbol>(placedItems)
+            .get(getRandom().nextInt(placedItems.size()));
+    }
+    
+    public Room chooseExistingRoom() {
+        List<Room> rooms = dungeon.computeBoundaryRooms();
+        return rooms.get(getRandom().nextInt(rooms.size()));
     }
     
     protected void linkNeighbors(Room room) {
