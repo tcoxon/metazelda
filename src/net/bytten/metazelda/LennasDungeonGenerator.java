@@ -13,20 +13,60 @@ public class LennasDungeonGenerator extends DungeonGenerator {
     public LennasDungeonGenerator(long seed) {
         super(seed);
     }
+    
+    private float computeSpaceChoiceProbFactor(Room room, Coords xy) {
+        int x = Math.abs(xy.x),
+            y = Math.abs(xy.y);
+        if (x < Math.abs(room.coords.x)) x = 0;
+        if (y < Math.abs(room.coords.y)) y = 0;
+        int dist = Math.max(x, y);
+        return 1.0f / (2*dist + 1.0f);
+    }
 
     @Override
     protected Integer chooseAdjacentSpace(Room room) {
-        return super.chooseAdjacentSpace(room);
+        // Choose a random direction, but bias it so that we stay near 0,0
+        float dirs[] = new float[Direction.NUM_DIRS];
+        float sum = 0.0f;
+        boolean atLeastOne = false;
+        for (int d = 0; d < dirs.length; ++d) {
+            Coords xy = room.coords.nextInDirection(d);
+            if (newRoomAllowedInSpace(xy)) {
+                float val = computeSpaceChoiceProbFactor(room, xy);
+                dirs[d] = val;
+                sum += val;
+                atLeastOne = true;
+            } else {
+                dirs[d] = 0.0f;
+            }
+        }
+        if (!atLeastOne) return null;
+        for (int d = 0; d < dirs.length; ++d) {
+            dirs[d] /= sum;
+        }
+        float p = getRandom().nextFloat();
+        float x = 0.0f;
+        int d = 0;
+        while (d < dirs.length) {
+            x += dirs[d];
+            if (x > p) {
+                return d;
+            }
+            ++d;
+        }
+        return null;
     }
 
     @Override
     protected boolean chooseCreateNewItem() {
+        // choose probabilities to aim towards a specific number of keys
         return getRandom().nextFloat() <
             1.0f - (float)dungeon.itemCount() / (float)getNumKeys();
     }
     
     @Override
     protected boolean chooseCreatePaddingRoom(int depth) {
+        // choose probabilities to aim towards a specific number of rooms
         return depth < 3 && getRandom().nextFloat() <
             1.0f - (float)dungeon.roomCount() / (float)getTargetRoomCount();
     }
