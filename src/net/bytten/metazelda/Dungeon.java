@@ -10,7 +10,6 @@ import java.util.TreeMap;
 
 public class Dungeon {
 
-    protected long seed;
     protected int itemCount;
     protected Map<Coords, Room> rooms;
     protected Bounds bounds;
@@ -19,11 +18,10 @@ public class Dungeon {
     // Used for getting external rooms:
     protected Map<Integer, Integer> minX, maxX, minY, maxY;
     
-    public Dungeon(long seed) {
+    public Dungeon() {
         rooms = new TreeMap<Coords, Room>();
         bounds = new Bounds(0,0,0,0);
         placedItems = new HashMap<Symbol, Condition>();
-        this.seed = seed;
         
         minX = new HashMap<Integer,Integer>();
         maxX = new HashMap<Integer,Integer>();
@@ -192,7 +190,7 @@ public class Dungeon {
     }
     
     public static Dungeon makeTestDungeon() {
-        Dungeon dungeon = new Dungeon(0);
+        Dungeon dungeon = new Dungeon();
         
         Symbol key = dungeon.makeNewItem(),
             feather = dungeon.makeNewItem(),
@@ -231,7 +229,4 @@ public class Dungeon {
         return dungeon;
     }
 
-    public long getSeed() {
-        return seed;
-    }
 }

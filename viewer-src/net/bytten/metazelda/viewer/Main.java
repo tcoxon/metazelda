@@ -35,7 +35,9 @@ public class Main extends JPanel {
     
     public void regenerate(long seed) {
         System.out.println("Seed: "+seed);
-        dungeon = DungeonGenerator.generate(seed);
+        DungeonGenerator gen = new DungeonGenerator(seed);
+        gen.generate();
+        dungeon = gen.getDungeon();
     }
     
     @Override
