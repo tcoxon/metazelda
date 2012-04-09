@@ -35,6 +35,15 @@ public class Room {
         return edges[d];
     }
     
+    public int linkCount() {
+        int result = 0;
+        for (int d = 0; d < Direction.NUM_DIRS; ++d) {
+            if (edges[d] != null)
+                ++result;
+        }
+        return result;
+    }
+    
     public boolean isStart() {
         return item != null && item.isStart();
     }

@@ -101,11 +101,33 @@ public class LennasDungeonGenerator extends DungeonGenerator {
         return super.chooseReuseItem();
     }
     
+    protected float measureLinearity() {
+        // Crudely measure linearity so we can generate more interesting
+        // dungeons
+        int linRooms = 0, allRooms = 0;
+        for (Room room: dungeon.getRooms()) {
+            ++allRooms;
+            if (room.linkCount() < 3) {
+                ++linRooms;
+            }
+        }
+        return (float)linRooms / (float)allRooms;
+    }
+    
+    // Obtained through several experiments. Designs with linearity > 0.7 tend
+    // to be boring. Designs with linearity < 0.7 are more interesting.
+    public static final float MAX_LINEARITY = 0.7f;
+    
     public boolean desirable() {
-        return dungeon != null &&
-            dungeon.itemCount() == getNumKeys() &&
+        if (dungeon == null) return false;
+        
+        float linearity = measureLinearity();
+        System.out.println("Design linearity: "+linearity);
+        
+        return dungeon.itemCount() == getNumKeys() &&
             dungeon.roomCount() >= getTargetRoomCount() * 0.75 &&
-            dungeon.roomCount() <= getTargetRoomCount() * 1.25;
+            dungeon.roomCount() <= getTargetRoomCount() * 1.25 &&
+            measureLinearity() < MAX_LINEARITY;
     }
 
     @Override
