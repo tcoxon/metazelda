@@ -157,6 +157,12 @@ public class Dungeon {
         room2.getEdges()[Direction.oppositeDirection(d)] = new Edge(cond);
     }
     
+    public boolean roomsAreLinked(Room room1, Room room2) {
+        int d = room1.coords.getDirectionTo(room2.coords);
+        return room1.getEdge(d) != null ||
+            room2.getEdge(Direction.oppositeDirection(d)) != null;
+    }
+    
     public static Dungeon makeTestDungeon() {
         Dungeon dungeon = new Dungeon();
         

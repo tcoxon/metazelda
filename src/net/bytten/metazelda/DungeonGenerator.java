@@ -76,8 +76,10 @@ public class DungeonGenerator {
         // Finally create the new room and link it to the parent room
         Room room = new Room(locRoom.coords.nextInDirection(locD),
                 item, precond);
-        dungeon.add(room);
-        dungeon.link(locRoom, room, cond);
+        synchronized (dungeon) {
+            dungeon.add(room);
+            dungeon.link(locRoom, room, cond);
+        }
         
         linkNeighbors(room);
         
@@ -90,18 +92,23 @@ public class DungeonGenerator {
         // for each neighboring room:
         for (int d = 0; d < Direction.NUM_DIRS; ++d) {
             Room neighbor = dungeon.get(room.coords.nextInDirection(d));
-            if (neighbor == null) continue;
+            if (neighbor == null || dungeon.roomsAreLinked(room, neighbor))
+                continue;
             
             if (precond.equals(neighbor.getPrecond())) {
                 // these two rooms have equivalent preconditions -- linking both
                 // ways will not break any puzzles
-                dungeon.link(room, neighbor);
+                synchronized (dungeon) {
+                    dungeon.link(room, neighbor);
+                }
             } else if (precond.implies(neighbor.getPrecond())) {
                 if (chooseLinkNeighborOneWay(room, neighbor)) {
                     // link from the new room to the neighbor. A link that way
                     // won't break any puzzles, but a link back the other way
                     // would!
-                    dungeon.linkOneWay(room, neighbor);
+                    synchronized (dungeon) {
+                        dungeon.linkOneWay(room, neighbor);
+                    }
                 }
             }
         }
@@ -115,7 +122,7 @@ public class DungeonGenerator {
     }
     
     protected boolean chooseReuseItem() {
-        return true;//getRandom().nextFloat() < 0.7;
+        return getRandom().nextFloat() < 0.3;
     }
     
     protected boolean chooseCreatePaddingRoom() {

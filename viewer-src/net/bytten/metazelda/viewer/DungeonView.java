@@ -120,20 +120,22 @@ public class DungeonView {
         AffineTransform origXfm = g.getTransform();
         
         // Figure out scale & translation to draw the dungeon at
-        Bounds bounds = dungeon.getBounds();
-        double scale = Math.min(((double)dim.width) / bounds.width(),
-                ((double)dim.height) / bounds.height());
-        // move the graph into view
-        g.translate(-scale * bounds.left, -scale * bounds.top);
-        
-        for (Room room: dungeon.getRooms()) {
-            // draw the edges between rooms
-            drawEdges(g, scale, dungeon, room);
-        }
-        
-        for (Room room: dungeon.getRooms()) {
-            // Draw the room
-            drawRoom(g, scale, room);
+        synchronized (dungeon) {
+            Bounds bounds = dungeon.getBounds();
+            double scale = Math.min(((double)dim.width) / bounds.width(),
+                    ((double)dim.height) / bounds.height());
+            // move the graph into view
+            g.translate(-scale * bounds.left, -scale * bounds.top);
+            
+            for (Room room: dungeon.getRooms()) {
+                // draw the edges between rooms
+                drawEdges(g, scale, dungeon, room);
+            }
+            
+            for (Room room: dungeon.getRooms()) {
+                // Draw the room
+                drawRoom(g, scale, room);
+            }
         }
         
         g.setTransform(origXfm);
