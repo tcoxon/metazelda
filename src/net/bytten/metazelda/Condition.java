@@ -21,6 +21,10 @@ public class Condition {
         this.symbols = new HashSet<Symbol>(other.symbols);
     }
     
+    public Set<Symbol> getSymbols() {
+        return symbols;
+    }
+    
     @Override
     public boolean equals(Object other) {
         if (other instanceof Condition) {

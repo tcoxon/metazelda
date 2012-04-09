@@ -13,7 +13,7 @@ public class Edge {
     }
     
     public boolean hasCondition() {
-        return condition != null;
+        return condition != null && condition.getSymbols().size() > 0;
     }
     
     public Condition getCondition() {
