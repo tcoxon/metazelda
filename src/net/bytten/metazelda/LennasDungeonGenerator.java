@@ -1,5 +1,8 @@
 package net.bytten.metazelda;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LennasDungeonGenerator extends DungeonGenerator {
 
     // Red key, Green key, Blue key, Equipment (Spring)
@@ -30,7 +33,15 @@ public class LennasDungeonGenerator extends DungeonGenerator {
 
     @Override
     protected Room chooseExistingRoom() {
-        return super.chooseExistingRoom();
+        List<Room> rooms = dungeon.computeBoundaryRooms();
+        List<Room> filtered = new ArrayList<Room>(rooms.size());
+        for (Room room: rooms) {
+            if (room.coords.y < 0)
+                filtered.add(room);
+        }
+        if (filtered.size() == 0)
+            filtered.add(dungeon.get(0,0));
+        return filtered.get(getRandom().nextInt(filtered.size()));
     }
 
     @Override
@@ -80,6 +91,11 @@ public class LennasDungeonGenerator extends DungeonGenerator {
 
     public void setTargetRoomCount(int targetRoomCount) {
         this.targetRoomCount = targetRoomCount;
+    }
+
+    @Override
+    protected boolean newRoomAllowedInSpace(Coords xy) {
+        return super.newRoomAllowedInSpace(xy) && xy.y <= 0;
     }
 
 }

@@ -145,18 +145,22 @@ public class DungeonGenerator {
         return rooms.get(getRandom().nextInt(rooms.size()));
     }
     
+    protected boolean newRoomAllowedInSpace(Coords xy) {
+        return dungeon.get(xy) == null;
+    }
+    
     protected Integer chooseAdjacentSpace(Room room) {
         // Return a random direction of travel from room to an adjacent empty
         // space, or null if there are no nearby spaces
         int d = getRandom().nextInt(Direction.NUM_DIRS),
             tries = 0;
         Coords xy = room.coords.nextInDirection(d);
-        while (dungeon.get(xy) != null && tries < Direction.NUM_DIRS) {
+        while (!newRoomAllowedInSpace(xy) && tries < Direction.NUM_DIRS) {
             d = (d+1) % Direction.NUM_DIRS;
             ++tries;
             xy = room.coords.nextInDirection(d);
         }
-        if (dungeon.get(xy) == null)
+        if (newRoomAllowedInSpace(xy))
             return d;
         return null;
     }
