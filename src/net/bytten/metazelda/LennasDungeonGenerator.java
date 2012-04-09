@@ -86,8 +86,9 @@ public class LennasDungeonGenerator extends DungeonGenerator {
 
     @Override
     protected boolean chooseLinkNeighborOneWay(Room room, Room neighbor) {
-        return !room.isGoal() && !neighbor.isGoal() &&
-                super.chooseLinkNeighborOneWay(room, neighbor);
+        // TODO disabled because Lenna's Inception does not have a mechanism for
+        // this yet.
+        return false;
     }
 
     @Override
