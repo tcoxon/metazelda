@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 
 import net.bytten.metazelda.Dungeon;
 import net.bytten.metazelda.DungeonGenerator;
+import net.bytten.metazelda.LennasDungeonGenerator;
 
 
 public class Main extends JPanel {
@@ -26,18 +27,28 @@ public class Main extends JPanel {
     protected Dungeon dungeon;
     protected DungeonView dungeonView;
     
-    public Main(long seed) {
+    protected String[] args;
+    
+    public Main(String[] args) {
         super();
-        regenerate(seed);
+        this.args = args;
+        regenerate(getSeed(args));
         dungeonView = new DungeonView();
-        
+    }
+    
+    protected DungeonGenerator makeDungeonGenerator(long seed) {
+        for (String arg: args) {
+            if ("-lenna".equals(arg)) {
+                return new LennasDungeonGenerator(seed);
+            }
+        }
+        return new DungeonGenerator(seed);
     }
     
     public void regenerate(long seed) {
         System.out.println("Seed: "+seed);
-        DungeonGenerator gen = new DungeonGenerator(seed);
-        gen.generate();
-        dungeon = gen.getDungeon();
+        DungeonGenerator gen = makeDungeonGenerator(seed);
+        dungeon = gen.generate();
     }
     
     @Override
@@ -74,7 +85,7 @@ public class Main extends JPanel {
     // main -------------------------------------------------------------------
     public static void main(String[] args) {
         final JFrame frame = new JFrame();
-        final Main panel = new Main(getSeed(args));
+        final Main panel = new Main(args);
         panel.setPreferredSize(new Dimension(640, 480));
         frame.setContentPane(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -8,7 +8,7 @@ import java.util.Set;
 public class DungeonGenerator {
     
     private Random random;
-    private Dungeon dungeon;
+    protected Dungeon dungeon;
     
     public DungeonGenerator(long seed) {
         random = new Random(seed);
@@ -102,19 +102,19 @@ public class DungeonGenerator {
         return getRandom().nextFloat() < 0.3;
     }
     
-    public Symbol choosePlacedItem() {
+    protected Symbol choosePlacedItem() {
         Set<Symbol> placedItems = dungeon.getPlacedItems();
         if (placedItems.size() == 0) return null;
         return new ArrayList<Symbol>(placedItems)
             .get(getRandom().nextInt(placedItems.size()));
     }
     
-    public Room chooseExistingRoom() {
+    protected Room chooseExistingRoom() {
         List<Room> rooms = dungeon.computeBoundaryRooms();
         return rooms.get(getRandom().nextInt(rooms.size()));
     }
     
-    public Integer chooseAdjacentSpace(Room room) {
+    protected Integer chooseAdjacentSpace(Room room) {
         // Return a random direction of travel from room to an adjacent empty
         // space, or null if there are no nearby spaces
         int d = getRandom().nextInt(Direction.NUM_DIRS),
