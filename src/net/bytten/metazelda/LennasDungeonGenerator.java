@@ -2,6 +2,7 @@ package net.bytten.metazelda;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class LennasDungeonGenerator extends DungeonGenerator {
 
@@ -12,6 +13,10 @@ public class LennasDungeonGenerator extends DungeonGenerator {
     
     public LennasDungeonGenerator(long seed) {
         super(seed);
+    }
+    
+    public LennasDungeonGenerator(Random random) {
+        super(random);
     }
     
     private float computeSpaceChoiceProbFactor(Room room, Coords xy) {

@@ -14,6 +14,10 @@ public class DungeonGenerator {
         random = new Random(seed);
     }
     
+    public DungeonGenerator(Random random) {
+        this.random = random;
+    }
+    
     protected Random getRandom() {
         return random;
     }
