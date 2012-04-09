@@ -1,7 +1,5 @@
 package net.bytten.metazelda;
 
-import java.util.Random;
-
 public class Room {
 
     public Condition precond;
@@ -45,19 +43,6 @@ public class Room {
         return item != null && item.isGoal();
     }
     
-    public Integer getRandomFreeEdgeDirection(Random rand) {
-        // Return a random direction for which there is no outgoing edge in the room
-        int d = rand.nextInt(Direction.NUM_DIRS),
-            tries = 0;
-        while (edges[d] != null && tries < Direction.NUM_DIRS){
-            d = (d+1) % Direction.NUM_DIRS;
-            ++tries;
-        }
-        if (edges[d] == null)
-            return d;
-        return null;
-    }
-
     public Condition getPrecond() {
         return precond;
     }
