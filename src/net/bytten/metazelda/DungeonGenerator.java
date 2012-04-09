@@ -4,8 +4,6 @@ import java.util.Random;
 
 public class DungeonGenerator {
     
-    public static final int MAX_ELEMS = 26;
-    
     private Random random;
     private Dungeon dungeon;
     
@@ -23,9 +21,9 @@ public class DungeonGenerator {
 
     // The actual core algorithm from
     //     http://bytten.net/devlog/tag/metazelda/
-    // Lines marked with XXX are where tweakable probabilities are. Play around
-    // with them to see if you can generate better dungeons.
-    public Room addItemPath(Dungeon dungeon, Symbol item) {
+    // The choose* methods below control the decisions the algorithm makes.
+    // Try tweaking the probabilities to see if you can produce better dungeons.
+    public Room addItemPath(Symbol item) {
         // Add a new room to the dungeon containing the given item. Conditions
         // to enter the room are randomly generated, and if requiring a new item
         // in the dungeon, will cause other rooms to be added, too.
@@ -33,13 +31,12 @@ public class DungeonGenerator {
         Random rand = getRandom();
         
         // Choose condition to enter the room
-        float r = rand.nextFloat();
-        if (dungeon.itemCount() < MAX_ELEMS && r < 0.2) {       // XXX
+        if (chooseCreateNewItem()) {
             // create a new condition and item for it
             Symbol elem = dungeon.makeNewItem();
             cond = new Condition(elem);
-            addItemPath(dungeon, elem);
-        } else if (r < 0.6) {                                   // XXX
+            addItemPath(elem);
+        } else if (chooseReuseItem()) {
             // make the condition one which we've used before
             Symbol elem = dungeon.getRandomPlacedItem(rand);
             if (elem != null)
@@ -49,11 +46,10 @@ public class DungeonGenerator {
         // Choose where to place the new room
         Room locRoom = null;
         Integer locD = null;
-        r = rand.nextFloat();
-        if (dungeon.roomCount() < 20 && r < 0.7) {              // XXX
+        if (chooseCreatePaddingRoom()) {
             // Add padding rooms (and potentially more conditions and branches
             // along the way)
-            locRoom = addItemPath(dungeon, null);
+            locRoom = addItemPath(null);
             locD = dungeon.getRandomAdjacentSpaceDirection(rand, locRoom);
             // addItemPath can create a room with no adjacent spaces, so
             // loc.second (the direction to add the new room in) might still be
@@ -81,14 +77,31 @@ public class DungeonGenerator {
         dungeon.add(room);
         dungeon.link(locRoom, room, cond);
         
-        linkNeighbors(dungeon, room);
+        linkNeighbors(room);
         
         return room;
     }
     
-    protected void linkNeighbors(Dungeon dungeon, Room room) {
+    private static final int MAX_ELEMS = 26;
+    
+    protected boolean chooseCreateNewItem() {
+        return dungeon.itemCount() < MAX_ELEMS && getRandom().nextFloat() < 0.2;
+    }
+    
+    protected boolean chooseReuseItem() {
+        return getRandom().nextFloat() < 0.4;
+    }
+    
+    protected boolean chooseCreatePaddingRoom() {
+        return dungeon.roomCount() < 20 && getRandom().nextFloat() < 0.7;
+    }
+    
+    protected boolean chooseLinkNeighborOneWay(Room room, Room neighbor) {
+        return getRandom().nextFloat() < 0.3;
+    }
+    
+    protected void linkNeighbors(Room room) {
         Condition precond = room.getPrecond();
-        Random rand = getRandom();
         
         // for each neighboring room:
         for (int d = 0; d < Direction.NUM_DIRS; ++d) {
@@ -100,7 +113,7 @@ public class DungeonGenerator {
                 // ways will not break any puzzles
                 dungeon.link(room, neighbor);
             } else if (precond.implies(neighbor.getPrecond())) {
-                if (rand.nextFloat() < 0.3) {                // XXX
+                if (chooseLinkNeighborOneWay(room, neighbor)) {
                     // link from the new room to the neighbor. A link that way
                     // won't break any puzzles, but a link back the other way
                     // would!
@@ -117,7 +130,7 @@ public class DungeonGenerator {
         startRoom.setItem(new Symbol(Symbol.START));
         dungeon.add(startRoom);
         
-        addItemPath(dungeon, new Symbol(Symbol.GOAL));
+        addItemPath(new Symbol(Symbol.GOAL));
         
         return dungeon;
     }
