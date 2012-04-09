@@ -84,52 +84,6 @@ public class DungeonGenerator {
         return room;
     }
     
-    private static final int MAX_ELEMS = 26;
-    
-    protected boolean chooseCreateNewItem() {
-        return dungeon.itemCount() < MAX_ELEMS && getRandom().nextFloat() < 0.2;
-    }
-    
-    protected boolean chooseReuseItem() {
-        return getRandom().nextFloat() < 0.4;
-    }
-    
-    protected boolean chooseCreatePaddingRoom() {
-        return dungeon.roomCount() < 20 && getRandom().nextFloat() < 0.7;
-    }
-    
-    protected boolean chooseLinkNeighborOneWay(Room room, Room neighbor) {
-        return getRandom().nextFloat() < 0.3;
-    }
-    
-    protected Symbol choosePlacedItem() {
-        Set<Symbol> placedItems = dungeon.getPlacedItems();
-        if (placedItems.size() == 0) return null;
-        return new ArrayList<Symbol>(placedItems)
-            .get(getRandom().nextInt(placedItems.size()));
-    }
-    
-    protected Room chooseExistingRoom() {
-        List<Room> rooms = dungeon.computeBoundaryRooms();
-        return rooms.get(getRandom().nextInt(rooms.size()));
-    }
-    
-    protected Integer chooseAdjacentSpace(Room room) {
-        // Return a random direction of travel from room to an adjacent empty
-        // space, or null if there are no nearby spaces
-        int d = getRandom().nextInt(Direction.NUM_DIRS),
-            tries = 0;
-        Coords xy = room.coords.nextInDirection(d);
-        while (dungeon.get(xy) != null && tries < Direction.NUM_DIRS) {
-            d = (d+1) % Direction.NUM_DIRS;
-            ++tries;
-            xy = room.coords.nextInDirection(d);
-        }
-        if (dungeon.get(xy) == null)
-            return d;
-        return null;
-    }
-    
     protected void linkNeighbors(Room room) {
         Condition precond = room.getPrecond();
         
@@ -152,6 +106,52 @@ public class DungeonGenerator {
             }
         }
         
+    }
+    
+    private static final int MAX_ELEMS = 26;
+    
+    protected boolean chooseCreateNewItem() {
+        return dungeon.itemCount() < MAX_ELEMS && getRandom().nextFloat() < 0.2;
+    }
+    
+    protected boolean chooseReuseItem() {
+        return true;//getRandom().nextFloat() < 0.7;
+    }
+    
+    protected boolean chooseCreatePaddingRoom() {
+        return dungeon.roomCount() < 20 && getRandom().nextFloat() < 0.7;
+    }
+    
+    protected boolean chooseLinkNeighborOneWay(Room room, Room neighbor) {
+        return getRandom().nextFloat() < 0.3;
+    }
+    
+    protected Symbol choosePlacedItem() {
+        Set<Symbol> placedItems = dungeon.getPlacedItems();
+        if (placedItems.size() == 0) return null;
+        int i = getRandom().nextInt(placedItems.size());
+        return new ArrayList<Symbol>(placedItems).get(i);
+    }
+    
+    protected Room chooseExistingRoom() {
+        List<Room> rooms = dungeon.computeBoundaryRooms();
+        return rooms.get(getRandom().nextInt(rooms.size()));
+    }
+    
+    protected Integer chooseAdjacentSpace(Room room) {
+        // Return a random direction of travel from room to an adjacent empty
+        // space, or null if there are no nearby spaces
+        int d = getRandom().nextInt(Direction.NUM_DIRS),
+            tries = 0;
+        Coords xy = room.coords.nextInDirection(d);
+        while (dungeon.get(xy) != null && tries < Direction.NUM_DIRS) {
+            d = (d+1) % Direction.NUM_DIRS;
+            ++tries;
+            xy = room.coords.nextInDirection(d);
+        }
+        if (dungeon.get(xy) == null)
+            return d;
+        return null;
     }
     
     public Dungeon generate() {
