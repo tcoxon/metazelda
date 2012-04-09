@@ -44,9 +44,10 @@ public class DungeonGenerator {
         } else if (chooseReuseItem()) {
             // make the condition one which we've used before
             Symbol elem = choosePlacedItem();
-            if (elem != null)
+            if (elem != null) {
                 cond = new Condition(elem);
-            depth = 0;
+                depth = 0;
+            }
         }
         
         // Choose where to place the new room
