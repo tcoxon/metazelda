@@ -6,9 +6,24 @@ public class Symbol {
         GOAL = -2;
 
     protected final int value;
+    protected final String name;
     
-    public Symbol(int x) {
-        value = x;
+    public Symbol(int value) {
+        this.value = value;
+        
+        if (value == START)
+            name = "Start";
+        else if (value == GOAL)
+            name = "Goal";
+        else if (value >= 0 && value < 26)
+            name = Character.toString((char)((int)'A' + value));
+        else
+            name = Integer.toString(value);
+    }
+    
+    public Symbol(int value, String name) {
+        this.value = value;
+        this.name = name;
     }
     
     @Override
@@ -39,13 +54,7 @@ public class Symbol {
     
     @Override
     public String toString() {
-        if (value == START)
-            return "Start";
-        if (value == GOAL)
-            return "Goal";
-        if (value < 26)
-            return Character.toString((char)((int)'A' + value));
-        return Integer.toString(value);
+        return name;
     }
     
 }
