@@ -110,33 +110,40 @@ public class LennasDungeonGenerator extends DungeonGenerator {
         return super.chooseReuseItem();
     }
     
-    protected float measureLinearity() {
+    protected float measureLayoutLinearity() {
         // Crudely measure linearity so we can generate more interesting
         // dungeons
-        int linRooms = 0, allRooms = 0;
+        float linearity = 0.0f, max = 0.0f;
         for (Room room: dungeon.getRooms()) {
-            ++allRooms;
+            max += 1;
             if (room.linkCount() < 3) {
-                ++linRooms;
+                linearity += 1.0f;
             }
         }
-        return (float)linRooms / (float)allRooms;
+        linearity /= max;
+        System.out.println("Design layout linearity: "+linearity);
+        return linearity;
+    }
+    
+    protected float measurePlaythroughNonlinearity() {
+        // TODO
+        return 0.0f;
     }
     
     // Obtained through several experiments. Designs with linearity > 0.7 tend
     // to be boring. Designs with linearity < 0.7 are more interesting.
-    public static final float MAX_LINEARITY = 0.7f;
+    public static final float
+        MAX_LAYOUT_LINEARITY = 0.7f,
+        MAX_PLAYTHROUGH_NONLINEARITY = 1.0f;
     
     public boolean desirable() {
         if (dungeon == null || abort) return false;
         
-        float linearity = measureLinearity();
-        System.out.println("Design linearity: "+linearity);
-        
         return dungeon.itemCount() == getNumKeys() &&
             dungeon.roomCount() >= getTargetRoomCount() * 0.75 &&
             dungeon.roomCount() <= getTargetRoomCount() * 1.25 &&
-            measureLinearity() < MAX_LINEARITY;
+            measureLayoutLinearity() < MAX_LAYOUT_LINEARITY &&
+            measurePlaythroughNonlinearity() < MAX_PLAYTHROUGH_NONLINEARITY;
     }
 
     @Override
