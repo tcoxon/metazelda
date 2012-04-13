@@ -8,8 +8,8 @@ import java.util.Set;
 public class DungeonGenerator {
     
     public static final double
-            INTENSITY_RATE = 1.2,
-            INTENSITY_DROP = 0.8;
+            INTENSITY_RATE = 1.0,
+            INTENSITY_DROP = -1.5;
     
     private Random random;
     protected Dungeon dungeon;
@@ -107,9 +107,9 @@ public class DungeonGenerator {
         Symbol item = room.getItem();
         room.setIntensity(currentIntensity);
         if (item != null) {
-            currentIntensity *= INTENSITY_DROP;
+            currentIntensity += INTENSITY_DROP;
         } else {
-            currentIntensity *= INTENSITY_RATE;
+            currentIntensity += INTENSITY_RATE;
         }
     }
     
