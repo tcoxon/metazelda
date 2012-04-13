@@ -7,8 +7,13 @@ import java.util.Set;
 
 public class DungeonGenerator {
     
+    public static final double
+            INTENSITY_RATE = 1.2,
+            INTENSITY_DROP = 0.8;
+    
     private Random random;
     protected Dungeon dungeon;
+    protected double currentIntensity;
     
     public DungeonGenerator(long seed) {
         random = new Random(seed);
@@ -85,6 +90,9 @@ public class DungeonGenerator {
         // Finally create the new room and link it to the parent room
         Room room = new Room(locRoom.coords.nextInDirection(locD),
                 item, precond);
+
+        updateIntensity(room);
+        
         synchronized (dungeon) {
             dungeon.add(room);
             dungeon.link(locRoom, room, cond);
@@ -93,6 +101,16 @@ public class DungeonGenerator {
         linkNeighbors(room);
         
         return room;
+    }
+    
+    protected void updateIntensity(Room room) {
+        Symbol item = room.getItem();
+        room.setIntensity(currentIntensity);
+        if (item != null) {
+            currentIntensity *= INTENSITY_DROP;
+        } else {
+            currentIntensity *= INTENSITY_RATE;
+        }
     }
     
     protected void linkNeighbors(Room room) {
@@ -174,13 +192,28 @@ public class DungeonGenerator {
         return null;
     }
     
+    protected void normalizeIntensity() {
+        double max = 0.0, min = Double.POSITIVE_INFINITY;
+        for (Room room: dungeon.getRooms()) {
+            max = Math.max(room.getIntensity(), max);
+            min = Math.min(room.getIntensity(), min);
+        }
+        for (Room room: dungeon.getRooms()) {
+            room.setIntensity((room.getIntensity() - min) / (max - min));
+        }
+    }
+    
     public Dungeon generate() {
         dungeon = new Dungeon();
         Room startRoom = new Room(0,0, null, new Condition());
         startRoom.setItem(new Symbol(Symbol.START));
         dungeon.add(startRoom);
         
+        currentIntensity = 1.0;
+        
         addItemPath(new Symbol(Symbol.GOAL), 0);
+        
+        normalizeIntensity();
         
         return dungeon;
     }

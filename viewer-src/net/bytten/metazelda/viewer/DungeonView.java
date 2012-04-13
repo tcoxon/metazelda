@@ -19,7 +19,18 @@ public class DungeonView {
         int cx = (int)(room.coords.x * scale + scale/2),
             cy = (int)(room.coords.y * scale + scale/2);
         
+        g.setColor(Color.getHSBColor(0.6f - (float)room.getIntensity()*0.6f,
+                0.7f, 1.0f));
+        
+        g.fillOval((int)(cx - scale*0.25),
+                (int)(cy - scale*0.25),
+                (int)(scale/2), (int)(scale/2));
+        
         g.setColor(Color.BLACK);
+        
+        g.drawOval((int)(cx - scale*0.25),
+                (int)(cy - scale*0.25),
+                (int)(scale/2), (int)(scale/2));
         
         if (room.isGoal()) {
             g.drawOval((int)(cx - scale*0.2),
@@ -27,13 +38,11 @@ public class DungeonView {
                     (int)(scale * 0.4), (int)(scale * 0.4));
         }
         
-        g.drawOval((int)(cx - scale*0.25),
-                (int)(cy - scale*0.25),
-                (int)(scale/2), (int)(scale/2));
-        
         if (room.getItem() != null) {
             g.drawString(room.getItem().toString(), cx, cy);
         }
+        
+        g.drawString(String.format("%.2f", room.getIntensity()), cx-12, cy+16);
     }
     
     public void drawArrow(Graphics2D g, double x1, double y1, double x2,

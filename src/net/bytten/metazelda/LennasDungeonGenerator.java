@@ -7,6 +7,7 @@ import java.util.Random;
 public class LennasDungeonGenerator extends DungeonGenerator {
 
     public static final Symbol ITEM_BOSS = new Symbol(-3, "Boss");
+    public static final double INTENSITY_BOSS = 1.1;
     
     // Red key, Green key, Blue key, Equipment (Spring)
     private int numKeys = 4;
@@ -206,6 +207,19 @@ public class LennasDungeonGenerator extends DungeonGenerator {
             }
         } else {
             return super.addItemPath(item, depth);
+        }
+    }
+
+    @Override
+    protected void updateIntensity(Room room) {
+        if (room.getItem() != ITEM_BOSS) {
+            super.updateIntensity(room);
+        } else {
+            for (Room r: dungeon.getRooms()) {
+                currentIntensity = Math.max(currentIntensity, r.getIntensity());
+            }
+            currentIntensity *= INTENSITY_BOSS;
+            room.setIntensity(currentIntensity);
         }
     }
 

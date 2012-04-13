@@ -6,17 +6,27 @@ public class Room {
     public final Coords coords;
     protected Symbol item;
     protected Edge[] edges; // index with Direction.{N,E,S,W}
+    protected double intensity;
     
     public Room(Coords coords, Symbol item, Condition precond) {
         this.coords = coords;
         this.item = item;
         this.edges = new Edge[Direction.NUM_DIRS];
         this.precond = precond;
+        this.intensity = 0.0;
         // all edges initially null
     }
     
     public Room(int x, int y, Symbol item, Condition precond) {
         this(new Coords(x,y), item, precond);
+    }
+    
+    public double getIntensity() {
+        return intensity;
+    }
+    
+    public void setIntensity(double intensity) {
+        this.intensity = intensity;
     }
 
     public Symbol getItem() {
