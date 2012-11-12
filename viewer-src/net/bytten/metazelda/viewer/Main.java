@@ -7,16 +7,21 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import net.bytten.metazelda.Coords;
 import net.bytten.metazelda.IDungeonConstraints;
 import net.bytten.metazelda.IDungeonGenerator;
 import net.bytten.metazelda.constraints.CountConstraints;
+import net.bytten.metazelda.constraints.SpaceConstraints;
 import net.bytten.metazelda.generators.DungeonGenerator;
 
 
@@ -51,7 +56,31 @@ public class Main extends JPanel {
     }
     
     protected IDungeonGenerator makeDungeonGenerator(long seed) {
-        IDungeonConstraints constraints = new CountConstraints(25, 4);
+        IDungeonConstraints constraints = null;
+        
+        if (getArg("space") != null) {
+            try {
+                SpaceConstraints.SpaceMap spaceMap = new SpaceConstraints.SpaceMap();
+                
+                BufferedImage img = ImageIO.read(new File(getArg("space")));
+                for (int x = 0; x < img.getWidth(); ++x)
+                for (int y = 0; y < img.getHeight(); ++y) {
+                    if ((img.getRGB(x,y) & 0xFFFFFF) != 0) {
+                        spaceMap.set(new Coords(x,y), true);
+                    }
+                }
+                
+                constraints = new SpaceConstraints(spaceMap, 4);
+                
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Falling back on CountConstraints");
+            }
+        }
+        
+        if (constraints == null)
+            constraints = new CountConstraints(25, 4);
+        
         return new DungeonGenerator(seed, constraints);
     }
     
@@ -134,18 +163,29 @@ public class Main extends JPanel {
             return seed.hashCode();
         }
     }
-
-    private static long getSeed(String[] args) {
+    
+    private String getArg(String arg) {
+        return getArg(arg, args);
+    }
+    
+    private static String getArg(String arg, String[] args) {
         for (int i = 0; i < args.length; ++i) {
-            if ("-seed".equals(args[i])) {
+            if (args[i].equals("-"+arg)) {
                 ++i;
                 if (i < args.length) {
-                    return parseSeed(args[i]);
+                    return args[i];
                 }
-            } else if ("-seed=".equals(args[i].substring(0,6))) {
-                return parseSeed(args[i].substring(6));
+            } else if (args[i].startsWith("-"+arg+"=")) {
+                return args[i].substring(2 + arg.length());
             }
         }
-        return new Random().nextLong();
+        return null;
+    }
+
+    private static long getSeed(String[] args) {
+        String val = getArg("seed", args);
+        
+        if (val == null) return new Random().nextLong();
+        return parseSeed(val);
     }
 }

@@ -10,7 +10,7 @@ It will randomly generate a graph and show it in the viewer.
 
 F5 to generate a new dungeon.
 Pass -seed=X to generate a dungeon from a specific seed.
-Pass -lenna to enable the more advanced dungeon generator.  
+Pass -space=spacemaps/skull.png to generate a dungeon in a specific shape.
 
 If you're hacking on this, you'll want to start by understanding how
 DungeonGenerator (the reference implementation) works.
