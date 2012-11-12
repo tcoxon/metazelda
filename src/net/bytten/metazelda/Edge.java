@@ -2,29 +2,29 @@ package net.bytten.metazelda;
 
 public class Edge {
 
-    protected Condition condition;
+    protected Symbol symbol;
     
     public Edge() {
-        condition = null;
+        symbol = null;
     }
     
-    public Edge(Condition condition) {
-        this.condition = condition;
+    public Edge(Symbol symbol) {
+        this.symbol = symbol;
     }
     
-    public boolean hasCondition() {
-        return condition != null && condition.getSymbols().size() > 0;
+    public boolean hasSymbol() {
+        return symbol != null;
     }
     
-    public Condition getCondition() {
-        return condition;
+    public Symbol getSymbol() {
+        return symbol;
     }
     
     @Override
     public boolean equals(Object other) {
         if (other instanceof Edge) {
             Edge o = (Edge)other;
-            return condition == o.condition || condition.equals(o.condition);
+            return symbol == o.symbol || symbol.equals(o.symbol);
         } else {
             return super.equals(other);
         }

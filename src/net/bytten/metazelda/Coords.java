@@ -9,17 +9,9 @@ public class Coords implements Comparable<Coords> {
         this.y = y;
     }
     
-    public Coords nextInDirection(int direction) {
+    public Coords nextInDirection(Direction d) {
         // Return the coordinates of the next room/space in the given direction
-        switch (direction) {
-        case Direction.N: return new Coords(x, y-1);
-        case Direction.E: return new Coords(x+1, y);
-        case Direction.S: return new Coords(x, y+1);
-        case Direction.W: return new Coords(x-1, y);
-        default:
-            // Should not occur
-            throw new RuntimeException("Unknown direction");
-        }
+        return new Coords(x + d.x, y + d.y);
     }
     
     @Override
@@ -48,7 +40,7 @@ public class Coords implements Comparable<Coords> {
         return (dx == 1 && dy == 0) || (dx == 0 && dy == 1);
     }
 
-    public int getDirectionTo(Coords other) {
+    public Direction getDirectionTo(Coords other) {
         int dx = x - other.x,
             dy = y - other.y;
         assert dx == 0 || dy == 0;

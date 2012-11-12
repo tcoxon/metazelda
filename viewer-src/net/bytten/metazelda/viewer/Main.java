@@ -14,8 +14,10 @@ import java.util.TimerTask;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import net.bytten.metazelda.DungeonGenerator;
-import net.bytten.metazelda.LennasDungeonGenerator;
+import net.bytten.metazelda.IDungeonConstraints;
+import net.bytten.metazelda.IDungeonGenerator;
+import net.bytten.metazelda.constraints.CountConstraints;
+import net.bytten.metazelda.generators.DungeonGenerator;
 
 
 public class Main extends JPanel {
@@ -25,7 +27,7 @@ public class Main extends JPanel {
     protected Graphics2D bufferG;
     protected Dimension bufferDim;
     
-    protected DungeonGenerator dungeonGen;
+    protected IDungeonGenerator dungeonGen;
     protected DungeonView dungeonView;
     
     protected Thread generatorThread;
@@ -48,13 +50,9 @@ public class Main extends JPanel {
         }, 0, 200);
     }
     
-    protected DungeonGenerator makeDungeonGenerator(long seed) {
-        for (String arg: args) {
-            if ("-lenna".equals(arg)) {
-                return new LennasDungeonGenerator(seed);
-            }
-        }
-        return new DungeonGenerator(seed);
+    protected IDungeonGenerator makeDungeonGenerator(long seed) {
+        IDungeonConstraints constraints = new CountConstraints(25, 4);
+        return new DungeonGenerator(seed, constraints);
     }
     
     public void regenerate(final long seed) {

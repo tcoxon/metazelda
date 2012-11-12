@@ -41,8 +41,8 @@ public class Room {
         return edges;
     }
     
-    public Edge getEdge(int d) {
-        return edges[d];
+    public Edge getEdge(Direction d) {
+        return edges[d.code];
     }
     
     public int linkCount() {

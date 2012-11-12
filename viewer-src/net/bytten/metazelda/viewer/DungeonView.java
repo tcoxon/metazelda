@@ -8,8 +8,8 @@ import java.awt.geom.AffineTransform;
 import net.bytten.metazelda.Bounds;
 import net.bytten.metazelda.Coords;
 import net.bytten.metazelda.Direction;
-import net.bytten.metazelda.Dungeon;
 import net.bytten.metazelda.Edge;
+import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Room;
 
 public class DungeonView {
@@ -61,12 +61,12 @@ public class DungeonView {
         g.setTransform(origXfm);
     }
     
-    public void drawEdges(Graphics2D g, double scale, Dungeon dungeon,
+    public void drawEdges(Graphics2D g, double scale, IDungeon dungeon,
             Room room) {
         g.setColor(Color.BLACK);
         
-        for (int d = 0; d < Direction.NUM_DIRS; ++d) {
-            int oppD = Direction.oppositeDirection(d);
+        for (Direction d: Direction.values()) {
+            Direction oppD = Direction.oppositeDirection(d);
             
             Edge edge = room.getEdge(d);
             if (edge == null) continue;
@@ -79,10 +79,10 @@ public class DungeonView {
                    x2 = nextCoords.x*scale + scale/2,
                    y2 = nextCoords.y*scale + scale/2;
             switch (d) {
-            case Direction.N: y1 -= scale/4; y2 += scale/4; break;
-            case Direction.E: x1 += scale/4; x2 -= scale/4; break;
-            case Direction.S: y1 += scale/4; y2 -= scale/4; break;
-            case Direction.W: x1 -= scale/4; x2 += scale/4; break;
+            case N: y1 -= scale/4; y2 += scale/4; break;
+            case E: x1 += scale/4; x2 -= scale/4; break;
+            case S: y1 += scale/4; y2 -= scale/4; break;
+            case W: x1 -= scale/4; x2 += scale/4; break;
             }
 
             Room nextRoom = dungeon.get(nextCoords);
@@ -95,18 +95,18 @@ public class DungeonView {
                 
                 double midx = (x1+x2)/2,
                        midy = (y1+y2)/2;
-                if (edge.getCondition() != null) {
-                    g.drawString(edge.getCondition().toString(),
+                if (edge.getSymbol() != null) {
+                    g.drawString(edge.getSymbol().toString(),
                             (int)midx, (int)midy);
                 }
             } else {
                 // Unidirectional edge
                 int dx = 0, dy = 0;
                 switch (d) {
-                case Direction.N: dx -= (int)(scale/20); break;
-                case Direction.E: dy += (int)(scale/20); break;
-                case Direction.S: dx += (int)(scale/20); break;
-                case Direction.W: dy -= (int)(scale/20); break;
+                case N: dx -= (int)(scale/20); break;
+                case E: dy += (int)(scale/20); break;
+                case S: dx += (int)(scale/20); break;
+                case W: dy -= (int)(scale/20); break;
                 }
                 x1 += dx; x2 += dx;
                 y1 += dy; y2 += dy;
@@ -116,8 +116,8 @@ public class DungeonView {
                        midy = (y1+y2)/2;
                 if (dx < 0) midx += dx*1.5;
                 if (dy > 0) midy += dy*1.5;
-                if (edge.getCondition() != null) {
-                    g.drawString(edge.getCondition().toString(),
+                if (edge.getSymbol() != null) {
+                    g.drawString(edge.getSymbol().toString(),
                             (int)midx, (int)midy);
                 }
             }
@@ -125,12 +125,12 @@ public class DungeonView {
         
     }
     
-    public void draw(Graphics2D g, Dimension dim, Dungeon dungeon) {
+    public void draw(Graphics2D g, Dimension dim, IDungeon dungeon) {
         AffineTransform origXfm = g.getTransform();
         
         // Figure out scale & translation to draw the dungeon at
         synchronized (dungeon) {
-            Bounds bounds = dungeon.getBounds();
+            Bounds bounds = dungeon.getExtentBounds();
             double scale = Math.min(((double)dim.width) / bounds.width(),
                     ((double)dim.height) / bounds.height());
             // move the graph into view
