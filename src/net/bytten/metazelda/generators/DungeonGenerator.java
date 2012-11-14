@@ -149,7 +149,27 @@ public class DungeonGenerator implements IDungeonGenerator {
             levels.addRoom(keyLevel, room);
         }
         
-        // TODO link adjacent rooms
+        // Link up adjacent rooms to make the graph less of a tree
+        for (Room room: dungeon.getRooms()) {
+            for (Direction d: Direction.values()) {
+                if (room.getEdge(d) != null) continue;
+                if (random.nextInt(6) != 0) continue;
+                
+                Room nextRoom = dungeon.get(room.coords.nextInDirection(d));
+                if (nextRoom == null) continue;
+                
+                boolean forwardImplies = room.precond.implies(nextRoom.precond),
+                        backwardImplies = nextRoom.precond.implies(room.precond);
+                if (forwardImplies && backwardImplies) {
+                    // both room are at the same keyLevel.
+                    dungeon.link(room, nextRoom);
+                } else {
+                    Symbol difference = room.precond.singleSymbolDifference(
+                            nextRoom.precond);
+                    dungeon.link(room, nextRoom, difference);
+                }
+            }
+        }
         
         // Now place the keys. For every key-level but the last one, place a
         // key for the next level in it, preferring rooms with fewest links

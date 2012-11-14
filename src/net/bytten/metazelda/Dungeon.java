@@ -74,12 +74,6 @@ public class Dungeon implements IDungeon {
         return placedItems.get(item);
     }
     
-    public Condition precondClosure(Condition cond) {
-        // return the entire set of symbols that must be held by the player
-        // for cond to be true.
-        return cond.closure(placedItems);
-    }
-    
     @Override
     public void add(Room room) {
         rooms.put(room.coords, room);
