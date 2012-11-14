@@ -3,6 +3,7 @@ package net.bytten.metazelda.generators;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -76,6 +77,16 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
+    protected static class RoomListEdgeComparator implements Comparator<Room> {
+        @Override
+        public int compare(Room arg0, Room arg1) {
+            return arg0.linkCount() - arg1.linkCount();
+        }
+    }
+    
+    protected static final RoomListEdgeComparator EDGE_COUNT_COMPARATOR
+        = new RoomListEdgeComparator();
+    
     @Override
     public void generate() {
         dungeon = new Dungeon();
@@ -116,7 +127,7 @@ public class DungeonGenerator implements IDungeonGenerator {
             
             // Find an existing room with a free edge:
             Room parentRoom = null;
-            if (!doLock)
+            if (!doLock && random.nextInt(10) > 0)
                 parentRoom = chooseRoomWithFreeEdge(levels.getRooms(keyLevel));
             if (parentRoom == null) {
                 parentRoom = chooseRoomWithFreeEdge(dungeon.getRooms());
@@ -136,6 +147,30 @@ public class DungeonGenerator implements IDungeonGenerator {
                 dungeon.link(parentRoom, room, doLock ? latestKey : null);
             }
             levels.addRoom(keyLevel, room);
+        }
+        
+        // TODO link adjacent rooms
+        
+        // Now place the keys. For every key-level but the last one, place a
+        // key for the next level in it, preferring rooms with fewest links
+        // (dead end rooms).
+        for (int key = 0; key < keyLevel; ++key) {
+            List<Room> rooms = levels.getRooms(key);
+            
+            Collections.shuffle(rooms, random);
+            // Collections.sort is stable: it doesn't reorder "equal" elements,
+            // which means the shuffling we just did is still useful.
+            Collections.sort(rooms, EDGE_COUNT_COMPARATOR);
+            
+            boolean placedKey = false;
+            for (Room room: rooms) {
+                if (room.getItem() == null) {
+                    room.setItem(new Symbol(key));
+                    placedKey = true;
+                    break;
+                }
+            }
+            assert placedKey;
         }
         
     }
