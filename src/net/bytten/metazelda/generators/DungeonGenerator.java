@@ -60,56 +60,82 @@ public class DungeonGenerator implements IDungeonGenerator {
         return null;
     }
     
+    protected class KeyLevelRoomMapping {
+        protected List<List<Room>> map = new ArrayList<List<Room>>(
+                constraints.numberKeys());
+        
+        List<Room> getRooms(int keyLevel) {
+            while (keyLevel >= map.size()) map.add(null);
+            if (map.get(keyLevel) == null)
+                map.set(keyLevel, new ArrayList<Room>());
+            return map.get(keyLevel);
+        }
+        
+        void addRoom(int keyLevel, Room room) {
+            getRooms(keyLevel).add(room);
+        }
+    }
+    
     @Override
     public void generate() {
         dungeon = new Dungeon();
-        List<Room> currentRooms = new ArrayList<Room>(
-                constraints.numberSpaces());
         
         int roomsPerLock = constraints.numberSpaces() /
-                constraints.numberKeys();
+                (constraints.numberKeys()+1);
         
-        int lockCount = 0;
-        Symbol latestLock = null;
+        // keyLevel: the number of keys required to get to the new room
+        int keyLevel = 0;
+        Symbol latestKey = null;
+        // condition that must hold true for the player to reach the new room
+        // (the set of keys they must have).
         Condition cond = new Condition();
+        
+        // Maps keyLevel -> Rooms that were created when lockCount had that
+        // value
+        KeyLevelRoomMapping levels = new KeyLevelRoomMapping();
         
         // Set up entrance room:
         assert constraints.validRoomCoords(constraints.initialCoords());
-        Room entry = new Room(constraints.initialCoords(),
+        Room entry = new Room(constraints.initialCoords(), null,
                 new Symbol(Symbol.START), cond);
         dungeon.add(entry);
-        currentRooms.add(entry);
+        levels.addRoom(keyLevel, entry);
         
         // Loop to place rooms and link them
         while (dungeon.roomCount() < constraints.numberSpaces()) {
             
             boolean doLock = false;
             
+            // Decide whether we need to place a new lock
+            if (levels.getRooms(keyLevel).size() >= roomsPerLock &&
+                    keyLevel < constraints.numberKeys()) {
+                latestKey = new Symbol(keyLevel ++);
+                cond = cond.and(latestKey);
+                doLock = true;
+            }
+            
             // Find an existing room with a free edge:
-            Room parentRoom = chooseRoomWithFreeEdge(currentRooms);
+            Room parentRoom = null;
+            if (!doLock)
+                parentRoom = chooseRoomWithFreeEdge(levels.getRooms(keyLevel));
             if (parentRoom == null) {
                 parentRoom = chooseRoomWithFreeEdge(dungeon.getRooms());
                 doLock = true;
             }
             
-            if (currentRooms.size() >= roomsPerLock &&
-                    lockCount < constraints.numberKeys()) {
-                currentRooms.clear();
-                latestLock = new Symbol(lockCount ++);
-                cond = cond.and(latestLock);
-                doLock = true;
-            }
-            
+            // Decide which direction to put the new room in relative to the
+            // parent
             Direction d = chooseFreeEdge(parentRoom);
             Coords coords = parentRoom.coords.nextInDirection(d);
-            Room room = new Room(coords, null, cond);
+            Room room = new Room(coords, parentRoom, null, cond);
             
+            // Add the room to the dungeon
             assert dungeon.get(room.coords) == null;
             synchronized (dungeon) {
                 dungeon.add(room);
-                dungeon.link(parentRoom, room, doLock ? latestLock : null);
+                dungeon.link(parentRoom, room, doLock ? latestKey : null);
             }
-            currentRooms.add(room);
+            levels.addRoom(keyLevel, room);
         }
         
     }

@@ -7,18 +7,20 @@ public class Room {
     protected Symbol item;
     protected Edge[] edges; // index with Direction.{N,E,S,W}
     protected double intensity;
+    protected Room parent;
     
-    public Room(Coords coords, Symbol item, Condition precond) {
+    public Room(Coords coords, Room parent, Symbol item, Condition precond) {
         this.coords = coords;
         this.item = item;
         this.edges = new Edge[Direction.NUM_DIRS];
         this.precond = precond;
         this.intensity = 0.0;
+        this.parent = parent;
         // all edges initially null
     }
     
-    public Room(int x, int y, Symbol item, Condition precond) {
-        this(new Coords(x,y), item, precond);
+    public Room(int x, int y, Room parent, Symbol item, Condition precond) {
+        this(new Coords(x,y), parent, item, precond);
     }
     
     public double getIntensity() {
@@ -64,5 +66,13 @@ public class Room {
     
     public Condition getPrecond() {
         return precond;
+    }
+
+    public Room getParent() {
+        return parent;
+    }
+
+    public void setParent(Room parent) {
+        this.parent = parent;
     }
 }
