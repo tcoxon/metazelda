@@ -75,6 +75,10 @@ public class DungeonGenerator implements IDungeonGenerator {
         void addRoom(int keyLevel, Room room) {
             getRooms(keyLevel).add(room);
         }
+        
+        int keyCount() {
+            return map.size();
+        }
     }
     
     protected static class RoomListEdgeComparator implements Comparator<Room> {
@@ -87,13 +91,23 @@ public class DungeonGenerator implements IDungeonGenerator {
     protected static final RoomListEdgeComparator EDGE_COUNT_COMPARATOR
         = new RoomListEdgeComparator();
     
-    @Override
-    public void generate() {
-        dungeon = new Dungeon();
+    protected int roomsPerLock() {
+        return constraints.numberSpaces() / (constraints.numberKeys()+1);
+    }
+
+    // Sets up the dungeon's entrance room
+    protected void initEntranceRoom(KeyLevelRoomMapping levels) {
+        assert constraints.validRoomCoords(constraints.initialCoords());
         
-        int roomsPerLock = constraints.numberSpaces() /
-                (constraints.numberKeys()+1);
+        Room entry = new Room(constraints.initialCoords(), null,
+                new Symbol(Symbol.START), new Condition());
+        dungeon.add(entry);
         
+        levels.addRoom(0, entry);
+    }
+    
+    // Fill the dungeon's space with rooms and doors (some locked)
+    protected void placeRooms(KeyLevelRoomMapping levels) {
         // keyLevel: the number of keys required to get to the new room
         int keyLevel = 0;
         Symbol latestKey = null;
@@ -101,26 +115,15 @@ public class DungeonGenerator implements IDungeonGenerator {
         // (the set of keys they must have).
         Condition cond = new Condition();
         
-        // Maps keyLevel -> Rooms that were created when lockCount had that
-        // value
-        KeyLevelRoomMapping levels = new KeyLevelRoomMapping();
-        
-        // Set up entrance room:
-        assert constraints.validRoomCoords(constraints.initialCoords());
-        Room entry = new Room(constraints.initialCoords(), null,
-                new Symbol(Symbol.START), cond);
-        dungeon.add(entry);
-        levels.addRoom(keyLevel, entry);
-        
         // Loop to place rooms and link them
         while (dungeon.roomCount() < constraints.numberSpaces()) {
             
             boolean doLock = false;
             
             // Decide whether we need to place a new lock
-            if (levels.getRooms(keyLevel).size() >= roomsPerLock &&
+            if (levels.getRooms(keyLevel).size() >= roomsPerLock() &&
                     keyLevel < constraints.numberKeys()) {
-                latestKey = new Symbol(keyLevel ++);
+                latestKey = new Symbol(keyLevel++);
                 cond = cond.and(latestKey);
                 doLock = true;
             }
@@ -149,8 +152,10 @@ public class DungeonGenerator implements IDungeonGenerator {
             }
             levels.addRoom(keyLevel, room);
         }
-        
-        // Link up adjacent rooms to make the graph less of a tree
+    }
+    
+    // Link up adjacent rooms to make the graph less of a tree:
+    protected void graphify() {
         for (Room room: dungeon.getRooms()) {
             for (Direction d: Direction.values()) {
                 if (room.getEdge(d) != null) continue;
@@ -162,7 +167,7 @@ public class DungeonGenerator implements IDungeonGenerator {
                 boolean forwardImplies = room.precond.implies(nextRoom.precond),
                         backwardImplies = nextRoom.precond.implies(room.precond);
                 if (forwardImplies && backwardImplies) {
-                    // both room are at the same keyLevel.
+                    // both rooms are at the same keyLevel.
                     dungeon.link(room, nextRoom);
                 } else {
                     Symbol difference = room.precond.singleSymbolDifference(
@@ -171,11 +176,13 @@ public class DungeonGenerator implements IDungeonGenerator {
                 }
             }
         }
-        
+    }
+    
+    public void placeKeys(KeyLevelRoomMapping levels) {
         // Now place the keys. For every key-level but the last one, place a
         // key for the next level in it, preferring rooms with fewest links
         // (dead end rooms).
-        for (int key = 0; key < keyLevel; ++key) {
+        for (int key = 0; key < levels.keyCount()-1; ++key) {
             List<Room> rooms = levels.getRooms(key);
             
             Collections.shuffle(rooms, random);
@@ -193,6 +200,27 @@ public class DungeonGenerator implements IDungeonGenerator {
             }
             assert placedKey;
         }
+    }
+    
+    @Override
+    public void generate() {
+        dungeon = new Dungeon();
+        
+        // Maps keyLevel -> Rooms that were created when lockCount had that
+        // value
+        KeyLevelRoomMapping levels = new KeyLevelRoomMapping();
+        
+        // Create the entrance to the dungeon:
+        initEntranceRoom(levels);
+        
+        // Fill the dungeon with rooms:
+        placeRooms(levels);
+
+        // Make the dungeon less tree-like:
+        graphify();
+        
+        // Place the keys within the dungeon:
+        placeKeys(levels);
         
     }
 

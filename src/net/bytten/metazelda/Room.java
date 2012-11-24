@@ -90,4 +90,8 @@ public class Room {
         children.add(child);
     }
     
+    public String toString() {
+        return "Room(" + coords.toString() + ")";
+    }
+    
 }

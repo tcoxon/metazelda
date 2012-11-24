@@ -8,7 +8,7 @@ public class Condition {
         keyLevel = 0;
     }
     public Condition(Symbol e) {
-        keyLevel = e.getValue();
+        keyLevel = e.getValue()+1;
     }
     public Condition(Condition other) {
         keyLevel = other.keyLevel;
@@ -24,7 +24,7 @@ public class Condition {
     }
     
     private void add(Symbol sym) {
-        keyLevel = Math.max(keyLevel, sym.getValue());
+        keyLevel = Math.max(keyLevel, sym.getValue()+1);
     }
     private void add(Condition cond) {
         keyLevel = Math.max(keyLevel, cond.keyLevel);
@@ -60,12 +60,13 @@ public class Condition {
         // be needed.
         
         if (this.equals(other)) return null;
-        return new Symbol(Math.max(keyLevel, other.keyLevel));
+        return new Symbol(Math.max(keyLevel, other.keyLevel)-1);
     }
     
     @Override
     public String toString() {
-        return new Symbol(keyLevel).toString();
+        if (keyLevel == 0) return "";
+        return new Symbol(keyLevel-1).toString();
     }
     
 }
