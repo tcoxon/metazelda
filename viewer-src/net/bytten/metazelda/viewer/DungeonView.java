@@ -87,6 +87,8 @@ public class DungeonView {
          g.setColor(Color.ORANGE);
          drawArrow(g, x1, y1, x2, y2);
          g.setColor(Color.BLACK);
+         
+         assert parent.getChildren().contains(child);
     }
     
     public void drawEdges(Graphics2D g, double scale, IDungeon dungeon,

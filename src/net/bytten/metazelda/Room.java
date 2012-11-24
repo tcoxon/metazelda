@@ -1,5 +1,9 @@
 package net.bytten.metazelda;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class Room {
 
     public Condition precond;
@@ -8,6 +12,7 @@ public class Room {
     protected Edge[] edges; // index with Direction.{N,E,S,W}
     protected double intensity;
     protected Room parent;
+    protected List<Room> children;
     
     public Room(Coords coords, Room parent, Symbol item, Condition precond) {
         this.coords = coords;
@@ -16,6 +21,7 @@ public class Room {
         this.precond = precond;
         this.intensity = 0.0;
         this.parent = parent;
+        this.children = new ArrayList<Room>(3);
         // all edges initially null
     }
     
@@ -75,4 +81,13 @@ public class Room {
     public void setParent(Room parent) {
         this.parent = parent;
     }
+    
+    public Collection<Room> getChildren() {
+        return children;
+    }
+    
+    public void addChild(Room child) {
+        children.add(child);
+    }
+    
 }

@@ -144,6 +144,7 @@ public class DungeonGenerator implements IDungeonGenerator {
             assert dungeon.get(room.coords) == null;
             synchronized (dungeon) {
                 dungeon.add(room);
+                parentRoom.addChild(room);
                 dungeon.link(parentRoom, room, doLock ? latestKey : null);
             }
             levels.addRoom(keyLevel, room);
