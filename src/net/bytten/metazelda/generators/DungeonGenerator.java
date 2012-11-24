@@ -86,15 +86,21 @@ public class DungeonGenerator implements IDungeonGenerator {
         private static final long serialVersionUID = 1L;
     }
     
-    protected static class RoomListEdgeComparator implements Comparator<Room> {
+    protected static final Comparator<Room>
+    EDGE_COUNT_COMPARATOR = new Comparator<Room>() {
         @Override
         public int compare(Room arg0, Room arg1) {
             return arg0.linkCount() - arg1.linkCount();
         }
-    }
-    
-    protected static final RoomListEdgeComparator EDGE_COUNT_COMPARATOR
-        = new RoomListEdgeComparator();
+    },
+    INTENSITY_COMPARATOR = new Comparator<Room>() {
+        @Override
+        public int compare(Room arg0, Room arg1) {
+            return arg0.getIntensity() > arg1.getIntensity() ? -1
+                    : arg0.getIntensity() < arg1.getIntensity() ? 1
+                            : 0;
+        }
+    };
     
     // Sets up the dungeon's entrance room
     protected void initEntranceRoom(KeyLevelRoomMapping levels)
@@ -236,7 +242,7 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
-    public void placeKeys(KeyLevelRoomMapping levels) throws RetryException {
+    protected void placeKeys(KeyLevelRoomMapping levels) throws RetryException {
         // Now place the keys. For every key-level but the last one, place a
         // key for the next level in it, preferring rooms with fewest links
         // (dead end rooms).
@@ -246,7 +252,9 @@ public class DungeonGenerator implements IDungeonGenerator {
             Collections.shuffle(rooms, random);
             // Collections.sort is stable: it doesn't reorder "equal" elements,
             // which means the shuffling we just did is still useful.
-            Collections.sort(rooms, EDGE_COUNT_COMPARATOR);
+            Collections.sort(rooms, INTENSITY_COMPARATOR);
+            // Alternatively, use the EDGE_COUNT_COMPARATOR to put keys at
+            // 'dead end' rooms.
             
             boolean placedKey = false;
             for (Room room: rooms) {
@@ -258,6 +266,66 @@ public class DungeonGenerator implements IDungeonGenerator {
             }
             assert placedKey;
         }
+    }
+    
+    protected static final double
+            INTENSITY_GROWTH_JITTER = 0.1,
+            INTENSITY_EASE_OFF = 0.2;
+    
+    protected double applyIntensity(Room room, double intensity) {
+        intensity *= 1.0 - INTENSITY_GROWTH_JITTER/2.0 +
+                INTENSITY_GROWTH_JITTER * random.nextDouble();
+        
+        room.setIntensity(intensity);
+        
+        double maxIntensity = intensity;
+        for (Room child: room.getChildren()) {
+            if (room.getPrecond().implies(child.getPrecond())) {
+                maxIntensity = Math.max(maxIntensity, applyIntensity(child,
+                        intensity + 1.0));
+            }
+        }
+        
+        return maxIntensity;
+    }
+
+    protected void normalizeIntensity() {
+        double maxIntensity = 0.0;
+        for (Room room: dungeon.getRooms()) {
+            maxIntensity = Math.max(maxIntensity, room.getIntensity());
+        }
+        for (Room room: dungeon.getRooms()) {
+            room.setIntensity(room.getIntensity() / maxIntensity);
+        }
+    }
+    
+    // Compute the 'intensity' of each room, a number from 0.0 to 1.0 that
+    // represents the relative difficulty of that room. Rooms generally get
+    // more intense the deeper into the dungeon they are.
+    protected void computeIntensity(KeyLevelRoomMapping levels)
+            throws RetryException {
+        
+        double nextLevelBaseIntensity = 0.0;
+        for (int level = 0; level < levels.keyCount(); ++level) {
+            
+            double intensity = nextLevelBaseIntensity *
+                    (1.0 - INTENSITY_EASE_OFF);
+            
+            for (Room room: levels.getRooms(level)) {
+                if (room.getParent() == null ||
+                        !room.getParent().getPrecond().
+                            implies(room.getPrecond())) {
+                    nextLevelBaseIntensity = Math.max(
+                            nextLevelBaseIntensity,
+                            applyIntensity(room, intensity));
+                }
+            }
+        }
+        
+        normalizeIntensity();
+        
+        dungeon.findBoss().setIntensity(1.0);
+        dungeon.findGoal().setIntensity(0.0);
     }
     
     protected void checkAcceptable() throws RetryException {
@@ -287,6 +355,8 @@ public class DungeonGenerator implements IDungeonGenerator {
         
                 // Make the dungeon less tree-like:
                 graphify();
+                
+                computeIntensity(levels);
                 
                 // Place the keys within the dungeon:
                 placeKeys(levels);

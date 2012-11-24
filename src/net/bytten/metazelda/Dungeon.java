@@ -3,7 +3,6 @@ package net.bytten.metazelda;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 public class Dungeon implements IDungeon {
@@ -38,16 +37,6 @@ public class Dungeon implements IDungeon {
     }
     
     @Override
-    public int itemCount() {
-        return itemCount;
-    }
-    
-    @Override
-    public Set<Symbol> getPlacedItems() {
-        return placedItems.keySet();
-    }
-    
-    @Override
     public int roomCount() {
         return rooms.size();
     }
@@ -66,12 +55,6 @@ public class Dungeon implements IDungeon {
         assert precond != null;
         if (e != null && !e.isGoal() && !e.isStart())
             placedItems.put(e, precond);
-    }
-    
-    @Override
-    public Condition getItemPrecond(Symbol item) {
-        // return the precondition to getting the given item in the dungeon
-        return placedItems.get(item);
     }
     
     @Override
@@ -190,6 +173,30 @@ public class Dungeon implements IDungeon {
         dungeon.link(room1, room2, boss);
         
         return dungeon;
+    }
+
+    @Override
+    public Room findStart() {
+        for (Room room: getRooms()) {
+            if (room.isStart()) return room;
+        }
+        return null;
+    }
+
+    @Override
+    public Room findBoss() {
+        for (Room room: getRooms()) {
+            if (room.isBoss()) return room;
+        }
+        return null;
+    }
+
+    @Override
+    public Room findGoal() {
+        for (Room room: getRooms()) {
+            if (room.isGoal()) return room;
+        }
+        return null;
     }
 
 }
