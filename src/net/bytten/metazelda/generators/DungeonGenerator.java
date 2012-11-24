@@ -96,10 +96,6 @@ public class DungeonGenerator implements IDungeonGenerator {
     protected static final RoomListEdgeComparator EDGE_COUNT_COMPARATOR
         = new RoomListEdgeComparator();
     
-    protected int roomsPerLock() {
-        return constraints.numberSpaces() / (constraints.numberKeys()+1);
-    }
-
     // Sets up the dungeon's entrance room
     protected void initEntranceRoom(KeyLevelRoomMapping levels)
             throws RetryException {
@@ -119,6 +115,10 @@ public class DungeonGenerator implements IDungeonGenerator {
     
     // Fill the dungeon's space with rooms and doors (some locked)
     protected void placeRooms(KeyLevelRoomMapping levels) throws RetryException {
+        
+        final int roomsPerLock = constraints.numberSpaces() /
+                constraints.numberKeys();
+        
         // keyLevel: the number of keys required to get to the new room
         int keyLevel = 0;
         Symbol latestKey = null;
@@ -132,8 +132,9 @@ public class DungeonGenerator implements IDungeonGenerator {
             boolean doLock = false;
             
             // Decide whether we need to place a new lock
-            if (levels.getRooms(keyLevel).size() >= roomsPerLock() &&
-                    keyLevel < constraints.numberKeys()) {
+            // (Don't place the last lock, since that's reserved for the boss)
+            if (levels.getRooms(keyLevel).size() >= roomsPerLock &&
+                    keyLevel < constraints.numberKeys()-1) {
                 latestKey = new Symbol(keyLevel++);
                 cond = cond.and(latestKey);
                 doLock = true;
@@ -165,15 +166,61 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
+    protected void placeBossGoalRooms(KeyLevelRoomMapping levels)
+            throws RetryException {
+        List<Room> possibleGoalRooms = new ArrayList<Room>(dungeon.roomCount());
+        
+        for (Room room: dungeon.getRooms()) {
+            if (room.getChildren().size() > 0 || room.getItem() != null)
+                continue;
+            Room parent = room.getParent();
+            if (parent == null || parent.getChildren().size() != 1 ||
+                    room.getItem() != null ||
+                    !parent.getPrecond().implies(room.getPrecond()))
+                continue;
+            possibleGoalRooms.add(room);
+        }
+        
+        if (possibleGoalRooms.size() == 0) throw new RetryException();
+        
+        Room goalRoom = possibleGoalRooms.get(random.nextInt(
+                possibleGoalRooms.size())),
+             bossRoom = goalRoom.getParent();
+        
+        goalRoom.setItem(new Symbol(Symbol.GOAL));
+        bossRoom.setItem(new Symbol(Symbol.BOSS));
+        
+        int oldKeyLevel = bossRoom.getPrecond().getKeyLevel(),
+            newKeyLevel = levels.keyCount();
+        List<Room> oklRooms = levels.getRooms(oldKeyLevel);
+        oklRooms.remove(goalRoom);
+        oklRooms.remove(bossRoom);
+        
+        levels.addRoom(newKeyLevel, goalRoom);
+        levels.addRoom(newKeyLevel, bossRoom);
+        
+        Symbol bossKey = new Symbol(newKeyLevel-1);
+        Condition precond = bossRoom.getPrecond().and(bossKey);
+        bossRoom.setPrecond(precond);
+        goalRoom.setPrecond(precond);
+        
+        dungeon.link(bossRoom.getParent(), bossRoom, bossKey);
+        dungeon.link(bossRoom, goalRoom);
+    }
+    
     // Link up adjacent rooms to make the graph less of a tree:
     protected void graphify() throws RetryException {
         for (Room room: dungeon.getRooms()) {
+            
+            if (room.isGoal() || room.isBoss()) continue;
+            
             for (Direction d: Direction.values()) {
                 if (room.getEdge(d) != null) continue;
                 if (random.nextInt(6) != 0) continue;
                 
                 Room nextRoom = dungeon.get(room.coords.nextInDirection(d));
-                if (nextRoom == null) continue;
+                if (nextRoom == null || nextRoom.isGoal() || nextRoom.isBoss())
+                    continue;
                 
                 boolean forwardImplies = room.precond.implies(nextRoom.precond),
                         backwardImplies = nextRoom.precond.implies(room.precond);
@@ -234,6 +281,9 @@ public class DungeonGenerator implements IDungeonGenerator {
                 
                 // Fill the dungeon with rooms:
                 placeRooms(levels);
+                
+                // Place the boss and goal rooms:
+                placeBossGoalRooms(levels);
         
                 // Make the dungeon less tree-like:
                 graphify();

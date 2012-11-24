@@ -69,4 +69,8 @@ public class Condition {
         return new Symbol(keyLevel-1).toString();
     }
     
+    public int getKeyLevel() {
+        return keyLevel;
+    }
+    
 }

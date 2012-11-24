@@ -3,7 +3,8 @@ package net.bytten.metazelda;
 public class Symbol {
     public static final int
         START = -1,
-        GOAL = -2;
+        GOAL = -2,
+        BOSS = -3;
 
     protected final int value;
     protected final String name;
@@ -15,6 +16,8 @@ public class Symbol {
             name = "Start";
         else if (value == GOAL)
             name = "Goal";
+        else if (value == BOSS)
+            name = "Boss";
         else if (value >= 0 && value < 26)
             name = Character.toString((char)((int)'A' + value));
         else
@@ -50,6 +53,10 @@ public class Symbol {
     
     public boolean isGoal() {
         return value == GOAL;
+    }
+    
+    public boolean isBoss() {
+        return value == BOSS;
     }
     
     @Override

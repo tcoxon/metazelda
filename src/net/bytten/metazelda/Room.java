@@ -70,8 +70,16 @@ public class Room {
         return item != null && item.isGoal();
     }
     
+    public boolean isBoss() {
+        return item != null && item.isBoss();
+    }
+    
     public Condition getPrecond() {
         return precond;
+    }
+    
+    public void setPrecond(Condition precond) {
+        this.precond = precond;
     }
 
     public Room getParent() {
