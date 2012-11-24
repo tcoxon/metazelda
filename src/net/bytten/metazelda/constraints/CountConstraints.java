@@ -1,5 +1,8 @@
 package net.bytten.metazelda.constraints;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import net.bytten.metazelda.Coords;
 import net.bytten.metazelda.Dungeon;
 
@@ -19,12 +22,12 @@ public class CountConstraints implements IDungeonConstraints {
     
     @Override
     public boolean validRoomCoords(Coords c) {
-        return true;
+        return c != null;
     }
 
     @Override
-    public Coords initialCoords() {
-        return new Coords(0,0);
+    public Collection<Coords> initialCoords() {
+        return Arrays.asList(new Coords(0,0));
     }
 
     @Override

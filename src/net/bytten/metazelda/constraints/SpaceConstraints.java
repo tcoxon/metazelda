@@ -58,13 +58,12 @@ public class SpaceConstraints extends CountConstraints {
 
     @Override
     public boolean validRoomCoords(Coords c) {
-        return spaceMap.get(c);
+        return super.validRoomCoords(c) && spaceMap.get(c);
     }
 
     @Override
-    public Coords initialCoords() {
-        // TODO pick at random:
-        return spaceMap.getBottomSpaces().iterator().next();
+    public Collection<Coords> initialCoords() {
+        return spaceMap.getBottomSpaces();
     }
     
     

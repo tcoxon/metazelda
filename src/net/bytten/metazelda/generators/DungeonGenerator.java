@@ -103,10 +103,15 @@ public class DungeonGenerator implements IDungeonGenerator {
     // Sets up the dungeon's entrance room
     protected void initEntranceRoom(KeyLevelRoomMapping levels)
             throws RetryException {
-        assert constraints.validRoomCoords(constraints.initialCoords());
+        Coords coords = null;
+        List<Coords> possibleEntries = new ArrayList<Coords>(
+                constraints.initialCoords());
+        assert possibleEntries.size() > 0;
+        coords = possibleEntries.get(random.nextInt(possibleEntries.size()));
+        assert constraints.validRoomCoords(coords);
         
-        Room entry = new Room(constraints.initialCoords(), null,
-                new Symbol(Symbol.START), new Condition());
+        Room entry = new Room(coords, null, new Symbol(Symbol.START),
+                new Condition());
         dungeon.add(entry);
         
         levels.addRoom(0, entry);
