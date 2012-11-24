@@ -12,12 +12,13 @@ import net.bytten.metazelda.Coords;
 import net.bytten.metazelda.Direction;
 import net.bytten.metazelda.Dungeon;
 import net.bytten.metazelda.IDungeon;
-import net.bytten.metazelda.IDungeonConstraints;
-import net.bytten.metazelda.IDungeonGenerator;
 import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
+import net.bytten.metazelda.constraints.IDungeonConstraints;
 
 public class DungeonGenerator implements IDungeonGenerator {
+    
+    public static final int MAX_RETRIES = 20;
 
     protected long seed;
     protected Random random;
@@ -81,6 +82,10 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
+    protected static class RetryException extends Exception {
+        private static final long serialVersionUID = 1L;
+    }
+    
     protected static class RoomListEdgeComparator implements Comparator<Room> {
         @Override
         public int compare(Room arg0, Room arg1) {
@@ -96,7 +101,8 @@ public class DungeonGenerator implements IDungeonGenerator {
     }
 
     // Sets up the dungeon's entrance room
-    protected void initEntranceRoom(KeyLevelRoomMapping levels) {
+    protected void initEntranceRoom(KeyLevelRoomMapping levels)
+            throws RetryException {
         assert constraints.validRoomCoords(constraints.initialCoords());
         
         Room entry = new Room(constraints.initialCoords(), null,
@@ -107,7 +113,7 @@ public class DungeonGenerator implements IDungeonGenerator {
     }
     
     // Fill the dungeon's space with rooms and doors (some locked)
-    protected void placeRooms(KeyLevelRoomMapping levels) {
+    protected void placeRooms(KeyLevelRoomMapping levels) throws RetryException {
         // keyLevel: the number of keys required to get to the new room
         int keyLevel = 0;
         Symbol latestKey = null;
@@ -155,7 +161,7 @@ public class DungeonGenerator implements IDungeonGenerator {
     }
     
     // Link up adjacent rooms to make the graph less of a tree:
-    protected void graphify() {
+    protected void graphify() throws RetryException {
         for (Room room: dungeon.getRooms()) {
             for (Direction d: Direction.values()) {
                 if (room.getEdge(d) != null) continue;
@@ -178,7 +184,7 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
-    public void placeKeys(KeyLevelRoomMapping levels) {
+    public void placeKeys(KeyLevelRoomMapping levels) throws RetryException {
         // Now place the keys. For every key-level but the last one, place a
         // key for the next level in it, preferring rooms with fewest links
         // (dead end rooms).
@@ -202,25 +208,45 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
+    protected void checkAcceptable() throws RetryException {
+        if (!constraints.isAcceptable(dungeon))
+            throw new RetryException();
+    }
+    
     @Override
     public void generate() {
-        dungeon = new Dungeon();
+        int attempt = 0;
+        while (true) {
+            try {
+                dungeon = new Dungeon();
+                
+                // Maps keyLevel -> Rooms that were created when lockCount had that
+                // value
+                KeyLevelRoomMapping levels = new KeyLevelRoomMapping();
+                
+                // Create the entrance to the dungeon:
+                initEntranceRoom(levels);
+                
+                // Fill the dungeon with rooms:
+                placeRooms(levels);
         
-        // Maps keyLevel -> Rooms that were created when lockCount had that
-        // value
-        KeyLevelRoomMapping levels = new KeyLevelRoomMapping();
-        
-        // Create the entrance to the dungeon:
-        initEntranceRoom(levels);
-        
-        // Fill the dungeon with rooms:
-        placeRooms(levels);
-
-        // Make the dungeon less tree-like:
-        graphify();
-        
-        // Place the keys within the dungeon:
-        placeKeys(levels);
+                // Make the dungeon less tree-like:
+                graphify();
+                
+                // Place the keys within the dungeon:
+                placeKeys(levels);
+                
+                checkAcceptable();
+                
+                return;
+            
+            } catch (RetryException e) {
+                if (++ attempt > MAX_RETRIES) {
+                    throw new RuntimeException("Dungeon generator failed", e);
+                }
+                System.out.println("Retrying dungeon generation...");
+            }
+        }
         
     }
 

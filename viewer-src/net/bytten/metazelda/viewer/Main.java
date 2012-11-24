@@ -18,11 +18,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import net.bytten.metazelda.Coords;
-import net.bytten.metazelda.IDungeonConstraints;
-import net.bytten.metazelda.IDungeonGenerator;
 import net.bytten.metazelda.constraints.CountConstraints;
+import net.bytten.metazelda.constraints.IDungeonConstraints;
 import net.bytten.metazelda.constraints.SpaceConstraints;
 import net.bytten.metazelda.generators.DungeonGenerator;
+import net.bytten.metazelda.generators.IDungeonGenerator;
 
 
 public class Main extends JPanel {

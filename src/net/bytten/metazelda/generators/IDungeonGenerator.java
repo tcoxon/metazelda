@@ -1,4 +1,6 @@
-package net.bytten.metazelda;
+package net.bytten.metazelda.generators;
+
+import net.bytten.metazelda.IDungeon;
 
 public interface IDungeonGenerator {
 

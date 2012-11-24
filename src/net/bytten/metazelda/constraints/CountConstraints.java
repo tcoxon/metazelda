@@ -1,7 +1,7 @@
 package net.bytten.metazelda.constraints;
 
 import net.bytten.metazelda.Coords;
-import net.bytten.metazelda.IDungeonConstraints;
+import net.bytten.metazelda.Dungeon;
 
 public class CountConstraints implements IDungeonConstraints {
 
@@ -30,6 +30,11 @@ public class CountConstraints implements IDungeonConstraints {
     @Override
     public int numberKeys() {
         return numKeys;
+    }
+    
+    @Override
+    public boolean isAcceptable(Dungeon dungeon) {
+        return true;
     }
 
 }

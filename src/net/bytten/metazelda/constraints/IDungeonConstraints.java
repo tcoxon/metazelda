@@ -1,4 +1,7 @@
-package net.bytten.metazelda;
+package net.bytten.metazelda.constraints;
+
+import net.bytten.metazelda.Coords;
+import net.bytten.metazelda.Dungeon;
 
 public interface IDungeonConstraints {
 
@@ -6,5 +9,6 @@ public interface IDungeonConstraints {
     public int numberSpaces();
     public int numberKeys();
     public Coords initialCoords();
+    public boolean isAcceptable(Dungeon dungeon);
     
 }
