@@ -21,6 +21,7 @@ import net.bytten.metazelda.Coords;
 import net.bytten.metazelda.constraints.CountConstraints;
 import net.bytten.metazelda.constraints.IDungeonConstraints;
 import net.bytten.metazelda.constraints.SpaceConstraints;
+import net.bytten.metazelda.constraints.SpaceMap;
 import net.bytten.metazelda.generators.DungeonGenerator;
 import net.bytten.metazelda.generators.IDungeonGenerator;
 
@@ -60,7 +61,7 @@ public class Main extends JPanel {
         
         if (getArg("space") != null) {
             try {
-                SpaceConstraints.SpaceMap spaceMap = new SpaceConstraints.SpaceMap();
+                SpaceMap spaceMap = new SpaceMap();
                 
                 BufferedImage img = ImageIO.read(new File(getArg("space")));
                 for (int x = 0; x < img.getWidth(); ++x)
