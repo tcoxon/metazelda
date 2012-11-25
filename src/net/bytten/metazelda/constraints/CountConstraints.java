@@ -22,7 +22,7 @@ public class CountConstraints implements IDungeonConstraints {
     
     @Override
     public boolean validRoomCoords(Coords c) {
-        return c != null;
+        return c != null && c.y <= 0;
     }
 
     @Override

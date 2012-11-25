@@ -26,6 +26,7 @@ public class DungeonGenerator implements IDungeonGenerator {
     protected IDungeonConstraints constraints;
     
     public DungeonGenerator(long seed, IDungeonConstraints constraints) {
+        System.out.println("Dungeon seed: "+seed);
         this.seed = seed;
         this.random = new Random(seed);
         assert constraints != null;
@@ -295,7 +296,7 @@ public class DungeonGenerator implements IDungeonGenerator {
             maxIntensity = Math.max(maxIntensity, room.getIntensity());
         }
         for (Room room: dungeon.getRooms()) {
-            room.setIntensity(room.getIntensity() / maxIntensity);
+            room.setIntensity(room.getIntensity() * 0.99 / maxIntensity);
         }
     }
     

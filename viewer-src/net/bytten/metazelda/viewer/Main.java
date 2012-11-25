@@ -88,7 +88,6 @@ public class Main extends JPanel {
         if (generatorThread == null) {
             generatorThread = new Thread() {
                 public void run() {
-                    System.out.println("Seed: "+seed);
                     dungeonGen = makeDungeonGenerator(seed);
                     dungeonGen.generate();
                     generatorThread = null;
@@ -133,7 +132,7 @@ public class Main extends JPanel {
 
     // main -------------------------------------------------------------------
     public static void main(String[] args) {
-        final JFrame frame = new JFrame();
+        final JFrame frame = new JFrame("Metazelda Dungeon Viewer/Generator");
         final Main panel = new Main(args);
         panel.setPreferredSize(new Dimension(640, 480));
         frame.setContentPane(panel);
