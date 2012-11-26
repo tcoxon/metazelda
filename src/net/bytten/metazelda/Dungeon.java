@@ -199,4 +199,12 @@ public class Dungeon implements IDungeon {
         return null;
     }
 
+    @Override
+    public Room findSwitch() {
+        for (Room room: getRooms()) {
+            if (room.isSwitch()) return room;
+        }
+        return null;
+    }
+
 }

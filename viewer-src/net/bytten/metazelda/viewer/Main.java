@@ -71,7 +71,7 @@ public class Main extends JPanel {
                     }
                 }
                 
-                constraints = new SpaceConstraints(spaceMap, 4);
+                constraints = new SpaceConstraints(spaceMap);
                 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -80,7 +80,7 @@ public class Main extends JPanel {
         }
         
         if (constraints == null)
-            constraints = new CountConstraints(25, 4);
+            constraints = new CountConstraints(25, 4, 1);
         
         return new DungeonGenerator(seed, constraints);
     }

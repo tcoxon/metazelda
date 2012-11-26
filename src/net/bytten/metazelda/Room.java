@@ -74,6 +74,10 @@ public class Room {
         return item != null && item.isBoss();
     }
     
+    public boolean isSwitch() {
+        return item != null && item.isSwitch();
+    }
+    
     public Condition getPrecond() {
         return precond;
     }

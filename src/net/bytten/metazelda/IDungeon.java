@@ -21,6 +21,7 @@ public interface IDungeon {
     public abstract Room findStart();
     public abstract Room findBoss();
     public abstract Room findGoal();
+    public abstract Room findSwitch();
     
     public abstract Bounds getExtentBounds();
 

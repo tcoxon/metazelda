@@ -65,7 +65,7 @@ public class DungeonGenerator implements IDungeonGenerator {
     
     protected class KeyLevelRoomMapping {
         protected List<List<Room>> map = new ArrayList<List<Room>>(
-                constraints.numberKeys());
+                constraints.getMaxKeys());
         
         List<Room> getRooms(int keyLevel) {
             while (keyLevel >= map.size()) map.add(null);
@@ -123,8 +123,8 @@ public class DungeonGenerator implements IDungeonGenerator {
     // Fill the dungeon's space with rooms and doors (some locked)
     protected void placeRooms(KeyLevelRoomMapping levels) throws RetryException {
         
-        final int roomsPerLock = constraints.numberSpaces() /
-                constraints.numberKeys();
+        final int roomsPerLock = constraints.getMaxSpaces() /
+                constraints.getMaxKeys();
         
         // keyLevel: the number of keys required to get to the new room
         int keyLevel = 0;
@@ -134,14 +134,14 @@ public class DungeonGenerator implements IDungeonGenerator {
         Condition cond = new Condition();
         
         // Loop to place rooms and link them
-        while (dungeon.roomCount() < constraints.numberSpaces()) {
+        while (dungeon.roomCount() < constraints.getMaxSpaces()) {
             
             boolean doLock = false;
             
             // Decide whether we need to place a new lock
             // (Don't place the last lock, since that's reserved for the boss)
             if (levels.getRooms(keyLevel).size() >= roomsPerLock &&
-                    keyLevel < constraints.numberKeys()-1) {
+                    keyLevel < constraints.getMaxKeys()-1) {
                 latestKey = new Symbol(keyLevel++);
                 cond = cond.and(latestKey);
                 doLock = true;
@@ -215,6 +215,106 @@ public class DungeonGenerator implements IDungeonGenerator {
         dungeon.link(bossRoom, goalRoom);
     }
     
+    protected void removeDescendantsFromList(List<Room> rooms, Room room) {
+        rooms.remove(room);
+        for (Room child: room.getChildren()) {
+            removeDescendantsFromList(rooms, child);
+        }
+    }
+    
+    protected void addPrecond(Room room, Condition cond) {
+        room.setPrecond(room.getPrecond().and(cond));
+        for (Room child: room.getChildren()) {
+            addPrecond(child, cond);
+        }
+    }
+    
+    protected boolean switchLockChildRooms(Room room,
+            Condition.SwitchState givenState) {
+        boolean anyLocks = false;
+        Condition.SwitchState state = givenState != Condition.SwitchState.EITHER
+                ? givenState
+                : (random.nextInt(2) == 0
+                    ? Condition.SwitchState.ON
+                    : Condition.SwitchState.OFF);
+        
+        for (Direction d: Direction.values()) {
+            if (room.getEdge(d) != null) {
+                Room nextRoom = dungeon.get(room.coords.nextInDirection(d));
+                if (room.getChildren().contains(nextRoom)) {
+                    if (room.getEdge(d).getSymbol() == null &&
+                            random.nextInt(4) != 0) {
+                        dungeon.link(room, nextRoom, state.toSymbol());
+                        addPrecond(nextRoom, new Condition(state.toSymbol()));
+                        anyLocks = true;
+                    } else {
+                        anyLocks |= switchLockChildRooms(nextRoom, state);
+                    }
+                    
+                    if (givenState == Condition.SwitchState.EITHER) {
+                        state = state.invert();
+                    }
+                }
+            }
+        }
+        return anyLocks;
+    }
+    
+    protected List<Room> getSolutionPath() {
+        List<Room> solution = new ArrayList<Room>();
+        Room room = dungeon.findGoal();
+        while (room != null) {
+            solution.add(room);
+            room = room.getParent();
+        }
+        return solution;
+    }
+    
+    protected void placeSwitches() throws RetryException {
+        // Possible TODO: have multiple switches on separate circuits
+        // At the moment, we only have one switch per dungeon.
+        if (constraints.getMaxSwitches() <= 0) return;
+        
+        List<Room> solution = getSolutionPath();
+        
+        for (int attempt = 0; attempt < 10; ++attempt) {
+            
+            List<Room> rooms = new ArrayList<Room>(dungeon.getRooms());
+            Collections.shuffle(rooms, random);
+            Collections.shuffle(solution, random);
+            
+            // Pick a base room from the solution path so that the player
+            // will have to encounter a switch-lock to solve the dungeon.
+            Room baseRoom = null;
+            for (Room room: solution) {
+                if (room.getChildren().size() > 1 && room.getParent() != null) {
+                    baseRoom = room;
+                    break;
+                }
+            }
+            if (baseRoom == null) throw new RetryException();
+            Condition baseRoomCond = baseRoom.getPrecond();
+            
+            removeDescendantsFromList(rooms, baseRoom);
+            
+            Room switchRoom = null;
+            for (Room room: rooms) {
+                if (room.getItem() == null &&
+                        baseRoomCond.implies(room.getPrecond())) {
+                    switchRoom = room;
+                    break;
+                }
+            }
+            if (switchRoom == null) continue;
+            
+            if (switchLockChildRooms(baseRoom, Condition.SwitchState.EITHER)) {
+                switchRoom.setItem(new Symbol(Symbol.SWITCH));
+                return;
+            }
+        }
+        throw new RetryException();
+    }
+    
     // Link up adjacent rooms to make the graph less of a tree:
     protected void graphify() throws RetryException {
         for (Room room: dungeon.getRooms()) {
@@ -223,7 +323,6 @@ public class DungeonGenerator implements IDungeonGenerator {
             
             for (Direction d: Direction.values()) {
                 if (room.getEdge(d) != null) continue;
-                if (random.nextInt(6) != 0) continue;
                 
                 Room nextRoom = dungeon.get(room.coords.nextInDirection(d));
                 if (nextRoom == null || nextRoom.isGoal() || nextRoom.isBoss())
@@ -233,10 +332,15 @@ public class DungeonGenerator implements IDungeonGenerator {
                         backwardImplies = nextRoom.precond.implies(room.precond);
                 if (forwardImplies && backwardImplies) {
                     // both rooms are at the same keyLevel.
+                    if (random.nextInt(6) != 0) continue;
+                    
                     dungeon.link(room, nextRoom);
                 } else {
                     Symbol difference = room.precond.singleSymbolDifference(
                             nextRoom.precond);
+                    if (difference == null || (!difference.isSwitchState() &&
+                            random.nextInt(6) != 0))
+                        continue;
                     dungeon.link(room, nextRoom, difference);
                 }
             }
@@ -353,6 +457,9 @@ public class DungeonGenerator implements IDungeonGenerator {
                 
                 // Place the boss and goal rooms:
                 placeBossGoalRooms(levels);
+                
+                // Place switches and the locks that require it:
+                placeSwitches();
         
                 // Make the dungeon less tree-like:
                 graphify();

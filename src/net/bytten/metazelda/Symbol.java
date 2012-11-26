@@ -4,7 +4,10 @@ public class Symbol {
     public static final int
         START = -1,
         GOAL = -2,
-        BOSS = -3;
+        BOSS = -3,
+        SWITCH_ON = -4,     // used as a condition (lock)
+        SWITCH_OFF = -5,    // used as a condition (lock)
+        SWITCH = -6;        // used as an item (key) within a room
 
     protected final int value;
     protected final String name;
@@ -18,6 +21,12 @@ public class Symbol {
             name = "Goal";
         else if (value == BOSS)
             name = "Boss";
+        else if (value == SWITCH_ON)
+            name = "ON";
+        else if (value == SWITCH_OFF)
+            name = "OFF";
+        else if (value == SWITCH)
+            name = "SW";
         else if (value >= 0 && value < 26)
             name = Character.toString((char)((int)'A' + value));
         else
@@ -57,6 +66,14 @@ public class Symbol {
     
     public boolean isBoss() {
         return value == BOSS;
+    }
+    
+    public boolean isSwitch() {
+        return value == SWITCH;
+    }
+    
+    public boolean isSwitchState() {
+        return value == SWITCH_ON || value == SWITCH_OFF;
     }
     
     @Override

@@ -6,10 +6,13 @@ import net.bytten.metazelda.Coords;
 
 public class SpaceConstraints extends CountConstraints {
 
+    public static final int DEFAULT_MAX_KEYS = 4,
+            DEFAULT_MAX_SWITCHES = 1;
+    
     protected SpaceMap spaceMap;
     
-    public SpaceConstraints(SpaceMap spaceMap, int numKeys) {
-        super(spaceMap.numberSpaces(), numKeys);
+    public SpaceConstraints(SpaceMap spaceMap) {
+        super(spaceMap.numberSpaces(), DEFAULT_MAX_KEYS, DEFAULT_MAX_SWITCHES);
         this.spaceMap = spaceMap;
     }
 

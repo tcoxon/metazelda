@@ -8,8 +8,9 @@ import net.bytten.metazelda.Dungeon;
 public interface IDungeonConstraints {
 
     public boolean validRoomCoords(Coords c);
-    public int numberSpaces();
-    public int numberKeys();
+    public int getMaxSpaces();
+    public int getMaxKeys();
+    public int getMaxSwitches();
     public Collection<Coords> initialCoords();
     public boolean isAcceptable(Dungeon dungeon);
     

@@ -8,16 +8,21 @@ import net.bytten.metazelda.Dungeon;
 
 public class CountConstraints implements IDungeonConstraints {
 
-    protected final int numSpaces, numKeys;
+    protected int maxSpaces, maxKeys, maxSwitches;
     
-    public CountConstraints(int numSpaces, int numKeys) {
-        this.numSpaces = numSpaces;
-        this.numKeys = numKeys;
+    public CountConstraints(int maxSpaces, int maxKeys, int maxSwitches) {
+        this.maxSpaces = maxSpaces;
+        this.maxKeys = maxKeys;
+        this.maxSwitches = maxSwitches;
     }
     
     @Override
-    public int numberSpaces() {
-        return numSpaces;
+    public int getMaxSpaces() {
+        return maxSpaces;
+    }
+    
+    public void setMaxSpaces(int maxSpaces) {
+        this.maxSpaces = maxSpaces;
     }
     
     @Override
@@ -31,13 +36,26 @@ public class CountConstraints implements IDungeonConstraints {
     }
 
     @Override
-    public int numberKeys() {
-        return numKeys;
+    public int getMaxKeys() {
+        return maxKeys;
+    }
+    
+    public void setMaxKeys(int maxKeys) {
+        this.maxKeys = maxKeys;
     }
     
     @Override
     public boolean isAcceptable(Dungeon dungeon) {
         return true;
+    }
+
+    @Override
+    public int getMaxSwitches() {
+        return maxSwitches;
+    }
+
+    public void setMaxSwitches(int maxSwitches) {
+        this.maxSwitches = maxSwitches;
     }
 
 }
