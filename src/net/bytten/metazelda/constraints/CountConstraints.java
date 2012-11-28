@@ -4,8 +4,14 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import net.bytten.metazelda.Coords;
-import net.bytten.metazelda.Dungeon;
+import net.bytten.metazelda.IDungeon;
 
+/**
+ * Limits the {@link net.bytten.metazelda.generators.IDungeonGenerator} only in
+ * the <i>number</i> of keys, switches and rooms it is allowed to place.
+ * 
+ * @see IDungeonConstraints
+ */
 public class CountConstraints implements IDungeonConstraints {
 
     protected int maxSpaces, maxKeys, maxSwitches;
@@ -45,7 +51,7 @@ public class CountConstraints implements IDungeonConstraints {
     }
     
     @Override
-    public boolean isAcceptable(Dungeon dungeon) {
+    public boolean isAcceptable(IDungeon dungeon) {
         return true;
     }
 

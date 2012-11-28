@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * @see IDungeon
+ */
 public class Dungeon implements IDungeon {
 
     protected int itemCount;
@@ -96,47 +99,6 @@ public class Dungeon implements IDungeon {
             room2.getEdge(Direction.oppositeDirection(d)) != null;
     }
     
-    public static Dungeon makeTestDungeon() {
-        Dungeon dungeon = new Dungeon();
-        
-        Symbol key = new Symbol(0),
-            feather = new Symbol(1),
-            boss = new Symbol(2),
-            goal = new Symbol(Symbol.GOAL),
-            start = new Symbol(Symbol.START);
-    
-        Room room0 = new Room(0,0, null, null, new Condition());
-        room0.setItem(start);
-        dungeon.add(room0);
-        
-        Room room1 = new Room(0,-1, room0, null, new Condition());
-        dungeon.add(room1);
-        dungeon.link(room0, room1);
-        
-        Room room2 = new Room(-1,-1, room1, feather, new Condition(key));
-        dungeon.add(room2);
-        dungeon.link(room1, room2, key);
-        
-        room2 = new Room(1,-1, room1, null, new Condition());
-        dungeon.add(room2);
-        dungeon.link(room1,room2);
-        
-        room1 = new Room(2,-1, room2, key, new Condition());
-        dungeon.add(room1);
-        dungeon.link(room2,room1);
-        
-        room1 = new Room(1,-2, room2, boss, new Condition(key).and(feather));
-        dungeon.add(room1);
-        dungeon.link(room2,room1, feather);
-        
-        room2 = new Room(0,-2, room1, goal,
-                new Condition(key).and(feather).and(boss));
-        dungeon.add(room2);
-        dungeon.link(room1, room2, boss);
-        
-        return dungeon;
-    }
-
     @Override
     public Room findStart() {
         for (Room room: getRooms()) {

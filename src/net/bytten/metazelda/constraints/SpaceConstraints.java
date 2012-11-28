@@ -4,6 +4,14 @@ import java.util.Collection;
 
 import net.bytten.metazelda.Coords;
 
+/**
+ * Constrains the coordinates where Rooms may be placed to be only those within
+ * the {@link SpaceMap}, as well as placing limitations on the number of keys
+ * and switches.
+ * 
+ * @see CountConstraints
+ * @see SpaceMap
+ */
 public class SpaceConstraints extends CountConstraints {
 
     public static final int DEFAULT_MAX_KEYS = 4,

@@ -16,6 +16,9 @@ import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.constraints.IDungeonConstraints;
 
+/**
+ * The default and reference implementation of an {@link IDungeonGenerator}.
+ */
 public class DungeonGenerator implements IDungeonGenerator {
     
     public static final int MAX_RETRIES = 20;
@@ -25,6 +28,14 @@ public class DungeonGenerator implements IDungeonGenerator {
     protected Dungeon dungeon;
     protected IDungeonConstraints constraints;
     
+    /**
+     * Creates a DungeonGenerator with a given random seed and places
+     * specific constraints on {@link IDungeon}s it generates.
+     * 
+     * @param seed          the random seed to use
+     * @param constraints   the constraints to place on generation
+     * @see net.bytten.metazelda.constraints.IDungeonConstraints
+     */
     public DungeonGenerator(long seed, IDungeonConstraints constraints) {
         System.out.println("Dungeon seed: "+seed);
         this.seed = seed;
@@ -33,6 +44,14 @@ public class DungeonGenerator implements IDungeonGenerator {
         this.constraints = constraints;
     }
     
+    /**
+     * Randomly chooses a {@link Room} within the given collection that has at
+     * least one adjacent empty space.
+     * 
+     * @param roomCollection    the collection of rooms to choose from
+     * @return  the room that was chosen, or null if there are no rooms with
+     *          adjacent empty spaces
+     */
     protected Room chooseRoomWithFreeEdge(Collection<Room> roomCollection) {
         List<Room> rooms = new ArrayList<Room>(roomCollection);
         Collections.shuffle(rooms, random);
@@ -49,6 +68,14 @@ public class DungeonGenerator implements IDungeonGenerator {
         return null;
     }
     
+    /**
+     * Randomly chooses a {@link Direction} in which the given {@link Room} has
+     * an adjacent empty space.
+     * 
+     * @param room  the room
+     * @return  the Direction of the empty space chosen adjacent to the Room or
+     *          null if there are no adjacent empty spaces
+     */
     protected Direction chooseFreeEdge(Room room) {
         int d0 = random.nextInt(4);
         for (int i = 0; i < 4; ++i) {
@@ -63,6 +90,14 @@ public class DungeonGenerator implements IDungeonGenerator {
         return null;
     }
     
+    /**
+     * Maps 'keyLevel' to the set of rooms within that keyLevel.
+     * <p>
+     * A 'keyLevel' is the count of the number of unique keys are needed for all
+     * the locks we've placed. For example, all the rooms in keyLevel 0 are
+     * accessible without collecting any keys, while to get to rooms in
+     * keyLevel 3, the player must have collected at least 3 keys.
+     */
     protected class KeyLevelRoomMapping {
         protected List<List<Room>> map = new ArrayList<List<Room>>(
                 constraints.getMaxKeys());
@@ -83,10 +118,21 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
+    /**
+     * Thrown by several IDungeonGenerator methods that can fail.
+     * Should be caught and handled in {@link #generate}.
+     */
     protected static class RetryException extends Exception {
         private static final long serialVersionUID = 1L;
     }
     
+    /**
+     * Comparator objects for sorting {@link Room}s in a couple of different
+     * ways. These are used to determine in which rooms of a given keyLevel it
+     * is best to place the next key.
+     * 
+     * @see #placeKeys
+     */
     protected static final Comparator<Room>
     EDGE_COUNT_COMPARATOR = new Comparator<Room>() {
         @Override
@@ -103,7 +149,12 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     };
     
-    // Sets up the dungeon's entrance room
+    /**
+     * Sets up the dungeon's entrance room.
+     * 
+     * @param levels    the keyLevel -> room-set mapping to update
+     * @see KeyLevelRoomMapping 
+     */
     protected void initEntranceRoom(KeyLevelRoomMapping levels)
             throws RetryException {
         Coords coords = null;
@@ -120,7 +171,14 @@ public class DungeonGenerator implements IDungeonGenerator {
         levels.addRoom(0, entry);
     }
     
-    // Fill the dungeon's space with rooms and doors (some locked)
+    /**
+     * Fill the dungeon's space with rooms and doors (some locked).
+     * Keys are not inserted at this point.
+     * 
+     * @param levels    the keyLevel -> room-set mapping to update
+     * @throws RetryException if it fails
+     * @see KeyLevelRoomMapping
+     */
     protected void placeRooms(KeyLevelRoomMapping levels) throws RetryException {
         
         final int roomsPerLock = constraints.getMaxSpaces() /
@@ -173,6 +231,14 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
+    /**
+     * Places the BOSS and GOAL rooms within the dungeon, in existing rooms.
+     * These rooms are moved into the next keyLevel.
+     * 
+     * @param levels    the keyLevel -> room-set mapping to update
+     * @throws RetryException if it fails
+     * @see KeyLevelRoomMapping
+     */
     protected void placeBossGoalRooms(KeyLevelRoomMapping levels)
             throws RetryException {
         List<Room> possibleGoalRooms = new ArrayList<Room>(dungeon.roomCount());
@@ -270,6 +336,13 @@ public class DungeonGenerator implements IDungeonGenerator {
         return solution;
     }
     
+    /**
+     * Makes some {@link Edge}s within the dungeon require the dungeon's switch
+     * to be in a particular state, and places the switch in a room in the
+     * dungeon.
+     * 
+     * @throws RetryException if it fails
+     */
     protected void placeSwitches() throws RetryException {
         // Possible TODO: have multiple switches on separate circuits
         // At the moment, we only have one switch per dungeon.
@@ -315,7 +388,12 @@ public class DungeonGenerator implements IDungeonGenerator {
         throw new RetryException();
     }
     
-    // Link up adjacent rooms to make the graph less of a tree:
+    /**
+     * Randomly links up some adjacent rooms to make the dungeon graph less of
+     * a tree.
+     * 
+     * @throws RetryException if it fails
+     */
     protected void graphify() throws RetryException {
         for (Room room: dungeon.getRooms()) {
             
@@ -347,6 +425,14 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
+    /**
+     * Places keys within the dungeon in such a way that the dungeon is
+     * guaranteed to be solvable.
+     * 
+     * @param levels    the keyLevel -> room-set mapping to use
+     * @throws RetryException if it fails
+     * @see KeyLevelRoomMapping
+     */
     protected void placeKeys(KeyLevelRoomMapping levels) throws RetryException {
         // Now place the keys. For every key-level but the last one, place a
         // key for the next level in it, preferring rooms with fewest links
@@ -404,9 +490,15 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
-    // Compute the 'intensity' of each room, a number from 0.0 to 1.0 that
-    // represents the relative difficulty of that room. Rooms generally get
-    // more intense the deeper into the dungeon they are.
+    /**
+     * Computes the 'intensity' of each {@link Room}. Rooms generally get more
+     * intense the deeper they are into the dungeon.
+     * 
+     * @param levels    the keyLevel -> room-set mapping to update
+     * @throws RetryException if it fails
+     * @see KeyLevelRoomMapping
+     * @see Room
+     */
     protected void computeIntensity(KeyLevelRoomMapping levels)
             throws RetryException {
         
@@ -433,6 +525,15 @@ public class DungeonGenerator implements IDungeonGenerator {
         dungeon.findGoal().setIntensity(0.0);
     }
     
+    /**
+     * Checks with the
+     * {@link net.bytten.metazelda.constraints.IDungeonConstraints} that the
+     * dungeon is OK to use.
+     * 
+     * @throws RetryException if the IDungeonConstraints decided generation must
+     *                        be re-attempted
+     * @see net.bytten.metazelda.constraints.IDungeonConstraints
+     */
     protected void checkAcceptable() throws RetryException {
         if (!constraints.isAcceptable(dungeon))
             throw new RetryException();
