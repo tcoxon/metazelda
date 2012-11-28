@@ -1,7 +1,6 @@
 package net.bytten.metazelda;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -11,17 +10,9 @@ public class Dungeon implements IDungeon {
     protected Map<Coords, Room> rooms;
     protected Bounds bounds;
     
-    // Used for getting external rooms:
-    protected Map<Integer, Integer> minX, maxX, minY, maxY;
-    
     public Dungeon() {
         rooms = new TreeMap<Coords, Room>();
         bounds = new Bounds(0,0,0,0);
-        
-        minX = new HashMap<Integer,Integer>();
-        maxX = new HashMap<Integer,Integer>();
-        minY = new HashMap<Integer,Integer>();
-        maxY = new HashMap<Integer,Integer>();
     }
     
     @Override
@@ -68,25 +59,6 @@ public class Dungeon implements IDungeon {
         if (room.coords.y > bounds.bottom) {
             bounds = new Bounds(bounds.left, bounds.top,
                     bounds.right, room.coords.y);
-        }
-        
-        updateBoundaryMin(minX, room.coords.y, room.coords.x);
-        updateBoundaryMax(maxX, room.coords.y, room.coords.x);
-        updateBoundaryMin(minY, room.coords.x, room.coords.y);
-        updateBoundaryMax(maxY, room.coords.x, room.coords.y);
-    }
-    
-    private void updateBoundaryMin(Map<Integer,Integer> minMap, int k, int v) {
-        Integer cv = minMap.get(k);
-        if (cv == null || v < cv) {
-            minMap.put(k,v);
-        }
-    }
-    
-    private void updateBoundaryMax(Map<Integer,Integer> maxMap, int k, int v) {
-        Integer cv = maxMap.get(k);
-        if (cv == null || v > cv) {
-            maxMap.put(k,v);
         }
     }
     
