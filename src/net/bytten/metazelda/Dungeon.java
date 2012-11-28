@@ -10,7 +10,6 @@ public class Dungeon implements IDungeon {
     protected int itemCount;
     protected Map<Coords, Room> rooms;
     protected Bounds bounds;
-    protected Map<Symbol, Condition> placedItems;
     
     // Used for getting external rooms:
     protected Map<Integer, Integer> minX, maxX, minY, maxY;
@@ -18,7 +17,6 @@ public class Dungeon implements IDungeon {
     public Dungeon() {
         rooms = new TreeMap<Coords, Room>();
         bounds = new Bounds(0,0,0,0);
-        placedItems = new HashMap<Symbol, Condition>();
         
         minX = new HashMap<Integer,Integer>();
         maxX = new HashMap<Integer,Integer>();
@@ -51,17 +49,9 @@ public class Dungeon implements IDungeon {
         return get(new Coords(x,y));
     }
     
-    private void placeItem(Symbol e, Condition precond) {
-        assert precond != null;
-        if (e != null && !e.isGoal() && !e.isStart())
-            placedItems.put(e, precond);
-    }
-    
     @Override
     public void add(Room room) {
         rooms.put(room.coords, room);
-        
-        placeItem(room.getItem(), room.getPrecond());
         
         if (room.coords.x < bounds.left) {
             bounds = new Bounds(room.coords.x, bounds.top,
