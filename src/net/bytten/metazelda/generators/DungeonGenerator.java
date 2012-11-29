@@ -445,14 +445,14 @@ public class DungeonGenerator implements IDungeonGenerator {
                         backwardImplies = nextRoom.precond.implies(room.precond);
                 if (forwardImplies && backwardImplies) {
                     // both rooms are at the same keyLevel.
-                    if (random.nextInt(6) != 0) continue;
+                    if (random.nextInt(5) != 0) continue;
                     
                     dungeon.link(room, nextRoom);
                 } else {
                     Symbol difference = room.precond.singleSymbolDifference(
                             nextRoom.precond);
                     if (difference == null || (!difference.isSwitchState() &&
-                            random.nextInt(6) != 0))
+                            random.nextInt(5) != 0))
                         continue;
                     dungeon.link(room, nextRoom, difference);
                 }
