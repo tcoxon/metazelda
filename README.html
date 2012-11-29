@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+</head>
+<body>
+<h1 id="metazelda">Metazelda</h1>
+<h2 id="introduction">Introduction</h2>
+<p>Implementation of an algorithm for procedurally-generating dungeons with Zelda-like item-based puzzles.</p>
+<div class="figure">
+<img src="http://bytten.net/random/metazelda2/2.png" /><p class="caption"></p>
+</div>
+<p>I plan to use this in my game, <a href="http://bytten.net/devlog/tags.html#lennasinception-ref">Lenna's Inception</a>.</p>
+<p>See also: <a href="http://bytten.net/devlog/tags.html#metazelda-ref">my posts on metazelda on my devlog</a></p>
+<h2 id="usage">Usage</h2>
+<p>To run after building: java -cp bin:viewer-bin net.bytten.metazelda.viewer.Main</p>
+<p>It will randomly generate a graph and show it in the viewer.</p>
+<p>Controls:</p>
+<ul>
+<li>F5 to generate a new dungeon.</li>
+<li>Pass -seed=X to generate a dungeon from a specific seed.</li>
+<li>Pass -space=spacemaps/skull.png to generate a dungeon in a specific shape.</li>
+</ul>
+<p>Reading the graph:</p>
+<ul>
+<li>Circles are rooms, black edges joining two circles are links (doorways between two rooms).</li>
+<li>The player starts at the room containing 'Start' and the aim is to get to the room containing 'Goal'.</li>
+<li>Rooms can contain symbols - represented by letters. The player collects the symbols of the rooms they've passed through.</li>
+<li>Edges with letters on them require the player to have collected the symbol with that letter to unlock that door.</li>
+<li>The colors are a heatmap of the relative difficulties of the rooms in the dungeon. Red - difficult; blue - easy.</li>
+<li>The switch object ('SW') can be put into one of two states: ON or OFF. Edges in the dungeon graph that have one of the words ON or OFF on them require the switch to be in that state for the door to unlock.</li>
+</ul>
+<h2 id="screenshots">Screenshots</h2>
+<p><img src="http://bytten.net/random/metazelda2/1.png" /> <img src="http://bytten.net/random/metazelda2/3.png" /> <img src="http://bytten.net/random/metazelda2/4.png" /> <img src="http://bytten.net/random/metazelda2/5.png" /></p>
+<h2 id="algorithm">Algorithm</h2>
+<p>The following algorithm for generating dungeons is implemented in the net.bytten.metazelda.generators.DungeonGenerator class.</p>
+</body>
+</html>
