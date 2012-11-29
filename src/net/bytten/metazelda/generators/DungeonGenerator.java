@@ -281,6 +281,13 @@ public class DungeonGenerator implements IDungeonGenerator {
         dungeon.link(bossRoom, goalRoom);
     }
     
+    /**
+     * Removes the given {@link Room} and all its descendants from the given
+     * list.
+     * 
+     * @param rooms the list of Rooms to remove nodes from
+     * @param room  the Room whose descendants to remove from the list
+     */ 
     protected void removeDescendantsFromList(List<Room> rooms, Room room) {
         rooms.remove(room);
         for (Room child: room.getChildren()) {
@@ -288,6 +295,13 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
+    /**
+     * Adds extra conditions to the given {@link Room}'s preconditions and all
+     * of its descendants.
+     * 
+     * @param room  the Room to add extra preconditions to
+     * @param cond  the extra preconditions to add
+     */
     protected void addPrecond(Room room, Condition cond) {
         room.setPrecond(room.getPrecond().and(cond));
         for (Room child: room.getChildren()) {
@@ -295,6 +309,20 @@ public class DungeonGenerator implements IDungeonGenerator {
         }
     }
     
+    /**
+     * Randomly locks descendant rooms of the given {@link Room} with
+     * {@link Edge}s that require the switch to be in the given state.
+     * <p>
+     * If the given state is EITHER, the required states will be random.
+     * 
+     * @param room          the room whose child to lock
+     * @param givenState    the state to require the switch to be in for the
+     *                      child rooms to be accessible
+     * @return              true if any locks were added, false if none were
+     *                      added (which can happen due to the way the random
+     *                      decisions are made)
+     * @see Condition.SwitchState
+     */
     protected boolean switchLockChildRooms(Room room,
             Condition.SwitchState givenState) {
         boolean anyLocks = false;
@@ -326,6 +354,13 @@ public class DungeonGenerator implements IDungeonGenerator {
         return anyLocks;
     }
     
+    /**
+     * Returns a path from the goal to the dungeon entrance, along the 'parent'
+     * relations.
+     * 
+     * @return  a list of linked {@link Room}s starting with the goal room and
+     *          ending with the start room.
+     */
     protected List<Room> getSolutionPath() {
         List<Room> solution = new ArrayList<Room>();
         Room room = dungeon.findGoal();
@@ -463,6 +498,19 @@ public class DungeonGenerator implements IDungeonGenerator {
             INTENSITY_GROWTH_JITTER = 0.1,
             INTENSITY_EASE_OFF = 0.2;
     
+    /**
+     * Recursively applies the given intensity to the given {@link Room}, and
+     * higher intensities to each of its descendants that are within the same
+     * keyLevel.
+     * <p>
+     * Intensities set by this method may (will) be outside of the normal range
+     * from 0.0 to 1.0. See {@link #normalizeIntensity} to correct this.
+     * 
+     * @param room      the room to set the intensity of
+     * @param intensity the value to set intensity to (some randomn variance is
+     *                  added)
+     * @see Room
+     */
     protected double applyIntensity(Room room, double intensity) {
         intensity *= 1.0 - INTENSITY_GROWTH_JITTER/2.0 +
                 INTENSITY_GROWTH_JITTER * random.nextDouble();
@@ -480,6 +528,12 @@ public class DungeonGenerator implements IDungeonGenerator {
         return maxIntensity;
     }
 
+    /**
+     * Scales intensities within the dungeon down so that they all fit within
+     * the range 0 <= intensity < 1.0.
+     * 
+     * @see Room
+     */
     protected void normalizeIntensity() {
         double maxIntensity = 0.0;
         for (Room room: dungeon.getRooms()) {

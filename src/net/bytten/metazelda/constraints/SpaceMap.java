@@ -8,6 +8,16 @@ import java.util.TreeSet;
 
 import net.bytten.metazelda.Coords;
 
+/**
+ * Controls which spaces are valid for an
+ * {@link net.bytten.metazelda.generators.IDungeonGenerator} to create
+ * {@link Room}s in.
+ * <p>
+ * Essentially just a Set<{@link Coords}> with some convenience methods.
+ * 
+ * @see Coords
+ * @see SpaceConstraints
+ */
 public class SpaceMap {
     protected Set<Coords> spaces = new TreeSet<Coords>();
     
