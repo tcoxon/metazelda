@@ -55,7 +55,7 @@ The following algorithm for generating dungeons is implemented in the
 net.bytten.metazelda.generators.DungeonGenerator class's generate() method.
 
 This algorithm generates lock-and-key puzzles that are guaranteed to be
-solvable.
+solvable _by construction_.
 
 Dungeons are generated over several phases:
 
