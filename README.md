@@ -52,6 +52,67 @@ Reading the graph:
 ## Algorithm
 
 The following algorithm for generating dungeons is implemented in the
-net.bytten.metazelda.generators.DungeonGenerator class.
+net.bytten.metazelda.generators.DungeonGenerator class's generate() method.
 
+This algorithm generates lock-and-key puzzles that are guaranteed to be
+solvable.
+
+Dungeons are generated over several phases:
+
+1. Create the entrance room
+2. Create a tree of linked rooms (including locked doors)
+3. Place the boss and goal rooms
+4. Place the switch and switch-locks
+5. Make the tree into a graph
+6. Compute the intensity (difficulty) of rooms
+7. Place keys within the dungeon
+
+### Definitions
+
+First of all, some definitions are needed so that you will understand what
+I mean by 'dungeon,' 'edge,' 'symbol,' and so on.
+
+I use the word 'dungeon' interchangeably with 'puzzle,' but there's no
+reason this algorithm couldn't be used for non-dungeon lock-and-key
+puzzles.
+
+#### Keys, Symbols
+
+Let's forget for now that the keys and locks are items and objects in the
+game and consider an abstraction: a key is a boolean variable --
+you either have it or you don't -- and a lock is a test of this variable.
+We'll give each of these boolean variables its own letter, i.e. A, B, C.
+
+Each boolean variable is initially false (the player starts with no keys),
+but goes true when the player collects the key. For the sake of simplicity,
+we will say these variables never go false again: our puzzles effectively
+have colored keys (such as in Doom) that can be reused rather than the
+small keys in Zelda that can only be used once.
+
+In Metazelda, we keep track of 'Symbols' to figure out which boolean
+variables have to be, or might be true.
+
+Rooms containing Symbols are said to give the player that Symbol (they set
+the boolean variable for that Symbol to true). Locks are also labelled with
+Symbols, and can only be unlocked if the player has that Symbol (if the
+boolean variable is true).
+
+#### Room Graphs
+
+Rooms are nodes in the graph.
+
+Rooms are 'linked' by doorways, which are represented by Edges in the graph.
+An Edge is optionally labelled by a Symbol, which means it's locked.
+
+### Creating the entrance room
+
+### Creating the initial tree of rooms
+
+### Placing the boss and goal rooms
+
+### Making the room tree into a graph
+
+### Computing the intensity of rooms
+
+### Placing keys within the dungeon
 

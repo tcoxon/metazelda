@@ -36,6 +36,34 @@
 <h2 id="screenshots">Screenshots</h2>
 <p><img src="http://bytten.net/random/metazelda2/1.png" /> <img src="http://bytten.net/random/metazelda2/3.png" /> <img src="http://bytten.net/random/metazelda2/4.png" /> <img src="http://bytten.net/random/metazelda2/5.png" /></p>
 <h2 id="algorithm">Algorithm</h2>
-<p>The following algorithm for generating dungeons is implemented in the net.bytten.metazelda.generators.DungeonGenerator class.</p>
+<p>The following algorithm for generating dungeons is implemented in the net.bytten.metazelda.generators.DungeonGenerator class's generate() method.</p>
+<p>This algorithm generates lock-and-key puzzles that are guaranteed to be solvable.</p>
+<p>Dungeons are generated over several phases:</p>
+<ol style="list-style-type: decimal">
+<li>Create the entrance room</li>
+<li>Create a tree of linked rooms (including locked doors)</li>
+<li>Place the boss and goal rooms</li>
+<li>Place the switch and switch-locks</li>
+<li>Make the tree into a graph</li>
+<li>Compute the intensity (difficulty) of rooms</li>
+<li>Place keys within the dungeon</li>
+</ol>
+<h3 id="definitions">Definitions</h3>
+<p>First of all, some definitions are needed so that you will understand what I mean by 'dungeon,' 'edge,' 'symbol,' and so on.</p>
+<p>I use the word 'dungeon' interchangeably with 'puzzle,' but there's no reason this algorithm couldn't be used for non-dungeon lock-and-key puzzles.</p>
+<h4 id="keys-symbols">Keys, Symbols</h4>
+<p>Let's forget for now that the keys and locks are items and objects in the game and consider an abstraction: a key is a boolean variable -- you either have it or you don't -- and a lock is a test of this variable. We'll give each of these boolean variables its own letter, i.e. A, B, C.</p>
+<p>Each boolean variable is initially false (the player starts with no keys), but goes true when the player collects the key. For the sake of simplicity, we will say these variables never go false again: our puzzles effectively have colored keys (such as in Doom) that can be reused rather than the small keys in Zelda that can only be used once.</p>
+<p>In Metazelda, we keep track of 'Symbols' to figure out which boolean variables have to be, or might be true.</p>
+<p>Rooms containing Symbols are said to give the player that Symbol (they set the boolean variable for that Symbol to true). Locks are also labelled with Symbols, and can only be unlocked if the player has that Symbol (if the boolean variable is true).</p>
+<h4 id="room-graphs">Room Graphs</h4>
+<p>Rooms are nodes in the graph.</p>
+<p>Rooms are 'linked' by doorways, which are represented by Edges in the graph. An Edge is optionally labelled by a Symbol, which means it's locked.</p>
+<h3 id="creating-the-entrance-room">Creating the entrance room</h3>
+<h3 id="creating-the-initial-tree-of-rooms">Creating the initial tree of rooms</h3>
+<h3 id="placing-the-boss-and-goal-rooms">Placing the boss and goal rooms</h3>
+<h3 id="making-the-room-tree-into-a-graph">Making the room tree into a graph</h3>
+<h3 id="computing-the-intensity-of-rooms">Computing the intensity of rooms</h3>
+<h3 id="placing-keys-within-the-dungeon">Placing keys within the dungeon</h3>
 </body>
 </html>
