@@ -1,4 +1,4 @@
-package net.bytten.metazelda;
+package net.bytten.metazelda.util;
 
 /**
  * An AWT-agnostic 2D coordinate class.
@@ -80,6 +80,12 @@ public class Coords implements Comparable<Coords> {
         if (dy < 0) return Direction.S;
         if (dy > 0) return Direction.N;
         throw new RuntimeException("Coords do not align in one dimension, or are equal");
+    }
+    
+    public double distance(Coords other) {
+        int dx = x - other.x,
+            dy = y - other.y;
+        return Math.sqrt(dx*dx + dy*dy);
     }
     
     public String toString() {

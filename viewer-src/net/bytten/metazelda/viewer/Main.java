@@ -17,13 +17,13 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import net.bytten.metazelda.Coords;
 import net.bytten.metazelda.constraints.CountConstraints;
-import net.bytten.metazelda.constraints.IDungeonConstraints;
 import net.bytten.metazelda.constraints.SpaceConstraints;
 import net.bytten.metazelda.constraints.SpaceMap;
 import net.bytten.metazelda.generators.DungeonGenerator;
 import net.bytten.metazelda.generators.IDungeonGenerator;
+import net.bytten.metazelda.generators.LinearDungeonGenerator;
+import net.bytten.metazelda.util.Coords;
 
 
 public class Main extends JPanel {
@@ -57,7 +57,7 @@ public class Main extends JPanel {
     }
     
     protected IDungeonGenerator makeDungeonGenerator(long seed) {
-        IDungeonConstraints constraints = null;
+        CountConstraints constraints = null;
         
         if (getArg("space") != null) {
             try {
@@ -82,7 +82,12 @@ public class Main extends JPanel {
         if (constraints == null)
             constraints = new CountConstraints(25, 4, 1);
         
-        return new DungeonGenerator(seed, constraints);
+        if (getArg("-switches") != null) {
+            return new DungeonGenerator(seed, constraints);
+        } else {
+            constraints.setMaxSwitches(0);
+            return new LinearDungeonGenerator(seed, constraints);
+        }
     }
     
     public void regenerate(final long seed) {

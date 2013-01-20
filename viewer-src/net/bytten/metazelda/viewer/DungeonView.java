@@ -6,11 +6,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
 import net.bytten.metazelda.Bounds;
-import net.bytten.metazelda.Coords;
-import net.bytten.metazelda.Direction;
 import net.bytten.metazelda.Edge;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Room;
+import net.bytten.metazelda.util.Coords;
+import net.bytten.metazelda.util.Direction;
 
 public class DungeonView {
 

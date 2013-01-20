@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Random;
 
 import net.bytten.metazelda.Condition;
-import net.bytten.metazelda.Coords;
-import net.bytten.metazelda.Direction;
 import net.bytten.metazelda.Dungeon;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.constraints.IDungeonConstraints;
+import net.bytten.metazelda.util.Coords;
+import net.bytten.metazelda.util.Direction;
 
 /**
  * The default and reference implementation of an {@link IDungeonGenerator}.

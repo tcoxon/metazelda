@@ -1,4 +1,4 @@
-package net.bytten.metazelda;
+package net.bytten.metazelda.util;
 
 /**
  * Represents a compass direction.

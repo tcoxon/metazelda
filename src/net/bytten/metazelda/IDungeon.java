@@ -2,6 +2,8 @@ package net.bytten.metazelda;
 
 import java.util.Collection;
 
+import net.bytten.metazelda.util.Coords;
+
 /**
  * Represents the spacial layout of a lock-and-key puzzle and contains all
  * {@link Symbol}s, {@link Room}s and {@link Edge}s within the puzzle.

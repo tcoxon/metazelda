@@ -25,6 +25,8 @@ Controls:
 * F5 to generate a new dungeon.
 * Pass -seed=X to generate a dungeon from a specific seed.
 * Pass -space=spacemaps/skull.png to generate a dungeon in a specific shape.
+* Pass -switches to generate dungeons with switch puzzles. This will turn off
+  linearity optimization.
 
 Reading the graph:
 
@@ -66,6 +68,7 @@ Dungeons are generated over several phases:
 5. Make the tree into a graph
 6. Compute the intensity (difficulty) of rooms
 7. Place keys within the dungeon
+8. Optimizing linearity
 
 ### Definitions
 
@@ -257,3 +260,38 @@ This gives the puzzle a jagged tension curve as found in
 Finally, placing the keys in the dungeon in such a way that the puzzle is
 solvable is the simplest part: the key for each key-level n > 0 is placed
 in the highest-intensity room in key-level n-1.
+
+### Optimizing linearity
+
+This phase is specific to the LinearDungeonGenerator class and does not affect
+the base DungeonGenerator class.
+
+According to [this insightful article on Gamasutra](http://www.gamasutra.com/view/feature/6582/learning_from_the_masters_level_.php),
+true nonlinearity (i.e. backtracking) in a level is undesirable. It's simply
+boring for players to repeatedly go back and forth between a few rooms. On the
+other hand, an appearance of nonlinearity _is_ desirable. The difference is that
+the backtracking should be optional: the shortest path to the goal should not
+require the player to repeatedly traverse the same path.
+
+LinearDungeonGenerator generates several dungeons with DungeonGenerator,
+and uses its measure of nonlinearity to pick the most linear). This does not
+stop dungeons _appearing_ nonlinear, because there will still be optional
+branches in the dungeons that are generated.
+
+Nonlinearity in Metazelda is defined as the number of times a player must walk
+through each room _after its first encounter_, on the shortest path through the
+dungeon.
+
+LinearDungeonGenerator uses A* to find the shortest path through the dungeon:
+it is the shortest path from the entrance to the first key, from each key to the
+next key and from the last key to the goal. Locked doors along the way are
+respected so that the shortest path does not pass through doors that are locked
+with a key that hasn't shown up in the path so far.
+
+It then uses this shortest path to count the rooms that are traversed multiple
+times.
+
+Dungeons with switches in them tend to have a lot of backtracking, and dungeons
+without lots of backtracking tend not to use the switches for anything
+significant. This is why linearity optimization is disabled when the -switches
+option is passed to the viewer application.

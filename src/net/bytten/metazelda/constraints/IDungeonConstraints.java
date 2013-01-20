@@ -2,8 +2,8 @@ package net.bytten.metazelda.constraints;
 
 import java.util.Collection;
 
-import net.bytten.metazelda.Coords;
 import net.bytten.metazelda.IDungeon;
+import net.bytten.metazelda.util.Coords;
 
 /**
  * Implementing classes may specify constraints to be placed on Dungeon
@@ -55,7 +55,7 @@ public interface IDungeonConstraints {
      * {@link net.bytten.metazelda.generators.IDungeonGenerator} is allowed to
      * pick the coordinates of the entrance room.
      * 
-     * @return the collection of {@link net.bytten.metazelda.Coords} objects
+     * @return the collection of {@link net.bytten.metazelda.util.Coords} objects
      *         (coordinates)
      */
     public Collection<Coords> initialCoords();

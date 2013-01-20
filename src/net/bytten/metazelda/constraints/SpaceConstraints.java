@@ -2,7 +2,7 @@ package net.bytten.metazelda.constraints;
 
 import java.util.Collection;
 
-import net.bytten.metazelda.Coords;
+import net.bytten.metazelda.util.Coords;
 
 /**
  * Constrains the coordinates where Rooms may be placed to be only those within

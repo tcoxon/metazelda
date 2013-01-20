@@ -3,8 +3,8 @@ package net.bytten.metazelda.constraints;
 import java.util.Arrays;
 import java.util.Collection;
 
-import net.bytten.metazelda.Coords;
 import net.bytten.metazelda.IDungeon;
+import net.bytten.metazelda.util.Coords;
 
 /**
  * Limits the {@link net.bytten.metazelda.generators.IDungeonGenerator} only in

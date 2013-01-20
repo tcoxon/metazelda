@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.bytten.metazelda.util.Coords;
+import net.bytten.metazelda.util.Direction;
+
 /**
  * Represents an individual space within the dungeon.
  * <p>

@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.bytten.metazelda.util.Coords;
+import net.bytten.metazelda.util.Direction;
+
 /**
  * @see IDungeon
  */
