@@ -24,6 +24,7 @@ import net.bytten.metazelda.generators.DungeonGenerator;
 import net.bytten.metazelda.generators.IDungeonGenerator;
 import net.bytten.metazelda.generators.LinearDungeonGenerator;
 import net.bytten.metazelda.util.Coords;
+import net.bytten.metazelda.util.StdoutLogger;
 
 
 public class Main extends JPanel {
@@ -83,10 +84,11 @@ public class Main extends JPanel {
             constraints = new CountConstraints(25, 4, 1);
         
         if (getArg("-switches") != null) {
-            return new DungeonGenerator(seed, constraints);
+            return new DungeonGenerator(new StdoutLogger(), seed, constraints);
         } else {
             constraints.setMaxSwitches(0);
-            return new LinearDungeonGenerator(seed, constraints);
+            return new LinearDungeonGenerator(new StdoutLogger(), seed,
+                    constraints);
         }
     }
     

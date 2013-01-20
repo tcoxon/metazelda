@@ -15,14 +15,16 @@ import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.constraints.IDungeonConstraints;
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
+import net.bytten.metazelda.util.ILogger;
 
 /**
  * The default and reference implementation of an {@link IDungeonGenerator}.
  */
-public class DungeonGenerator implements IDungeonGenerator {
+public class DungeonGenerator implements IDungeonGenerator, ILogger {
     
     public static final int MAX_RETRIES = 20;
 
+    protected ILogger logger;
     protected long seed;
     protected Random random;
     protected Dungeon dungeon;
@@ -36,12 +38,23 @@ public class DungeonGenerator implements IDungeonGenerator {
      * @param constraints   the constraints to place on generation
      * @see net.bytten.metazelda.constraints.IDungeonConstraints
      */
-    public DungeonGenerator(long seed, IDungeonConstraints constraints) {
-        System.out.println("Dungeon seed: "+seed);
+    public DungeonGenerator(ILogger logger, long seed,
+            IDungeonConstraints constraints) {
+        this.logger = logger;
+        log("Dungeon seed: "+seed);
         this.seed = seed;
         this.random = new Random(seed);
         assert constraints != null;
         this.constraints = constraints;
+    }
+    
+    public DungeonGenerator(long seed, IDungeonConstraints constraints) {
+        this(null, seed, constraints);
+    }
+    
+    @Override
+    public void log(String msg) {
+        if (logger != null) logger.log(msg);
     }
     
     /**
@@ -632,7 +645,7 @@ public class DungeonGenerator implements IDungeonGenerator {
                 if (++ attempt > MAX_RETRIES) {
                     throw new RuntimeException("Dungeon generator failed", e);
                 }
-                System.out.println("Retrying dungeon generation...");
+                log("Retrying dungeon generation...");
             }
         }
         

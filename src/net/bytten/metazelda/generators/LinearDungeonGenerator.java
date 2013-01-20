@@ -15,6 +15,7 @@ import net.bytten.metazelda.util.AStar;
 import net.bytten.metazelda.util.AStar.IRoom;
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
+import net.bytten.metazelda.util.ILogger;
 
 /**
  * Extends DungeonGenerator to choose the least nonlinear one immediately
@@ -26,8 +27,13 @@ public class LinearDungeonGenerator extends DungeonGenerator {
     
     public static final int MAX_ATTEMPTS = 10;
 
+    public LinearDungeonGenerator(ILogger logger, long seed,
+            IDungeonConstraints constraints) {
+        super(logger, seed, constraints);
+    }
+    
     public LinearDungeonGenerator(long seed, IDungeonConstraints constraints) {
-        super(seed, constraints);
+        this(null, seed, constraints);
     }
     
     private class AStarRoom implements AStar.IRoom {
@@ -133,7 +139,7 @@ public class LinearDungeonGenerator extends DungeonGenerator {
             super.generate();
             
             int nonlinearity = measureNonlinearity();
-            System.out.println("Dungeon " + attempts + " nonlinearity: "+
+            log("Dungeon " + attempts + " nonlinearity: "+
                     nonlinearity);
             if (nonlinearity < currentNonlinearity) {
                 currentNonlinearity = nonlinearity;
@@ -142,7 +148,7 @@ public class LinearDungeonGenerator extends DungeonGenerator {
             }
         }
         assert currentBest != null;
-        System.out.println("Chose " + bestAttempt + " nonlinearity: "+
+        log("Chose " + bestAttempt + " nonlinearity: "+
                 currentNonlinearity);
         dungeon = currentBest;
     }
