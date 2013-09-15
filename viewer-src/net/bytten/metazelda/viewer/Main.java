@@ -94,7 +94,7 @@ public class Main extends JPanel {
     
     public void regenerate(final long seed) {
         if (generatorThread == null) {
-            generatorThread = new Thread() {
+            generatorThread = new Thread("Metazelda.regenerate Thread") {
                 public void run() {
                     dungeonGen = makeDungeonGenerator(seed);
                     dungeonGen.generate();
