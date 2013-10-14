@@ -27,7 +27,11 @@ public class Coords implements Comparable<Coords> {
      * @param d the direction
      */
     public Coords nextInDirection(Direction d) {
-        return new Coords(x + d.x, y + d.y);
+        return add(d.x,d.y);
+    }
+    
+    public Coords add(int dx, int dy) {
+        return new Coords(x + dx, y + dy);
     }
     
     @Override
