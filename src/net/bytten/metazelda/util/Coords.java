@@ -34,6 +34,10 @@ public class Coords implements Comparable<Coords> {
         return new Coords(x + dx, y + dy);
     }
     
+    public Coords subtract(Coords other) {
+        return new Coords(x-other.x, y-other.y);
+    }
+    
     @Override
     public boolean equals(Object other) {
          if (other instanceof Coords) {
