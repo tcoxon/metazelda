@@ -14,13 +14,14 @@ package net.bytten.metazelda;
  */
 public class Edge {
 
+    protected int targetRoomId;
     protected Symbol symbol;
    
     /**
      * Creates an unconditional Edge.
      */
-    public Edge() {
-        symbol = null;
+    public Edge(int targetRoomId) {
+        this(targetRoomId, null);
     }
     
     /**
@@ -29,7 +30,8 @@ public class Edge {
      * 
      * @param symbol    the symbol that must be obtained
      */
-    public Edge(Symbol symbol) {
+    public Edge(int targetRoomId, Symbol symbol) {
+        this.targetRoomId = targetRoomId;
         this.symbol = symbol;
     }
     
@@ -52,11 +54,16 @@ public class Edge {
         this.symbol = symbol;
     }
     
+    public int getTargetRoomId() {
+        return targetRoomId;
+    }
+    
     @Override
     public boolean equals(Object other) {
         if (other instanceof Edge) {
             Edge o = (Edge)other;
-            return symbol == o.symbol || symbol.equals(o.symbol);
+            return targetRoomId == o.targetRoomId &&
+                    (symbol == o.symbol || symbol.equals(o.symbol));
         } else {
             return super.equals(other);
         }

@@ -26,7 +26,7 @@ public class Room {
     public final int id;
     protected Set<Coords> coords;
     protected Symbol item;
-    protected Edge[] edges; // index with Direction.{N,E,S,W}.code
+    protected List<Edge> edges;
     protected double intensity;
     protected Room parent;
     protected List<Room> children;
@@ -50,7 +50,7 @@ public class Room {
     public Room(int id, Set<Coords> coords, Room parent, Symbol item, Condition precond) {
         this.id = id;
         this.item = item;
-        this.edges = new Edge[Direction.NUM_DIRS];
+        this.edges = new ArrayList<Edge>();
         this.precond = precond;
         this.intensity = 0.0;
         this.parent = parent;
@@ -95,7 +95,7 @@ public class Room {
      * 
      * @return the array of Edges
      */
-    public Edge[] getEdges() {
+    public List<Edge> getEdges() {
         return edges;
     }
     
@@ -107,8 +107,12 @@ public class Room {
      * @return  the {@link Edge} for the link in the given direction, or null if
      *          there is no link from this Room in the given direction
      */
-    public Edge getEdge(Direction d) {
-        return edges[d.code];
+    public Edge getEdge(int targetRoomId) {
+        for (Edge e: edges) {
+            if (e.getTargetRoomId() == targetRoomId)
+                return e;
+        }
+        return null;
     }
     
     /**
@@ -117,12 +121,7 @@ public class Room {
      * @return  the number of links
      */
     public int linkCount() {
-        int result = 0;
-        for (int d = 0; d < Direction.NUM_DIRS; ++d) {
-            if (edges[d] != null)
-                ++result;
-        }
-        return result;
+        return edges.size();
     }
     
     /**

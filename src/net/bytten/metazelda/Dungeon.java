@@ -81,6 +81,7 @@ public class Dungeon implements IDungeon {
     
     @Override
     public void linkOneWay(Room room1, Room room2, Symbol cond) {
+        if (room1.getEdge(room2.id) == null) 
         assert rooms.values().contains(room1) && rooms.values().contains(room2);
         assert room1.coords.isAdjacent(room2.coords);
         Direction d = room1.coords.getDirectionTo(room2.coords);
