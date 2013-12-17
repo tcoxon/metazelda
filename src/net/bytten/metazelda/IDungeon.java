@@ -2,8 +2,6 @@ package net.bytten.metazelda;
 
 import java.util.Collection;
 
-import net.bytten.metazelda.util.Coords;
-
 /**
  * Represents the spacial layout of a lock-and-key puzzle and contains all
  * {@link Symbol}s, {@link Room}s and {@link Edge}s within the puzzle.
@@ -20,16 +18,10 @@ public interface IDungeon {
     public abstract int roomCount();
 
     /**
-     * @param coords    the coordinates
-     * @return  the room at the given coordinates
+     * @param id        the id of the room
+     * @return  the room with the given id
      */
-    public abstract Room get(Coords coords);
-    /**
-     * @param x the X coordinate
-     * @param y the Y coordinate
-     * @return  the room at the given coordinates
-     */
-    public abstract Room get(int x, int y);
+    public abstract Room get(int id);
 
     /**
      * Adds a new room to the dungeon, overwriting any rooms already in it that

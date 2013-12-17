@@ -3,6 +3,7 @@ package net.bytten.metazelda;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
@@ -21,8 +22,9 @@ import net.bytten.metazelda.util.Direction;
  */
 public class Room {
 
-    public Condition precond;
-    public final Coords coords;
+    protected Condition precond;
+    public final int id;
+    protected Set<Coords> coords;
     protected Symbol item;
     protected Edge[] edges; // index with Direction.{N,E,S,W}.code
     protected double intensity;
@@ -45,8 +47,8 @@ public class Room {
      * @param precond   the precondition of the room
      * @see Condition
      */
-    public Room(Coords coords, Room parent, Symbol item, Condition precond) {
-        this.coords = coords;
+    public Room(int id, Set<Coords> coords, Room parent, Symbol item, Condition precond) {
+        this.id = id;
         this.item = item;
         this.edges = new Edge[Direction.NUM_DIRS];
         this.precond = precond;
@@ -199,6 +201,10 @@ public class Room {
      */
     public void addChild(Room child) {
         children.add(child);
+    }
+    
+    public Set<Coords> getCoords() {
+        return coords;
     }
     
     public String toString() {

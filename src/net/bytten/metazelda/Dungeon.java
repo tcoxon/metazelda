@@ -6,18 +6,22 @@ import java.util.TreeMap;
 
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
+import net.bytten.metazelda.util.IntMap;
 
 /**
  * @see IDungeon
+ * 
+ * Due to the fact it uses IntMap to store the rooms, it makes the assumption
+ * that room ids are low in value, tight in range, and all positive.
  */
 public class Dungeon implements IDungeon {
 
     protected int itemCount;
-    protected Map<Coords, Room> rooms;
+    protected IntMap<Room> rooms;
     protected Bounds bounds;
     
     public Dungeon() {
-        rooms = new TreeMap<Coords, Room>();
+        rooms = new IntMap<Room>();
         bounds = new Bounds(0,0,0,0);
     }
     
@@ -37,34 +41,31 @@ public class Dungeon implements IDungeon {
     }
     
     @Override
-    public Room get(Coords coords) {
-        return rooms.get(coords);
-    }
-    
-    @Override
-    public Room get(int x, int y) {
-        return get(new Coords(x,y));
+    public Room get(int id) {
+        return rooms.get(id);
     }
     
     @Override
     public void add(Room room) {
-        rooms.put(room.coords, room);
+        rooms.put(room.id, room);
         
-        if (room.coords.x < bounds.left) {
-            bounds = new Bounds(room.coords.x, bounds.top,
-                    bounds.right, bounds.bottom);
-        }
-        if (room.coords.x > bounds.right) {
-            bounds = new Bounds(bounds.left, bounds.top,
-                    room.coords.x, bounds.bottom);
-        }
-        if (room.coords.y < bounds.top) {
-            bounds = new Bounds(bounds.left, room.coords.y,
-                    bounds.right, bounds.bottom);
-        }
-        if (room.coords.y > bounds.bottom) {
-            bounds = new Bounds(bounds.left, bounds.top,
-                    bounds.right, room.coords.y);
+        for (Coords xy: room.getCoords()) {
+            if (xy.x < bounds.left) {
+                bounds = new Bounds(xy.x, bounds.top,
+                        bounds.right, bounds.bottom);
+            }
+            if (xy.x > bounds.right) {
+                bounds = new Bounds(bounds.left, bounds.top,
+                        xy.x, bounds.bottom);
+            }
+            if (xy.y < bounds.top) {
+                bounds = new Bounds(bounds.left, xy.y,
+                        bounds.right, bounds.bottom);
+            }
+            if (xy.y > bounds.bottom) {
+                bounds = new Bounds(bounds.left, bounds.top,
+                        bounds.right, xy.y);
+            }
         }
     }
     
