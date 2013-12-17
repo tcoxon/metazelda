@@ -73,6 +73,12 @@ public class Symbol {
         }
     }
     
+    public static boolean equals(Symbol a, Symbol b) {
+        if (a == b) return true;
+        if (b == null) return a.equals(b);
+        return b.equals(a);
+    }
+    
     @Override
     public int hashCode() {
         return value;

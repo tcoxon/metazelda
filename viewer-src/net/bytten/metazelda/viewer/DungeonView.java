@@ -9,6 +9,7 @@ import net.bytten.metazelda.Bounds;
 import net.bytten.metazelda.Edge;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Room;
+import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
 
@@ -116,7 +117,7 @@ public class DungeonView {
             case W: x1 -= scale/4; x2 += scale/4; break;
             }
 
-            if (nextRoom != null && edge.getSymbol().equals(
+            if (nextRoom != null && Symbol.equals(edge.getSymbol(),
                     nextRoom.getEdge(room.id).getSymbol())) {
                 // Bidirectional edge
                 // avoid drawing twice:

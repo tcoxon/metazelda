@@ -50,6 +50,7 @@ public class Room {
      */
     public Room(int id, Set<Coords> coords, Room parent, Symbol item, Condition precond) {
         this.id = id;
+        this.coords = coords;
         this.item = item;
         this.edges = new ArrayList<Edge>();
         this.precond = precond;

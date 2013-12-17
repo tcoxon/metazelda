@@ -21,10 +21,8 @@ public class AStar {
     
     protected class DistanceComparator implements Comparator<Integer> {
         public int compare(Integer id1, Integer id2) {
-            Coords c1 = client.getCoords(id1),
-                   c2 = client.getCoords(id2);
-            double s1 = fScore.get(c1),
-                   s2 = fScore.get(c2);
+            double s1 = fScore.get(id1),
+                   s2 = fScore.get(id2);
             if (s1 < s2) return -1;
             if (s1 == s2) return 0;
             return 1;
