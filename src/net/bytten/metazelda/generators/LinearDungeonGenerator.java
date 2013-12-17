@@ -12,9 +12,7 @@ import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.constraints.IDungeonConstraints;
 import net.bytten.metazelda.util.AStar;
-import net.bytten.metazelda.util.AStar.IRoom;
 import net.bytten.metazelda.util.Coords;
-import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.ILogger;
 
 /**
@@ -36,48 +34,33 @@ public class LinearDungeonGenerator extends DungeonGenerator {
         this(null, seed, constraints);
     }
     
-    private class AStarRoom implements AStar.IRoom {
-
-        int keyLevel;
-        Room room;
+    private class AStarClient implements AStar.IClient {
         
-        public AStarRoom(int keyLevel, Room room) {
+        private int keyLevel;
+        
+        public AStarClient(int keyLevel) {
             this.keyLevel = keyLevel;
-            this.room = room;
         }
 
         @Override
-        public Collection<Coords> neighbors() {
-            List<Coords> result = new ArrayList<Coords>(4);
-            for (Direction d: Direction.values()) {
-                Edge e = room.getEdge(d);
-                if (e != null && (!e.hasSymbol() ||
-                        e.getSymbol().getValue() < keyLevel)) {
-                    result.add(room.coords.nextInDirection(d));
+        public Collection<Integer> getNeighbors(int roomId) {
+            List<Integer> ids = new ArrayList<Integer>();
+            for (Edge edge: dungeon.get(roomId).getEdges()) {
+                if (!edge.hasSymbol() || edge.getSymbol().getValue() < keyLevel) {
+                    ids.add(edge.getTargetRoomId());
                 }
             }
-            return result;
-        }
-        
-    }
-    
-    private class AStarMap implements AStar.IMap {
-        
-        int keyLevel;
-        
-        public AStarMap(int keyLevel) {
-            this.keyLevel = keyLevel;
+            return ids;
         }
 
         @Override
-        public IRoom get(Coords xy) {
-            return new AStarRoom(keyLevel, dungeon.get(xy));
+        public Coords getCoords(int roomId) {
+            return dungeon.get(roomId).getCenter();
         }
-        
     }
     
-    private List<Coords> astar(Coords start, Coords goal, final int keyLevel) {
-        AStar astar = new AStar(new AStarMap(keyLevel), start, goal);
+    private List<Integer> astar(int start, int goal, final int keyLevel) {
+        AStar astar = new AStar(new AStarClient(keyLevel), start, goal);
         return astar.solve();
     }
     
@@ -109,7 +92,7 @@ public class LinearDungeonGenerator extends DungeonGenerator {
         assert current != null && goal != null;
         int nextKey = 0, nonlinearity = 0;
         
-        Set<Coords> visitedRooms = new TreeSet<Coords>();
+        Set<Integer> visitedRooms = new TreeSet<Integer>();
         while (current != goal) {
             Room intermediateGoal;
             if (nextKey == constraints.getMaxKeys())
@@ -117,10 +100,10 @@ public class LinearDungeonGenerator extends DungeonGenerator {
             else
                 intermediateGoal = keyRooms.get(nextKey);
             
-            List<Coords> steps = astar(current.coords, intermediateGoal.coords,
+            List<Integer> steps = astar(current.id, intermediateGoal.id,
                     nextKey);
-            for (Coords c: steps) {
-                if (visitedRooms.contains(c)) ++nonlinearity;
+            for (Integer id: steps) {
+                if (visitedRooms.contains(id)) ++nonlinearity;
             }
             visitedRooms.addAll(steps);
             

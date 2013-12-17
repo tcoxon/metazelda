@@ -8,7 +8,7 @@ package net.bytten.metazelda;
  */
 public class Symbol {
     /**
-     * Symbol values with special meanings.
+     * Symbol map with special meanings.
      * <p>
      * Certain items (such as START, GOAL, BOSS) serve no purpose in the puzzle
      * other than as markers for the client of the library to place special game

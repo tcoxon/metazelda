@@ -1,6 +1,7 @@
 package net.bytten.metazelda.constraints;
 
 import java.util.Collection;
+import java.util.Set;
 
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.util.Coords;
@@ -13,16 +14,6 @@ import net.bytten.metazelda.util.Coords;
  */
 public interface IDungeonConstraints {
 
-    /**
-     * Determines whether the
-     * {@link net.bytten.metazelda.generators.IDungeonGenerator} may place a
-     * Room at the given coordinates
-     * 
-     * @param c the coordinates
-     * @return whether a room can be placed here
-     */
-    public boolean validRoomCoords(Coords c);
-    
     /**
      * @return  the maximum number of Rooms an 
      * {@link net.bytten.metazelda.generators.IDungeonGenerator} may
@@ -51,14 +42,24 @@ public interface IDungeonConstraints {
     public int getMaxSwitches();
     
     /**
-     * Gets the collection of coordinates from which an
+     * Gets the collection of ids from which an
      * {@link net.bytten.metazelda.generators.IDungeonGenerator} is allowed to
-     * pick the coordinates of the entrance room.
+     * pick the entrance room.
      * 
-     * @return the collection of {@link net.bytten.metazelda.util.Coords} objects
-     *         (coordinates)
+     * @return the collection of ids
      */
-    public Collection<Coords> initialCoords();
+    public Collection<Integer> initialRooms();
+    
+    /**
+     * @return a collection of ids of rooms that are adjacent to the room with
+     * the given id.
+     */
+    public Collection<Integer> getAdjacentRooms(int id);
+    
+    /**
+     * @return a set of Coords which the room with the given id occupies.
+     */
+    public Set<Coords> getCoords(int id);
     
     /**
      * Runs post-generation checks to determine the suitability of the dungeon.

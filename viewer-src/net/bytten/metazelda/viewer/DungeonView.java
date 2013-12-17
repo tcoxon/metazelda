@@ -16,8 +16,8 @@ public class DungeonView {
 
     public void drawRoom(Graphics2D g, double scale, Room room) {
         
-        int cx = (int)(room.coords.x * scale + scale/2),
-            cy = (int)(room.coords.y * scale + scale/2);
+        int cx = (int)(room.getCenter().x * scale + scale/2),
+            cy = (int)(room.getCenter().y * scale + scale/2);
         
         g.setColor(Color.getHSBColor(0.6f - (float)room.getIntensity()*0.6f,
                 0.7f, 1.0f));
@@ -63,10 +63,10 @@ public class DungeonView {
     
     protected void drawParentEdge(Graphics2D g, double scale,
             Room parent, Room child, Direction d) {
-        double x1 = parent.coords.x*scale + scale/2,
-                y1 = parent.coords.y*scale + scale/2,
-                x2 = child.coords.x*scale + scale/2,
-                y2 = child.coords.y*scale + scale/2;
+        double x1 = parent.getCenter().x*scale + scale/2,
+                y1 = parent.getCenter().y*scale + scale/2,
+                x2 = child.getCenter().x*scale + scale/2,
+                y2 = child.getCenter().y*scale + scale/2;
          switch (d) {
          case N: y1 -= scale/4; y2 += scale/4; break;
          case E: x1 += scale/4; x2 -= scale/4; break;
@@ -95,20 +95,16 @@ public class DungeonView {
             Room room) {
         g.setColor(Color.BLACK);
         
-        for (Direction d: Direction.values()) {
-            Direction oppD = Direction.oppositeDirection(d);
+        for (Edge edge: room.getEdges()) {
+            Room nextRoom = dungeon.get(edge.getTargetRoomId());
+            Coords coords = room.getCenter(),
+                   nextCoords = nextRoom.getCenter();
+            Direction d = coords.getDirectionTo(nextCoords);
             
-            Coords coords = room.coords,
-                    nextCoords = coords.nextInDirection(d);
-            
-            Room nextRoom = dungeon.get(nextCoords);
-            if (nextRoom != null && nextRoom.getParent() == room) {
+            if (nextRoom.getParent() == room) {
                 drawParentEdge(g, scale, room, nextRoom, d);
             }
                 
-            Edge edge = room.getEdge(d);
-            if (edge == null) continue;
-            
             double x1 = coords.x*scale + scale/2,
                    y1 = coords.y*scale + scale/2,
                    x2 = nextCoords.x*scale + scale/2,
@@ -120,10 +116,11 @@ public class DungeonView {
             case W: x1 -= scale/4; x2 += scale/4; break;
             }
 
-            if (nextRoom != null && edge.equals(nextRoom.getEdge(oppD))) {
+            if (nextRoom != null && edge.getSymbol().equals(
+                    nextRoom.getEdge(room.id).getSymbol())) {
                 // Bidirectional edge
                 // avoid drawing twice:
-                if (room.coords.compareTo(nextRoom.coords) > 0) continue;
+                if (coords.compareTo(nextCoords) > 0) continue;
                 
                 g.drawLine((int)x1, (int)y1, (int)x2, (int)y2);
                 

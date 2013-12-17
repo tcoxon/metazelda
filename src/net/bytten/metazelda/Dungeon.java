@@ -1,11 +1,8 @@
 package net.bytten.metazelda;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
 
 import net.bytten.metazelda.util.Coords;
-import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.IntMap;
 
 /**
@@ -81,27 +78,20 @@ public class Dungeon implements IDungeon {
     
     @Override
     public void linkOneWay(Room room1, Room room2, Symbol cond) {
-        if (room1.getEdge(room2.id) == null) 
         assert rooms.values().contains(room1) && rooms.values().contains(room2);
-        assert room1.coords.isAdjacent(room2.coords);
-        Direction d = room1.coords.getDirectionTo(room2.coords);
-        room1.getEdges()[d.code] = new Edge(cond);
+        room1.setEdge(room2.id, cond);
     }
     
     @Override
     public void link(Room room1, Room room2, Symbol cond) {
-        assert rooms.values().contains(room1) && rooms.values().contains(room2);
-        assert room1.coords.isAdjacent(room2.coords);
-        Direction d = room1.coords.getDirectionTo(room2.coords);
-        room1.getEdges()[d.code] = new Edge(cond);
-        room2.getEdges()[Direction.oppositeDirection(d).code] = new Edge(cond);
+        linkOneWay(room1, room2, cond);
+        linkOneWay(room2, room1, cond);
     }
     
     @Override
     public boolean roomsAreLinked(Room room1, Room room2) {
-        Direction d = room1.coords.getDirectionTo(room2.coords);
-        return room1.getEdge(d) != null ||
-            room2.getEdge(Direction.oppositeDirection(d)) != null;
+        return room1.getEdge(room2.id) != null ||
+            room2.getEdge(room1.id) != null;
     }
     
     @Override

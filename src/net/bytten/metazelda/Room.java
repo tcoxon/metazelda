@@ -25,6 +25,7 @@ public class Room {
     protected Condition precond;
     public final int id;
     protected Set<Coords> coords;
+    protected Coords center;
     protected Symbol item;
     protected List<Edge> edges;
     protected double intensity;
@@ -56,6 +57,12 @@ public class Room {
         this.parent = parent;
         this.children = new ArrayList<Room>(3);
         // all edges initially null
+        
+        int x = 0, y = 0;
+        for (Coords xy: coords) {
+            x += xy.x; y += xy.y;
+        }
+        center = new Coords(x/coords.size(), y/coords.size());
     }
     
     /**
@@ -113,6 +120,17 @@ public class Room {
                 return e;
         }
         return null;
+    }
+    
+    public Edge setEdge(int targetRoomId, Symbol symbol) {
+        Edge e = getEdge(targetRoomId);
+        if (e != null) {
+            e.symbol = symbol;
+        } else {
+            e = new Edge(targetRoomId, symbol);
+            edges.add(e);
+        }
+        return e;
     }
     
     /**
@@ -204,6 +222,10 @@ public class Room {
     
     public Set<Coords> getCoords() {
         return coords;
+    }
+    
+    public Coords getCenter() {
+        return center;
     }
     
     public String toString() {

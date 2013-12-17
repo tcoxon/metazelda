@@ -6,9 +6,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import net.bytten.metazelda.Condition;
 import net.bytten.metazelda.Dungeon;
+import net.bytten.metazelda.Edge;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
@@ -70,10 +72,8 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         Collections.shuffle(rooms, random);
         for (int i = 0; i < rooms.size(); ++i) {
             Room room = rooms.get(i);
-            for (Direction d: Direction.values()) {
-                Coords coords = room.coords.nextInDirection(d);
-                if (dungeon.get(coords) == null &&
-                        constraints.validRoomCoords(coords)) {
+            for (int next: constraints.getAdjacentRooms(room.id)) {
+                if (dungeon.get(next) == null) {
                     return room;
                 }
             }
@@ -89,18 +89,15 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      * @return  the Direction of the empty space chosen adjacent to the Room or
      *          null if there are no adjacent empty spaces
      */
-    protected Direction chooseFreeEdge(Room room) {
-        int d0 = random.nextInt(4);
-        for (int i = 0; i < 4; ++i) {
-            Direction d = Direction.fromCode((d0 + i) % Direction.NUM_DIRS);
-            Coords coords = room.coords.nextInDirection(d);
-            if (dungeon.get(coords) == null &&
-                    constraints.validRoomCoords(coords)) {
-                return d;
-            }
+    protected int chooseFreeEdge(Room room) {
+        List<Integer> neighbors = new ArrayList<Integer>(
+                constraints.getAdjacentRooms(room.id));
+        Collections.shuffle(neighbors, random);
+        for (int neighbor: neighbors) {
+            if (dungeon.get(neighbor) == null)
+                return neighbor;
         }
-        assert false : "Room does not have a free edge";
-        return null;
+        throw new RuntimeException("Internal error: Room doesn't have a free edge");
     }
     
     /**
@@ -170,15 +167,14 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      */
     protected void initEntranceRoom(KeyLevelRoomMapping levels)
             throws RetryException {
-        Coords coords = null;
-        List<Coords> possibleEntries = new ArrayList<Coords>(
-                constraints.initialCoords());
+        int id;
+        List<Integer> possibleEntries = new ArrayList<Integer>(
+                constraints.initialRooms());
         assert possibleEntries.size() > 0;
-        coords = possibleEntries.get(random.nextInt(possibleEntries.size()));
-        assert constraints.validRoomCoords(coords);
+        id = possibleEntries.get(random.nextInt(possibleEntries.size()));
         
-        Room entry = new Room(coords, null, new Symbol(Symbol.START),
-                new Condition());
+        Room entry = new Room(id, constraints.getCoords(id), null,
+                new Symbol(Symbol.START), new Condition());
         dungeon.add(entry);
         
         levels.addRoom(0, entry);
@@ -229,12 +225,12 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             
             // Decide which direction to put the new room in relative to the
             // parent
-            Direction d = chooseFreeEdge(parentRoom);
-            Coords coords = parentRoom.coords.nextInDirection(d);
-            Room room = new Room(coords, parentRoom, null, cond);
+            int nextId = chooseFreeEdge(parentRoom);
+            Set<Coords> coords = constraints.getCoords(nextId);
+            Room room = new Room(nextId, coords, parentRoom, null, cond);
             
             // Add the room to the dungeon
-            assert dungeon.get(room.coords) == null;
+            assert dungeon.get(room.id) == null;
             synchronized (dungeon) {
                 dungeon.add(room);
                 parentRoom.addChild(room);
@@ -345,22 +341,21 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                     ? Condition.SwitchState.ON
                     : Condition.SwitchState.OFF);
         
-        for (Direction d: Direction.values()) {
-            if (room.getEdge(d) != null) {
-                Room nextRoom = dungeon.get(room.coords.nextInDirection(d));
-                if (room.getChildren().contains(nextRoom)) {
-                    if (room.getEdge(d).getSymbol() == null &&
-                            random.nextInt(4) != 0) {
-                        dungeon.link(room, nextRoom, state.toSymbol());
-                        addPrecond(nextRoom, new Condition(state.toSymbol()));
-                        anyLocks = true;
-                    } else {
-                        anyLocks |= switchLockChildRooms(nextRoom, state);
-                    }
-                    
-                    if (givenState == Condition.SwitchState.EITHER) {
-                        state = state.invert();
-                    }
+        for (Edge edge: room.getEdges()) {
+            int neighborId = edge.getTargetRoomId();
+            Room nextRoom = dungeon.get(neighborId);
+            if (room.getChildren().contains(nextRoom)) {
+                if (room.getEdge(neighborId).getSymbol() == null &&
+                        random.nextInt(4) != 0) {
+                    dungeon.link(room, nextRoom, state.toSymbol());
+                    addPrecond(nextRoom, new Condition(state.toSymbol()));
+                    anyLocks = true;
+                } else {
+                    anyLocks |= switchLockChildRooms(nextRoom, state);
+                }
+                
+                if (givenState == Condition.SwitchState.EITHER) {
+                    state = state.invert();
                 }
             }
         }
@@ -447,23 +442,23 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             
             if (room.isGoal() || room.isBoss()) continue;
             
-            for (Direction d: Direction.values()) {
-                if (room.getEdge(d) != null) continue;
+            for (int nextId: constraints.getAdjacentRooms(room.id)) {
+                if (room.getEdge(nextId) != null) continue;
                 
-                Room nextRoom = dungeon.get(room.coords.nextInDirection(d));
+                Room nextRoom = dungeon.get(nextId);
                 if (nextRoom == null || nextRoom.isGoal() || nextRoom.isBoss())
                     continue;
                 
-                boolean forwardImplies = room.precond.implies(nextRoom.precond),
-                        backwardImplies = nextRoom.precond.implies(room.precond);
+                boolean forwardImplies = room.getPrecond().implies(nextRoom.getPrecond()),
+                        backwardImplies = nextRoom.getPrecond().implies(room.getPrecond());
                 if (forwardImplies && backwardImplies) {
                     // both rooms are at the same keyLevel.
                     if (random.nextInt(5) != 0) continue;
                     
                     dungeon.link(room, nextRoom);
                 } else {
-                    Symbol difference = room.precond.singleSymbolDifference(
-                            nextRoom.precond);
+                    Symbol difference = room.getPrecond().singleSymbolDifference(
+                            nextRoom.getPrecond());
                     if (difference == null || (!difference.isSwitchState() &&
                             random.nextInt(5) != 0))
                         continue;

@@ -1,6 +1,8 @@
 package net.bytten.metazelda.constraints;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import net.bytten.metazelda.util.Coords;
 
@@ -25,13 +27,17 @@ public class SpaceConstraints extends CountConstraints {
     }
 
     @Override
-    public boolean validRoomCoords(Coords c) {
-        return c != null && spaceMap.get(c);
+    protected boolean validRoomCoords(Coords c) {
+        return super.validRoomCoords(c) && spaceMap.get(c);
     }
 
     @Override
-    public Collection<Coords> initialCoords() {
-        return spaceMap.getBottomSpaces();
+    public Collection<Integer> initialRooms() {
+        List<Integer> ids = new ArrayList<Integer>();
+        for (Coords xy: spaceMap.getBottomSpaces()) {
+            ids.add(getRoomId(xy));
+        }
+        return ids;
     }
     
     
