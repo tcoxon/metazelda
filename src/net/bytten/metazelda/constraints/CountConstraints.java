@@ -58,7 +58,7 @@ public class CountConstraints implements IDungeonConstraints {
     }
     
     @Override
-    public int getMaxSpaces() {
+    public int getMaxRooms() {
         return maxSpaces;
     }
     

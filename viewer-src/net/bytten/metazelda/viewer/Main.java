@@ -17,7 +17,10 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import net.bytten.metazelda.constraints.ColorMap;
 import net.bytten.metazelda.constraints.CountConstraints;
+import net.bytten.metazelda.constraints.FreeformConstraints;
+import net.bytten.metazelda.constraints.IDungeonConstraints;
 import net.bytten.metazelda.constraints.SpaceConstraints;
 import net.bytten.metazelda.constraints.SpaceMap;
 import net.bytten.metazelda.generators.DungeonGenerator;
@@ -35,7 +38,7 @@ public class Main extends JPanel {
     protected Dimension bufferDim;
     
     protected IDungeonGenerator dungeonGen;
-    protected DungeonView dungeonView;
+    protected IDungeonView dungeonView;
     
     protected Thread generatorThread;
     protected Timer repaintTimer;
@@ -46,7 +49,7 @@ public class Main extends JPanel {
         super();
         this.args = args;
         regenerate(getSeed(args));
-        dungeonView = new DungeonView();
+        dungeonView = new GridDungeonView();
         
         repaintTimer = new Timer();
         repaintTimer.schedule(new TimerTask() {
@@ -58,35 +61,68 @@ public class Main extends JPanel {
     }
     
     protected IDungeonGenerator makeDungeonGenerator(long seed) {
-        CountConstraints constraints = null;
+        IDungeonConstraints constraints = null;
         
-        if (getArg("space") != null) {
+        if (getArg("color") != null) {
+            
             try {
-                SpaceMap spaceMap = new SpaceMap();
-                
-                BufferedImage img = ImageIO.read(new File(getArg("space")));
+                ColorMap colorMap = new ColorMap();
+                BufferedImage img = ImageIO.read(new File(getArg("color")));
                 for (int x = 0; x < img.getWidth(); ++x)
                 for (int y = 0; y < img.getHeight(); ++y) {
-                    if ((img.getRGB(x,y) & 0xFFFFFF) != 0) {
-                        spaceMap.set(new Coords(x,y), true);
-                    }
+                    colorMap.set(x,y,img.getRGB(x,y));
                 }
                 
-                constraints = new SpaceConstraints(spaceMap);
+                constraints = new FreeformConstraints(colorMap);
                 
+                // TODO: new FreeformDungeonView(colorMap);
+                dungeonView = new GridDungeonView();
+            
             } catch (IOException e) {
                 e.printStackTrace();
-                System.err.println("Falling back on CountConstraints");
+                System.err.println("Falling back on non-freeform dungeon design");
             }
+            
         }
         
-        if (constraints == null)
-            constraints = new CountConstraints(25, 4, 1);
+        if (constraints == null) {
+            
+            CountConstraints cons = null;
+            
+            dungeonView = new GridDungeonView();
         
-        if (getArg("-switches") != null) {
+            if (getArg("space") != null) {
+                try {
+                    SpaceMap spaceMap = new SpaceMap();
+                    
+                    BufferedImage img = ImageIO.read(new File(getArg("space")));
+                    for (int x = 0; x < img.getWidth(); ++x)
+                    for (int y = 0; y < img.getHeight(); ++y) {
+                        if ((img.getRGB(x,y) & 0xFFFFFF) != 0) {
+                            spaceMap.set(new Coords(x,y), true);
+                        }
+                    }
+                    
+                    cons = new SpaceConstraints(spaceMap);
+                    
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.err.println("Falling back on CountConstraints");
+                }
+            }
+            
+            if (cons == null)
+                cons = new CountConstraints(25, 4, 1);
+            
+            if (getArg("switches") == null) 
+                cons.setMaxSwitches(0);
+            
+            constraints = cons;
+        }
+        
+        if (getArg("switches") != null) {
             return new DungeonGenerator(new StdoutLogger(), seed, constraints);
         } else {
-            constraints.setMaxSwitches(0);
             return new LinearDungeonGenerator(new StdoutLogger(), seed,
                     constraints);
         }
@@ -112,7 +148,8 @@ public class Main extends JPanel {
         bufferG.setColor(Color.WHITE);
         bufferG.fillRect(0, 0, bufferDim.width, bufferDim.height);
         
-        if (dungeonGen != null && dungeonGen.getDungeon() != null) {
+        if (dungeonView != null && dungeonGen != null &&
+                dungeonGen.getDungeon() != null) {
             dungeonView.draw(bufferG, bufferDim, dungeonGen.getDungeon());
         }
         
@@ -178,10 +215,7 @@ public class Main extends JPanel {
     private static String getArg(String arg, String[] args) {
         for (int i = 0; i < args.length; ++i) {
             if (args[i].equals("-"+arg)) {
-                ++i;
-                if (i < args.length) {
-                    return args[i];
-                }
+                return args[i];
             } else if (args[i].startsWith("-"+arg+"=")) {
                 return args[i].substring(2 + arg.length());
             }

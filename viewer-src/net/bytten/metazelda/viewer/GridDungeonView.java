@@ -13,7 +13,7 @@ import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
 
-public class DungeonView {
+public class GridDungeonView implements IDungeonView {
 
     public void drawRoom(Graphics2D g, double scale, Room room) {
         
@@ -157,6 +157,7 @@ public class DungeonView {
         
     }
     
+    @Override
     public void draw(Graphics2D g, Dimension dim, IDungeon dungeon) {
         AffineTransform origXfm = g.getTransform();
         

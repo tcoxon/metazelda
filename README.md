@@ -26,7 +26,8 @@ Controls:
 
 * F5 to generate a new dungeon.
 * Pass -seed=X to generate a dungeon from a specific seed.
-* Pass -space=spacemaps/skull.png to generate a dungeon in a specific shape.
+* Pass -color=colormaps/testcase.png to generate a free-form (non-grid) dungeon.
+* Pass -space=spacemaps/skull.png to generate a grid dungeon in a specific shape.
 * Pass -switches to generate dungeons with switch puzzles. This will turn off
   linearity optimization.
 

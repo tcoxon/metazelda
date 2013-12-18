@@ -19,7 +19,7 @@ public interface IDungeonConstraints {
      * {@link net.bytten.metazelda.generators.IDungeonGenerator} may
      *          place in an {@link net.bytten.metazelda.IDungeon}
      */
-    public int getMaxSpaces();
+    public int getMaxRooms();
     
     /**
      * @return  the maximum number of keys an 

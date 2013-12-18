@@ -190,7 +190,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      */
     protected void placeRooms(KeyLevelRoomMapping levels) throws RetryException {
         
-        final int roomsPerLock = constraints.getMaxSpaces() /
+        final int roomsPerLock = constraints.getMaxRooms() /
                 constraints.getMaxKeys();
         
         // keyLevel: the number of keys required to get to the new room
@@ -201,7 +201,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         Condition cond = new Condition();
         
         // Loop to place rooms and link them
-        while (dungeon.roomCount() < constraints.getMaxSpaces()) {
+        while (dungeon.roomCount() < constraints.getMaxRooms()) {
             
             boolean doLock = false;
             
