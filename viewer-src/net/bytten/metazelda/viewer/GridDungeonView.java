@@ -11,7 +11,6 @@ import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.util.Coords;
-import net.bytten.metazelda.util.Direction;
 
 public class GridDungeonView implements IDungeonView {
 
@@ -63,33 +62,28 @@ public class GridDungeonView implements IDungeonView {
     }
     
     protected void drawParentEdge(Graphics2D g, double scale,
-            Room parent, Room child, Direction d) {
+            Room parent, Room child) {
         double x1 = parent.getCenter().x*scale + scale/2,
                 y1 = parent.getCenter().y*scale + scale/2,
                 x2 = child.getCenter().x*scale + scale/2,
                 y2 = child.getCenter().y*scale + scale/2;
-         switch (d) {
-         case N: y1 -= scale/4; y2 += scale/4; break;
-         case E: x1 += scale/4; x2 -= scale/4; break;
-         case S: y1 += scale/4; y2 -= scale/4; break;
-         case W: x1 -= scale/4; x2 += scale/4; break;
-         }
+        double sdy = Math.signum(y2-y1), sdx = Math.signum(x2-x1);
+        y1 += sdy * scale/4;
+        y2 -= sdy * scale/4;
+        x1 += sdx * scale/4;
+        x2 -= sdx * scale/4;
 
-         int dx = 0, dy = 0;
-         switch (d) {
-         case N: dx -= (int)(scale/10); break;
-         case E: dy += (int)(scale/10); break;
-         case S: dx += (int)(scale/10); break;
-         case W: dy -= (int)(scale/10); break;
-         }
-         x1 += dx; x2 += dx;
-         y1 += dy; y2 += dy;
+        int dx = 0, dy = 0;
+        dx += (int)(sdy * scale/10);
+        dy += (int)(sdx * scale/10);
+        x1 += dx; x2 += dx;
+        y1 += dy; y2 += dy;
+        
+        g.setColor(Color.ORANGE);
+        drawArrow(g, x1, y1, x2, y2);
+        g.setColor(Color.BLACK);
          
-         g.setColor(Color.ORANGE);
-         drawArrow(g, x1, y1, x2, y2);
-         g.setColor(Color.BLACK);
-         
-         assert parent.getChildren().contains(child);
+        assert parent.getChildren().contains(child);
     }
     
     public void drawEdges(Graphics2D g, double scale, IDungeon dungeon,
@@ -100,22 +94,20 @@ public class GridDungeonView implements IDungeonView {
             Room nextRoom = dungeon.get(edge.getTargetRoomId());
             Coords coords = room.getCenter(),
                    nextCoords = nextRoom.getCenter();
-            Direction d = coords.getDirectionTo(nextCoords);
             
             if (nextRoom.getParent() == room) {
-                drawParentEdge(g, scale, room, nextRoom, d);
+                drawParentEdge(g, scale, room, nextRoom);
             }
                 
             double x1 = coords.x*scale + scale/2,
                    y1 = coords.y*scale + scale/2,
                    x2 = nextCoords.x*scale + scale/2,
                    y2 = nextCoords.y*scale + scale/2;
-            switch (d) {
-            case N: y1 -= scale/4; y2 += scale/4; break;
-            case E: x1 += scale/4; x2 -= scale/4; break;
-            case S: y1 += scale/4; y2 -= scale/4; break;
-            case W: x1 -= scale/4; x2 += scale/4; break;
-            }
+            double sdy = Math.signum(y2-y1), sdx = Math.signum(x2-x1);
+            y1 += sdy * scale/4;
+            y2 -= sdy * scale/4;
+            x1 += sdx * scale/4;
+            x2 -= sdx * scale/4;
 
             if (nextRoom != null && Symbol.equals(edge.getSymbol(),
                     nextRoom.getEdge(room.id).getSymbol())) {
@@ -134,12 +126,8 @@ public class GridDungeonView implements IDungeonView {
             } else {
                 // Unidirectional edge
                 int dx = 0, dy = 0;
-                switch (d) {
-                case N: dx -= (int)(scale/20); break;
-                case E: dy += (int)(scale/20); break;
-                case S: dx += (int)(scale/20); break;
-                case W: dy -= (int)(scale/20); break;
-                }
+                dx += (int)(sdy * scale/20);
+                dy += (int)(sdx * scale/20);
                 x1 += dx; x2 += dx;
                 y1 += dy; y2 += dy;
                 drawArrow(g, x1, y1, x2, y2);
