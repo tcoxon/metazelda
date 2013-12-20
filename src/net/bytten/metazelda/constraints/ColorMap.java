@@ -54,4 +54,12 @@ public class ColorMap {
         return ymin;
     }
     
+    public int getRight() {
+        return xmax;
+    }
+    
+    public int getBottom() {
+        return ymax;
+    }
+    
 }

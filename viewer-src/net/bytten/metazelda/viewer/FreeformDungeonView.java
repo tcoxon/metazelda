@@ -1,12 +1,13 @@
 package net.bytten.metazelda.viewer;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.constraints.ColorMap;
 
-public class FreeformDungeonView implements IDungeonView {
+public class FreeformDungeonView extends GridDungeonView {
 
     protected ColorMap colorMap;
     
@@ -16,7 +17,24 @@ public class FreeformDungeonView implements IDungeonView {
     
     @Override
     public void draw(Graphics2D g, Dimension dim, IDungeon dungeon) {
-        // TODO
+        drawColors(g, getScale(dim,dungeon));
+        super.draw(g,dim,dungeon);
+    }
+    
+    protected void drawColors(Graphics2D g, double scale) {
+        Graphics2D g2 = (Graphics2D)g.create();
+        g2.scale(scale, scale);
+
+        for (int x = colorMap.getLeft(); x <= colorMap.getRight(); ++x)
+            for (int y = colorMap.getTop(); y <= colorMap.getBottom(); ++y) {
+                Integer val = colorMap.get(x, y);
+                if (val == null) continue;
+                
+                g2.setColor(new Color(val));
+                g2.fillRect(x, y, 1, 1);
+            }
+        
+        g2.dispose();
     }
 
 }

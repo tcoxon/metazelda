@@ -74,9 +74,7 @@ public class Main extends JPanel {
                 }
                 
                 constraints = new FreeformConstraints(colorMap);
-                
-                // TODO: new FreeformDungeonView(colorMap);
-                dungeonView = new GridDungeonView();
+                dungeonView = new FreeformDungeonView(colorMap);
             
             } catch (IOException e) {
                 e.printStackTrace();

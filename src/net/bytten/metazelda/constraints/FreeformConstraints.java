@@ -39,8 +39,8 @@ public class FreeformConstraints implements IDungeonConstraints {
     }
     
     protected void analyzeMap() {
-        for (int x = colorMap.getLeft(); x < colorMap.getWidth(); ++x)
-            for (int y = colorMap.getTop(); y < colorMap.getHeight(); ++y) {
+        for (int x = colorMap.getLeft(); x <= colorMap.getRight(); ++x)
+            for (int y = colorMap.getTop(); y <= colorMap.getBottom(); ++y) {
                 Integer val = colorMap.get(x,y);
                 if (val == null) continue;
                 Group group = groups.get(val);
