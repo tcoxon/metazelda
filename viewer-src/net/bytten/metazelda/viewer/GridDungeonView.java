@@ -16,8 +16,8 @@ public class GridDungeonView implements IDungeonView {
 
     public void drawRoom(Graphics2D g, double scale, double roomSize, Room room) {
         
-        int cx = (int)(room.getCenter().x * scale + scale/2),
-            cy = (int)(room.getCenter().y * scale + scale/2);
+        int cx = (int)(room.getCenter().x * scale + roomSize*scale),
+            cy = (int)(room.getCenter().y * scale + roomSize*scale);
         
         g.setColor(Color.getHSBColor(0.6f - (float)room.getIntensity()*0.6f,
                 0.7f, 1.0f));
@@ -63,10 +63,10 @@ public class GridDungeonView implements IDungeonView {
     
     protected void drawParentEdge(Graphics2D g, double scale, double roomSize,
             Room parent, Room child) {
-        double x1 = parent.getCenter().x*scale + scale/2,
-                y1 = parent.getCenter().y*scale + scale/2,
-                x2 = child.getCenter().x*scale + scale/2,
-                y2 = child.getCenter().y*scale + scale/2;
+        double x1 = parent.getCenter().x*scale + roomSize*scale,
+                y1 = parent.getCenter().y*scale + roomSize*scale,
+                x2 = child.getCenter().x*scale + roomSize*scale,
+                y2 = child.getCenter().y*scale + roomSize*scale;
         double sdy = Math.signum(y2-y1), sdx = Math.signum(x2-x1);
         y1 += sdy * scale*roomSize/2;
         y2 -= sdy * scale*roomSize/2;
@@ -99,10 +99,10 @@ public class GridDungeonView implements IDungeonView {
                 drawParentEdge(g, scale, roomSize, room, nextRoom);
             }
                 
-            double x1 = coords.x*scale + scale/2,
-                   y1 = coords.y*scale + scale/2,
-                   x2 = nextCoords.x*scale + scale/2,
-                   y2 = nextCoords.y*scale + scale/2;
+            double x1 = coords.x*scale + roomSize*scale,
+                   y1 = coords.y*scale + roomSize*scale,
+                   x2 = nextCoords.x*scale + roomSize*scale,
+                   y2 = nextCoords.y*scale + roomSize*scale;
             double sdy = Math.signum(y2-y1), sdx = Math.signum(x2-x1);
             y1 += sdy * scale*roomSize/2;
             y2 -= sdy * scale*roomSize/2;
