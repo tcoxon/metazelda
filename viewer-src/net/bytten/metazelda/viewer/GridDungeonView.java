@@ -14,7 +14,7 @@ import net.bytten.metazelda.util.Coords;
 
 public class GridDungeonView implements IDungeonView {
 
-    public void drawRoom(Graphics2D g, double scale, Room room) {
+    public void drawRoom(Graphics2D g, double scale, double roomSize, Room room) {
         
         int cx = (int)(room.getCenter().x * scale + scale/2),
             cy = (int)(room.getCenter().y * scale + scale/2);
@@ -22,20 +22,20 @@ public class GridDungeonView implements IDungeonView {
         g.setColor(Color.getHSBColor(0.6f - (float)room.getIntensity()*0.6f,
                 0.7f, 1.0f));
         
-        g.fillOval((int)(cx - scale*0.25),
-                (int)(cy - scale*0.25),
-                (int)(scale/2), (int)(scale/2));
+        g.fillOval((int)(cx - scale*roomSize/2),
+                (int)(cy - scale*roomSize/2),
+                (int)(roomSize*scale), (int)(roomSize*scale));
         
         g.setColor(Color.BLACK);
         
-        g.drawOval((int)(cx - scale*0.25),
-                (int)(cy - scale*0.25),
-                (int)(scale/2), (int)(scale/2));
+        g.drawOval((int)(cx - scale*roomSize/2),
+                (int)(cy - scale*roomSize/2),
+                (int)(roomSize*scale), (int)(roomSize*scale));
         
         if (room.isGoal()) {
-            g.drawOval((int)(cx - scale*0.2),
-                    (int)(cy - scale*0.2),
-                    (int)(scale * 0.4), (int)(scale * 0.4));
+            g.drawOval((int)(cx - scale*roomSize*0.4),
+                    (int)(cy - scale*roomSize*0.4),
+                    (int)(scale * roomSize * 0.8), (int)(scale * roomSize * 0.8));
         }
         
         if (room.getItem() != null) {
@@ -61,21 +61,21 @@ public class GridDungeonView implements IDungeonView {
         g.setTransform(origXfm);
     }
     
-    protected void drawParentEdge(Graphics2D g, double scale,
+    protected void drawParentEdge(Graphics2D g, double scale, double roomSize,
             Room parent, Room child) {
         double x1 = parent.getCenter().x*scale + scale/2,
                 y1 = parent.getCenter().y*scale + scale/2,
                 x2 = child.getCenter().x*scale + scale/2,
                 y2 = child.getCenter().y*scale + scale/2;
         double sdy = Math.signum(y2-y1), sdx = Math.signum(x2-x1);
-        y1 += sdy * scale/4;
-        y2 -= sdy * scale/4;
-        x1 += sdx * scale/4;
-        x2 -= sdx * scale/4;
+        y1 += sdy * scale*roomSize/2;
+        y2 -= sdy * scale*roomSize/2;
+        x1 += sdx * scale*roomSize/2;
+        x2 -= sdx * scale*roomSize/2;
 
         int dx = 0, dy = 0;
-        dx += (int)(sdy * scale/10);
-        dy += (int)(sdx * scale/10);
+        dx += (int)(sdy * scale*roomSize/5);
+        dy += (int)(sdx * scale*roomSize/5);
         x1 += dx; x2 += dx;
         y1 += dy; y2 += dy;
         
@@ -86,8 +86,8 @@ public class GridDungeonView implements IDungeonView {
         assert parent.getChildren().contains(child);
     }
     
-    public void drawEdges(Graphics2D g, double scale, IDungeon dungeon,
-            Room room) {
+    public void drawEdges(Graphics2D g, double scale, double roomSize,
+            IDungeon dungeon, Room room) {
         g.setColor(Color.BLACK);
         
         for (Edge edge: room.getEdges()) {
@@ -96,7 +96,7 @@ public class GridDungeonView implements IDungeonView {
                    nextCoords = nextRoom.getCenter();
             
             if (nextRoom.getParent() == room) {
-                drawParentEdge(g, scale, room, nextRoom);
+                drawParentEdge(g, scale, roomSize, room, nextRoom);
             }
                 
             double x1 = coords.x*scale + scale/2,
@@ -104,10 +104,10 @@ public class GridDungeonView implements IDungeonView {
                    x2 = nextCoords.x*scale + scale/2,
                    y2 = nextCoords.y*scale + scale/2;
             double sdy = Math.signum(y2-y1), sdx = Math.signum(x2-x1);
-            y1 += sdy * scale/4;
-            y2 -= sdy * scale/4;
-            x1 += sdx * scale/4;
-            x2 -= sdx * scale/4;
+            y1 += sdy * scale*roomSize/2;
+            y2 -= sdy * scale*roomSize/2;
+            x1 += sdx * scale*roomSize/2;
+            x2 -= sdx * scale*roomSize/2;
 
             if (nextRoom != null && Symbol.equals(edge.getSymbol(),
                     nextRoom.getEdge(room.id).getSymbol())) {
@@ -126,8 +126,8 @@ public class GridDungeonView implements IDungeonView {
             } else {
                 // Unidirectional edge
                 int dx = 0, dy = 0;
-                dx += (int)(sdy * scale/20);
-                dy += (int)(sdx * scale/20);
+                dx += (int)(sdy * scale*roomSize/10);
+                dy += (int)(sdx * scale*roomSize/10);
                 x1 += dx; x2 += dx;
                 y1 += dy; y2 += dy;
                 drawArrow(g, x1, y1, x2, y2);
@@ -145,6 +145,24 @@ public class GridDungeonView implements IDungeonView {
         
     }
     
+    protected double getScale(Dimension dim, IDungeon dungeon) {
+        Bounds bounds = dungeon.getExtentBounds();
+        return Math.min(((double)dim.width) / bounds.width(),
+                ((double)dim.height) / bounds.height());
+    }
+    
+    protected double getRoomSize(Dimension dim, IDungeon dungeon) {
+        double min = Double.MAX_VALUE;
+        for (Room room: dungeon.getRooms()) {
+            for (Edge edge: room.getEdges()) {
+                Room neighbor = dungeon.get(edge.getTargetRoomId());
+                double dist = neighbor.getCenter().distance(room.getCenter());
+                if (dist < min) min = dist;
+            }
+        }
+        return min/2;
+    }
+    
     @Override
     public void draw(Graphics2D g, Dimension dim, IDungeon dungeon) {
         AffineTransform origXfm = g.getTransform();
@@ -152,19 +170,20 @@ public class GridDungeonView implements IDungeonView {
         // Figure out scale & translation to draw the dungeon at
         synchronized (dungeon) {
             Bounds bounds = dungeon.getExtentBounds();
-            double scale = Math.min(((double)dim.width) / bounds.width(),
-                    ((double)dim.height) / bounds.height());
+            double scale = getScale(dim, dungeon),
+                   roomSize = getRoomSize(dim, dungeon);
+            
             // move the graph into view
             g.translate(-scale * bounds.left, -scale * bounds.top);
             
             for (Room room: dungeon.getRooms()) {
                 // draw the edges between rooms
-                drawEdges(g, scale, dungeon, room);
+                drawEdges(g, scale, roomSize, dungeon, room);
             }
             
             for (Room room: dungeon.getRooms()) {
                 // Draw the room
-                drawRoom(g, scale, room);
+                drawRoom(g, scale, roomSize, room);
             }
         }
         
