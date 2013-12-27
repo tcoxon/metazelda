@@ -5,22 +5,24 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
  * Horribly messy (but compact and generic) A* implementation.
  */
-public class AStar {
-    public static interface IClient {
-        public Collection<Integer> getNeighbors(int roomId);
-        public Coords getCoords(int roomId);
+public class AStar<Id extends Comparable<Id>> {
+    public static interface IClient<Id> {
+        public Collection<Id> getNeighbors(Id roomId);
+        public Coords getCoords(Id roomId);
     }
     
-    protected class DistanceComparator implements Comparator<Integer> {
-        public int compare(Integer id1, Integer id2) {
+    protected class DistanceComparator implements Comparator<Id> {
+        public int compare(Id id1, Id id2) {
             double s1 = fScore.get(id1),
                    s2 = fScore.get(id2);
             if (s1 < s2) return -1;
@@ -30,15 +32,15 @@ public class AStar {
     }
     protected final DistanceComparator DISTCMP = new DistanceComparator();
     
-    protected IntMap<Double> gScore = new IntMap<Double>(),
-                                 fScore = new IntMap<Double>();
-    protected IntMap<Integer> cameFrom = new IntMap<Integer>();
-    protected Set<Integer> closedSet = new TreeSet<Integer>();
-    protected Queue<Integer> openSet = new PriorityQueue<Integer>(110, DISTCMP);
-    protected IClient client;
-    protected Integer from, to;
+    protected Map<Id,Double> gScore = new TreeMap<Id,Double>(),
+                                 fScore = new TreeMap<Id,Double>();
+    protected Map<Id,Id> cameFrom = new TreeMap<Id,Id>();
+    protected Set<Id> closedSet = new TreeSet<Id>();
+    protected Queue<Id> openSet = new PriorityQueue<Id>(110, DISTCMP);
+    protected IClient<Id> client;
+    protected Id from, to;
     
-    public AStar(IClient client, Integer from, Integer to) {
+    public AStar(IClient<Id> client, Id from, Id to) {
         this.client = client;
         this.from = from;
         this.to = to;
@@ -50,11 +52,11 @@ public class AStar {
         return Math.abs(toPos.x - pos.x) + Math.abs(toPos.y - pos.y);
     }
     
-    protected void updateFScore(Integer id) {
+    protected void updateFScore(Id id) {
         fScore.put(id, gScore.get(id) + heuristicDistance(client.getCoords(id)));
     }
     
-    public List<Integer> solve() {
+    public List<Id> solve() {
         /* See this page for the algorithm:
          * http://en.wikipedia.org/wiki/A*_search_algorithm
          */
@@ -63,14 +65,14 @@ public class AStar {
         updateFScore(from);
         
         while (!openSet.isEmpty()) {
-            Integer current = openSet.remove();
+            Id current = openSet.remove();
             
             if (current.equals(to))
                 return reconstructPath();
             
             closedSet.add(current);
             
-            for (Integer neighbor: client.getNeighbors(current)) {
+            for (Id neighbor: client.getNeighbors(current)) {
                 
                 if (closedSet.contains(neighbor))
                     continue;
@@ -90,15 +92,15 @@ public class AStar {
         return null;
     }
     
-    protected Integer nextStep() {
-        List<Integer> path = solve();
+    protected Id nextStep() {
+        List<Id> path = solve();
         if (path == null || path.size() == 0) return null;
         return path.get(0);
     }
     
-    protected List<Integer> reconstructPath() {
-        List<Integer> result = new ArrayList<Integer>();
-        Integer current = to;
+    protected List<Id> reconstructPath() {
+        List<Id> result = new ArrayList<Id>();
+        Id current = to;
         while (!current.equals(from)) {
             result.add(current);
             current = cameFrom.get(current);

@@ -34,7 +34,7 @@ public class LinearDungeonGenerator extends DungeonGenerator {
         this(null, seed, constraints);
     }
     
-    private class AStarClient implements AStar.IClient {
+    private class AStarClient implements AStar.IClient<Integer> {
         
         private int keyLevel;
         
@@ -43,7 +43,7 @@ public class LinearDungeonGenerator extends DungeonGenerator {
         }
 
         @Override
-        public Collection<Integer> getNeighbors(int roomId) {
+        public Collection<Integer> getNeighbors(Integer roomId) {
             List<Integer> ids = new ArrayList<Integer>();
             for (Edge edge: dungeon.get(roomId).getEdges()) {
                 if (!edge.hasSymbol() || edge.getSymbol().getValue() < keyLevel) {
@@ -54,13 +54,13 @@ public class LinearDungeonGenerator extends DungeonGenerator {
         }
 
         @Override
-        public Coords getCoords(int roomId) {
+        public Coords getCoords(Integer roomId) {
             return dungeon.get(roomId).getCenter();
         }
     }
     
     private List<Integer> astar(int start, int goal, final int keyLevel) {
-        AStar astar = new AStar(new AStarClient(keyLevel), start, goal);
+        AStar<Integer> astar = new AStar<Integer>(new AStarClient(keyLevel), start, goal);
         return astar.solve();
     }
     

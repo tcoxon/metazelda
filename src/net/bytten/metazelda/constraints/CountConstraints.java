@@ -10,6 +10,7 @@ import java.util.TreeSet;
 
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.util.Coords;
+import net.bytten.metazelda.util.CoordsMap;
 import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.IntMap;
 
@@ -26,7 +27,7 @@ public class CountConstraints implements IDungeonConstraints {
     protected int maxSpaces, maxKeys, maxSwitches;
     
     protected IntMap<Coords> gridCoords;
-    protected TreeMap<Coords,Integer> roomIds;
+    protected CoordsMap<Integer> roomIds;
     protected int firstRoomId;
     
     public CountConstraints(int maxSpaces, int maxKeys, int maxSwitches) {
@@ -35,12 +36,12 @@ public class CountConstraints implements IDungeonConstraints {
         this.maxSwitches = maxSwitches;
 
         gridCoords = new IntMap<Coords>();
-        roomIds = new TreeMap<Coords,Integer>();
+        roomIds = new CoordsMap<Integer>();
         Coords first = new Coords(0,0);
         firstRoomId = getRoomId(first);
     }
     
-    protected int getRoomId(Coords xy) {
+    public int getRoomId(Coords xy) {
         if (roomIds.containsKey(xy)) {
             assert gridCoords.get(roomIds.get(xy)).equals(xy);
             return roomIds.get(xy);
@@ -52,7 +53,7 @@ public class CountConstraints implements IDungeonConstraints {
         }
     }
     
-    protected Coords getRoomCoords(int id) {
+    public Coords getRoomCoords(int id) {
         assert gridCoords.containsKey(id);
         return gridCoords.get(id);
     }

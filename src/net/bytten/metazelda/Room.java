@@ -1,9 +1,11 @@
 package net.bytten.metazelda;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
@@ -64,6 +66,11 @@ public class Room {
             x += xy.x; y += xy.y;
         }
         center = new Coords(x/coords.size(), y/coords.size());
+    }
+    
+    public Room(int id, Coords coords, Room parent, Symbol item, Condition precond) {
+        this(id, new TreeSet<Coords>(Arrays.asList(coords)), parent, item,
+                precond);
     }
     
     /**
