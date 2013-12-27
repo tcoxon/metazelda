@@ -96,7 +96,7 @@ public class CountConstraints implements IDungeonConstraints {
     }
 
     protected boolean validRoomCoords(Coords c) {
-        return c.y >= 0;
+        return c.y <= 0;
     }
     
     @Override

@@ -19,7 +19,8 @@ public class Dungeon implements IDungeon {
     
     public Dungeon() {
         rooms = new IntMap<Room>();
-        bounds = new Bounds(0,0,0,0);
+        bounds = new Bounds(Integer.MAX_VALUE,Integer.MAX_VALUE,
+                Integer.MIN_VALUE,Integer.MIN_VALUE);
     }
     
     @Override

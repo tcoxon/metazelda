@@ -28,7 +28,7 @@ public class SpaceConstraints extends CountConstraints {
 
     @Override
     protected boolean validRoomCoords(Coords c) {
-        return super.validRoomCoords(c) && spaceMap.get(c);
+        return spaceMap.get(c);
     }
 
     @Override
