@@ -14,13 +14,17 @@ import net.bytten.metazelda.util.Coords;
 
 public class GridDungeonView implements IDungeonView {
 
+    protected Color getIntensityColor(double intensity) {
+        return Color.getHSBColor(0.6f - (float)intensity*0.6f,
+                0.7f, 1.0f);
+    }
+    
     public void drawRoom(Graphics2D g, double scale, double roomSize, Room room) {
         
         int cx = (int)(room.getCenter().x * scale + roomSize*scale),
             cy = (int)(room.getCenter().y * scale + roomSize*scale);
         
-        g.setColor(Color.getHSBColor(0.6f - (float)room.getIntensity()*0.6f,
-                0.7f, 1.0f));
+        g.setColor(getIntensityColor(room.getIntensity()));
         
         g.fillOval((int)(cx - scale*roomSize/2),
                 (int)(cy - scale*roomSize/2),
