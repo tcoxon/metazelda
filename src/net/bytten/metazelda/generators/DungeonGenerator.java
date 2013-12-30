@@ -194,8 +194,13 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      */
     protected void placeRooms(KeyLevelRoomMapping levels) throws RetryException {
         
-        final int roomsPerLock = constraints.getMaxSpaces() /
+        final int roomsPerLock;
+        if (constraints.getMaxKeys() > 0) {
+            roomsPerLock = constraints.getMaxSpaces() /
                 constraints.getMaxKeys();
+        } else {
+            roomsPerLock = constraints.getMaxSpaces();
+        }
         
         // keyLevel: the number of keys required to get to the new room
         int keyLevel = 0;
@@ -277,7 +282,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         bossRoom.setItem(new Symbol(Symbol.BOSS));
         
         int oldKeyLevel = bossRoom.getPrecond().getKeyLevel(),
-            newKeyLevel = levels.keyCount();
+            newKeyLevel = Math.min(levels.keyCount(), constraints.getMaxKeys());
         List<Room> oklRooms = levels.getRooms(oldKeyLevel);
         oklRooms.remove(goalRoom);
         oklRooms.remove(bossRoom);
@@ -290,7 +295,11 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         bossRoom.setPrecond(precond);
         goalRoom.setPrecond(precond);
         
-        dungeon.link(bossRoom.getParent(), bossRoom, bossKey);
+        if (newKeyLevel == 0) {
+            dungeon.link(bossRoom.getParent(), bossRoom);
+        } else {
+            dungeon.link(bossRoom.getParent(), bossRoom, bossKey);
+        }
         dungeon.link(bossRoom, goalRoom);
     }
     
