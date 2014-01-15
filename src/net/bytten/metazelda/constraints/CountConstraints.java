@@ -13,6 +13,7 @@ import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.CoordsMap;
 import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.IntMap;
+import net.bytten.metazelda.util.Pair;
 
 /**
  * Limits the {@link net.bytten.metazelda.generators.IDungeonGenerator} in
@@ -100,12 +101,13 @@ public class CountConstraints implements IDungeonConstraints {
     }
     
     @Override
-    public Collection<Integer> getAdjacentRooms(int id) {
+    public List<Pair<Double,Integer>> getAdjacentRooms(int id) {
         Coords xy = gridCoords.get(id);
-        List<Integer> ids = new ArrayList<Integer>();
+        List<Pair<Double,Integer>> ids = new ArrayList<Pair<Double,Integer>>();
         for (Direction d: Direction.values()) {
             Coords neighbor = xy.add(d.x, d.y);
-            if (validRoomCoords(neighbor)) ids.add(getRoomId(neighbor));
+            if (validRoomCoords(neighbor)) ids.add(
+                    new Pair<Double,Integer>(1.0,getRoomId(neighbor)));
         }
         return ids;
     }

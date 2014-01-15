@@ -1,10 +1,12 @@
 package net.bytten.metazelda.constraints;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.util.Coords;
+import net.bytten.metazelda.util.Pair;
 
 /**
  * Implementing classes may specify constraints to be placed on Dungeon
@@ -51,10 +53,10 @@ public interface IDungeonConstraints {
     public Collection<Integer> initialRooms();
     
     /**
-     * @return a collection of ids of rooms that are adjacent to the room with
-     * the given id.
+     * @return a weighted list of ids of rooms that are adjacent to the room
+     * with the given id.
      */
-    public Collection<Integer> getAdjacentRooms(int id);
+    public List<Pair<Double,Integer>> getAdjacentRooms(int id);
     
     /**
      * @return a set of Coords which the room with the given id occupies.

@@ -18,6 +18,8 @@ import net.bytten.metazelda.constraints.IDungeonConstraints;
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.ILogger;
+import net.bytten.metazelda.util.Pair;
+import net.bytten.metazelda.util.RandomUtil;
 
 /**
  * The default and reference implementation of an {@link IDungeonGenerator}.
@@ -72,8 +74,8 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         Collections.shuffle(rooms, random);
         for (int i = 0; i < rooms.size(); ++i) {
             Room room = rooms.get(i);
-            for (int next: constraints.getAdjacentRooms(room.id)) {
-                if (dungeon.get(next) == null) {
+            for (Pair<Double,Integer> next: constraints.getAdjacentRooms(room.id)) {
+                if (dungeon.get(next.second) == null) {
                     return room;
                 }
             }
@@ -90,12 +92,14 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      *          null if there are no adjacent empty spaces
      */
     protected int chooseFreeEdge(Room room) {
-        List<Integer> neighbors = new ArrayList<Integer>(
+        List<Pair<Double,Integer>> neighbors = new ArrayList<Pair<Double,Integer>>(
                 constraints.getAdjacentRooms(room.id));
         Collections.shuffle(neighbors, random);
-        for (int neighbor: neighbors) {
-            if (dungeon.get(neighbor) == null)
-                return neighbor;
+        while (!neighbors.isEmpty()) {
+            Pair<Double,Integer> choice = RandomUtil.choice(random, neighbors);
+            if (dungeon.get(choice.second) == null)
+                return choice.second;
+            neighbors.remove(choice);
         }
         throw new RuntimeException("Internal error: Room doesn't have a free edge");
     }
@@ -451,7 +455,8 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             
             if (room.isGoal() || room.isBoss()) continue;
             
-            for (int nextId: constraints.getAdjacentRooms(room.id)) {
+            for (Pair<Double,Integer> next: constraints.getAdjacentRooms(room.id)) {
+                int nextId = next.second;
                 if (room.getEdge(nextId) != null) continue;
                 
                 Room nextRoom = dungeon.get(nextId);

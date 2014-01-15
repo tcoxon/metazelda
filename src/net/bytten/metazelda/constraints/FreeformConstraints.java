@@ -1,7 +1,9 @@
 package net.bytten.metazelda.constraints;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -9,6 +11,7 @@ import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.IntMap;
+import net.bytten.metazelda.util.Pair;
 
 public class FreeformConstraints implements IDungeonConstraints {
     
@@ -97,8 +100,12 @@ public class FreeformConstraints implements IDungeonConstraints {
     }
 
     @Override
-    public Collection<Integer> getAdjacentRooms(int id) {
-        return Collections.unmodifiableSet(groups.get(id).adjacentGroups);
+    public List<Pair<Double,Integer>> getAdjacentRooms(int id) {
+        List<Pair<Double,Integer>> options = new ArrayList<Pair<Double,Integer>>();
+        for (int i: groups.get(id).adjacentGroups) {
+            options.add(new Pair<Double,Integer>(1.0, i));
+        }
+        return options;
     }
 
     @Override
