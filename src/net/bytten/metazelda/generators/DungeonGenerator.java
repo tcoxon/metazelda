@@ -467,14 +467,17 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                         backwardImplies = nextRoom.getPrecond().implies(room.getPrecond());
                 if (forwardImplies && backwardImplies) {
                     // both rooms are at the same keyLevel.
-                    if (random.nextInt(5) != 0) continue;
+                    if (random.nextDouble() >=
+                            constraints.edgeGraphifyProbability(room.id, nextRoom.id))
+                        continue;
                     
                     dungeon.link(room, nextRoom);
                 } else {
                     Symbol difference = room.getPrecond().singleSymbolDifference(
                             nextRoom.getPrecond());
                     if (difference == null || (!difference.isSwitchState() &&
-                            random.nextInt(5) != 0))
+                            random.nextDouble() >=
+                                constraints.edgeGraphifyProbability(room.id, nextRoom.id)))
                         continue;
                     dungeon.link(room, nextRoom, difference);
                 }

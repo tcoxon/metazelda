@@ -118,4 +118,9 @@ public class FreeformConstraints implements IDungeonConstraints {
         return true;
     }
 
+    @Override
+    public double edgeGraphifyProbability(int id, int nextId) {
+        return 0.2;
+    }
+
 }

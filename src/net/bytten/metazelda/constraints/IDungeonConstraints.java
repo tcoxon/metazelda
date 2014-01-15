@@ -59,6 +59,12 @@ public interface IDungeonConstraints {
     public List<Pair<Double,Integer>> getAdjacentRooms(int id);
     
     /**
+     * @return desired probability for an extra edge to be added between the
+     * given rooms during the graphify phase.
+     */
+    public double edgeGraphifyProbability(int id, int nextId);
+    
+    /**
      * @return a set of Coords which the room with the given id occupies.
      */
     public Set<Coords> getCoords(int id);

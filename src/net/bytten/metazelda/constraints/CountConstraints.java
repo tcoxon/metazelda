@@ -117,4 +117,9 @@ public class CountConstraints implements IDungeonConstraints {
         return new TreeSet<Coords>(Arrays.asList(getRoomCoords(id)));
     }
 
+    @Override
+    public double edgeGraphifyProbability(int id, int nextId) {
+        return 0.2;
+    }
+
 }
