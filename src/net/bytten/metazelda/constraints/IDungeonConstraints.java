@@ -56,7 +56,7 @@ public interface IDungeonConstraints {
      * @return a weighted list of ids of rooms that are adjacent to the room
      * with the given id.
      */
-    public List<Pair<Double,Integer>> getAdjacentRooms(int id);
+    public List<Pair<Double,Integer>> getAdjacentRooms(int id, int keyLevel);
     
     /**
      * @return desired probability for an extra edge to be added between the

@@ -100,7 +100,7 @@ public class FreeformConstraints implements IDungeonConstraints {
     }
 
     @Override
-    public List<Pair<Double,Integer>> getAdjacentRooms(int id) {
+    public List<Pair<Double,Integer>> getAdjacentRooms(int id, int keyLevel) {
         List<Pair<Double,Integer>> options = new ArrayList<Pair<Double,Integer>>();
         for (int i: groups.get(id).adjacentGroups) {
             options.add(new Pair<Double,Integer>(1.0, i));

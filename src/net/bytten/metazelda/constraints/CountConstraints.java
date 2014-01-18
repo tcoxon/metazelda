@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import net.bytten.metazelda.IDungeon;
@@ -101,7 +100,7 @@ public class CountConstraints implements IDungeonConstraints {
     }
     
     @Override
-    public List<Pair<Double,Integer>> getAdjacentRooms(int id) {
+    public List<Pair<Double,Integer>> getAdjacentRooms(int id, int keyLevel) {
         Coords xy = gridCoords.get(id);
         List<Pair<Double,Integer>> ids = new ArrayList<Pair<Double,Integer>>();
         for (Direction d: Direction.values()) {
