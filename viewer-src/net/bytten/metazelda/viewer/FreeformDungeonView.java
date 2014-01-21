@@ -31,8 +31,10 @@ public class FreeformDungeonView extends GridDungeonView {
     
     protected Color getBackgroundColor(IDungeon dungeon, int id) {
         switch (coloringMode) {
+        case INTENSITY:
+            if (dungeon.get(id) != null)
+                return getIntensityColor(dungeon.get(id).getIntensity());
         default: case ID: return new Color(id);
-        case INTENSITY: return getIntensityColor(dungeon.get(id).getIntensity());
         }
     }
     
