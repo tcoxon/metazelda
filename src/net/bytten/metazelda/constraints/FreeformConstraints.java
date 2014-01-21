@@ -41,6 +41,10 @@ public class FreeformConstraints implements IDungeonConstraints {
         analyzeMap();
     }
     
+    protected boolean allowGroupsToBeAdjacent(int id0, int id1) {
+        return true;
+    }
+    
     protected void analyzeMap() {
         for (int x = colorMap.getLeft(); x <= colorMap.getRight(); ++x)
             for (int y = colorMap.getTop(); y <= colorMap.getBottom(); ++y) {
@@ -61,7 +65,7 @@ public class FreeformConstraints implements IDungeonConstraints {
                     Coords neighbor = xy.add(d.x, d.y);
                     if (group.coords.contains(neighbor)) continue;
                     Integer val = colorMap.get(neighbor.x, neighbor.y);
-                    if (val != null) {
+                    if (val != null && allowGroupsToBeAdjacent(group.id, val)) {
                         group.adjacentGroups.add(val);
                     }
                 }
