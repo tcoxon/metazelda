@@ -96,9 +96,8 @@ public class FreeformConstraints implements IDungeonConstraints {
     public Collection<Integer> initialRooms() {
         Set<Integer> result = new TreeSet<Integer>();
         
-        // TODO place the initial room elsewhere than the center?
-        Coords center = colorMap.getCenter();
-        result.add(colorMap.get(center.x, center.y));
+        // TODO place the initial room elsewhere?
+        result.add(groups.values().iterator().next().id);
         
         return result;
     }
