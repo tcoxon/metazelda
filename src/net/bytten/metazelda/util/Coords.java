@@ -86,8 +86,8 @@ public class Coords implements Comparable<Coords> {
         if (dx < 0) return Direction.E;
         if (dx > 0) return Direction.W;
         if (dy < 0) return Direction.S;
-        if (dy > 0) return Direction.N;
-        throw new RuntimeException("Coords do not align in one dimension, or are equal");
+        assert dy > 0;
+        return Direction.N;
     }
     
     public double distance(Coords other) {

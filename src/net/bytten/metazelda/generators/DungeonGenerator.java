@@ -17,6 +17,7 @@ import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.constraints.IDungeonConstraints;
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
+import net.bytten.metazelda.util.GenerationFailureException;
 import net.bytten.metazelda.util.ILogger;
 import net.bytten.metazelda.util.Pair;
 import net.bytten.metazelda.util.RandomUtil;
@@ -107,7 +108,8 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 return choice.second;
             neighbors.remove(choice);
         }
-        throw new RuntimeException("Internal error: Room doesn't have a free edge");
+        assert false;
+        throw new GenerationFailureException("Internal error: Room doesn't have a free edge");
     }
     
     /**
@@ -683,7 +685,8 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                         log("roomsPerLock is now "+roomsPerLock);
                         
                         if (roomsPerLock == 0) {
-                            throw new RuntimeException("Failed to place rooms. Have you forgotten to disable boss-locking?");
+                            throw new GenerationFailureException(
+                                    "Failed to place rooms. Have you forgotten to disable boss-locking?");
                             // If the boss room is locked, the final key is used
                             // only for the boss room. So if the final key is
                             // also used to cross the river, rooms cannot be

@@ -46,6 +46,8 @@ public class FreeformConstraints implements IDungeonConstraints {
     }
     
     protected void analyzeMap() {
+        colorMap.checkConnected();
+        
         for (int x = colorMap.getLeft(); x <= colorMap.getRight(); ++x)
             for (int y = colorMap.getTop(); y <= colorMap.getBottom(); ++y) {
                 Integer val = colorMap.get(x,y);

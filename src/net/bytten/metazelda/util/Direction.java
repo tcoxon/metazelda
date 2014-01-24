@@ -35,10 +35,10 @@ public enum Direction {
         case N: return S;
         case E: return W;
         case S: return N;
-        case W: return E;
         default:
-            // Should not occur
-            throw new RuntimeException("Unknown direction");
+        case W: 
+            assert d == W;
+            return E;
         }
     }
     
