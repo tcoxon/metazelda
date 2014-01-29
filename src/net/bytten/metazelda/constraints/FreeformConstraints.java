@@ -41,10 +41,6 @@ public class FreeformConstraints implements IDungeonConstraints {
         analyzeMap();
     }
     
-    protected boolean allowGroupsToBeAdjacent(int id0, int id1) {
-        return true;
-    }
-    
     protected void analyzeMap() {
         colorMap.checkConnected();
         
@@ -67,7 +63,7 @@ public class FreeformConstraints implements IDungeonConstraints {
                     Coords neighbor = xy.add(d.x, d.y);
                     if (group.coords.contains(neighbor)) continue;
                     Integer val = colorMap.get(neighbor.x, neighbor.y);
-                    if (val != null && allowGroupsToBeAdjacent(group.id, val)) {
+                    if (val != null && allowRoomsToBeAdjacent(group.id, val)) {
                         group.adjacentGroups.add(val);
                     }
                 }
@@ -113,6 +109,16 @@ public class FreeformConstraints implements IDungeonConstraints {
         return options;
     }
 
+    /* The reason for this being separate from getAdjacentRooms is that this
+     * method is called at most once for each pair of rooms during analyzeMap,
+     * while getAdjacentRooms is called many times during generation under the
+     * assumption that it's simply a cheap "getter". Subclasses may override
+     * this method to perform more expensive checks than with getAdjacentRooms.
+     */
+    protected boolean allowRoomsToBeAdjacent(int id0, int id1) {
+        return true;
+    }
+    
     @Override
     public Set<Coords> getCoords(int id) {
         return Collections.unmodifiableSet(groups.get(id).coords);
