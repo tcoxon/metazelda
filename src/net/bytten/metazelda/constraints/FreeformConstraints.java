@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
+import net.bytten.metazelda.util.GenerationFailureException;
 import net.bytten.metazelda.util.IntMap;
 import net.bytten.metazelda.util.Pair;
 
@@ -68,6 +69,45 @@ public class FreeformConstraints implements IDungeonConstraints {
                     }
                 }
             }
+        }
+        
+        checkConnected();
+    }
+    
+    protected boolean isConnected() {
+        // This is different from ColorMap.checkConnected because it also checks
+        // what the client says for allowRoomsToBeAdjacent allows the map to be
+        // full connected.
+        // Do a breadth first search starting at the top left to check if
+        // every position is reachable.
+        Set<Integer> world = new TreeSet<Integer>(groups.keySet()),
+                    queue = new TreeSet<Integer>();
+        
+        Integer first = world.iterator().next();
+        world.remove(first);
+        queue.add(first);
+        
+        while (!queue.isEmpty()) {
+            Integer pos = queue.iterator().next();
+            queue.remove(pos);
+            
+            for (Pair<Double,Integer> adjacent: getAdjacentRooms(pos, getMaxKeys()+1)) {
+                Integer adjId = adjacent.second;
+                
+                if (world.contains(adjId)) {
+                    world.remove(adjId);
+                    queue.add(adjId);
+                }
+            }
+        }
+        
+        return world.size() == 0;
+    }
+    
+    protected void checkConnected() {
+        if (!isConnected()) {
+            // Parts of the map are unreachable!
+            throw new GenerationFailureException("ColorMap is not fully connected");
         }
     }
     
