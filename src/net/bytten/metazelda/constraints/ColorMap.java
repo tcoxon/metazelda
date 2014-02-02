@@ -96,9 +96,7 @@ public class ColorMap {
     }
     
     public void checkConnected() {
-        boolean result = isConnected();
-        assert result;
-        if (!result) {
+        if (!isConnected()) {
             // Parts of the map are unreachable!
             throw new GenerationFailureException("ColorMap is not fully connected");
         }
