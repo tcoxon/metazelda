@@ -42,6 +42,30 @@ public enum Direction {
         }
     }
     
+    public Direction clockwise() {
+        switch (this) {
+        case N: return E;
+        case E: return S;
+        case S: return W;
+        default:
+        case W:
+            assert this == W;
+            return N;
+        }
+    }
+    
+    public Direction anticlockwise() {
+        switch (this) {
+        case N: return W;
+        case E: return N;
+        case S: return E;
+        default:
+        case W:
+            assert this == W;
+            return S;
+        }
+    }
+    
     /**
      * Gets the Direction for a given integer representation of a direction.
      * 
