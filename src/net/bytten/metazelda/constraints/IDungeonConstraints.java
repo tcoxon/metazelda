@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.bytten.metazelda.IDungeon;
+import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Pair;
 
@@ -77,5 +78,7 @@ public interface IDungeonConstraints {
      *          attempt generation again
      */
     public boolean isAcceptable(IDungeon dungeon);
+    
+    public boolean roomCanFitItem(int id, Symbol key);
     
 }

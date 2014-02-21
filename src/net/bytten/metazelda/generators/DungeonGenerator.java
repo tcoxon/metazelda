@@ -275,6 +275,9 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             throws RetryException {
         List<Room> possibleGoalRooms = new ArrayList<Room>(dungeon.roomCount());
         
+        Symbol goalSym = new Symbol(Symbol.GOAL),
+               bossSym = new Symbol(Symbol.BOSS);
+        
         for (Room room: dungeon.getRooms()) {
             if (room.getChildren().size() > 0 || room.getItem() != null)
                 continue;
@@ -283,6 +286,14 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                     room.getItem() != null ||
                     !parent.getPrecond().implies(room.getPrecond()))
                 continue;
+            if (isGenerateGoal()) {
+                if (!constraints.roomCanFitItem(room.id, goalSym) ||
+                        !constraints.roomCanFitItem(parent.id, bossSym))
+                    continue;
+            } else {
+                if (!constraints.roomCanFitItem(room.id, bossSym))
+                    continue;
+            }
             possibleGoalRooms.add(room);
         }
         
@@ -297,8 +308,8 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             goalRoom = null;
         }
         
-        if (goalRoom != null) goalRoom.setItem(new Symbol(Symbol.GOAL));
-        bossRoom.setItem(new Symbol(Symbol.BOSS));
+        if (goalRoom != null) goalRoom.setItem(goalSym);
+        bossRoom.setItem(bossSym);
         
         if (isBossRoomLocked()) {
             int oldKeyLevel = bossRoom.getPrecond().getKeyLevel(),
@@ -448,10 +459,13 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             
             removeDescendantsFromList(rooms, baseRoom);
             
+            Symbol switchSym = new Symbol(Symbol.SWITCH);
+            
             Room switchRoom = null;
             for (Room room: rooms) {
                 if (room.getItem() == null &&
-                        baseRoomCond.implies(room.getPrecond())) {
+                        baseRoomCond.implies(room.getPrecond()) &&
+                        constraints.roomCanFitItem(room.id, switchSym)) {
                     switchRoom = room;
                     break;
                 }
@@ -459,7 +473,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             if (switchRoom == null) continue;
             
             if (switchLockChildRooms(baseRoom, Condition.SwitchState.EITHER)) {
-                switchRoom.setItem(new Symbol(Symbol.SWITCH));
+                switchRoom.setItem(switchSym);
                 return;
             }
         }
@@ -532,15 +546,19 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             // Alternatively, use the EDGE_COUNT_COMPARATOR to put keys at
             // 'dead end' rooms.
             
+            Symbol keySym = new Symbol(key);
+            
             boolean placedKey = false;
             for (Room room: rooms) {
-                if (room.getItem() == null) {
-                    room.setItem(new Symbol(key));
+                if (room.getItem() == null && constraints.roomCanFitItem(room.id, keySym)) {
+                    room.setItem(keySym);
                     placedKey = true;
                     break;
                 }
             }
-            assert placedKey;
+            if (!placedKey)
+                // there were no rooms into which the key would fit
+                throw new RetryException();
         }
     }
     

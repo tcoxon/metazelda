@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.bytten.metazelda.IDungeon;
+import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.GenerationFailureException;
@@ -172,6 +173,11 @@ public class FreeformConstraints implements IDungeonConstraints {
     @Override
     public double edgeGraphifyProbability(int id, int nextId) {
         return 0.2;
+    }
+
+    @Override
+    public boolean roomCanFitItem(int id, Symbol key) {
+        return true;
     }
 
 }
