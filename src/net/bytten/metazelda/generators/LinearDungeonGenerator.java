@@ -89,6 +89,9 @@ public class LinearDungeonGenerator extends DungeonGenerator {
         
         Room current = dungeon.findStart(),
                 goal = dungeon.findGoal();
+        // Clients may disable generation of the goal room -- the equivalent
+        // 'ending' room becomes the boss room.
+        if (goal == null) goal = dungeon.findBoss();
         assert current != null && goal != null;
         int nextKey = 0, nonlinearity = 0;
         
