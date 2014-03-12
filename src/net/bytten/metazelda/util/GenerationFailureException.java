@@ -7,4 +7,8 @@ public class GenerationFailureException extends RuntimeException {
         super(message);
     }
 
+    public GenerationFailureException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

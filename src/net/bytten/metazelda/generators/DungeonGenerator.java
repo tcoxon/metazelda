@@ -727,13 +727,16 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 // Place the keys within the dungeon:
                 placeKeys(levels);
                 
+                if (levels.keyCount()-1 != constraints.getMaxKeys())
+                    throw new RetryException();
+
                 checkAcceptable();
                 
                 return;
             
             } catch (RetryException e) {
                 if (++ attempt > MAX_RETRIES) {
-                    throw new RuntimeException("Dungeon generator failed", e);
+                    throw new GenerationFailureException("Dungeon generator failed", e);
                 }
                 log("Retrying dungeon generation...");
             }
