@@ -84,7 +84,8 @@ public class AStar<Id extends Comparable<Id>> {
                 double dist = edgeCost(current, neighbor);
                 double g = gScore.get(current) + dist;
                 
-                if (!openSet.contains(neighbor) || g < gScore.get(neighbor)) {
+                if ((!openSet.contains(neighbor) || g < gScore.get(neighbor)) &&
+                        !Double.isInfinite(g)) {
                     cameFrom.put(neighbor, current);
                     gScore.put(neighbor, g);
                     updateFScore(neighbor);
