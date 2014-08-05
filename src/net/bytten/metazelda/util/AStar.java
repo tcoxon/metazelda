@@ -52,6 +52,10 @@ public class AStar<Id extends Comparable<Id>> {
         return Math.abs(toPos.x - pos.x) + Math.abs(toPos.y - pos.y);
     }
     
+    protected double edgeCost(Id from, Id to) {
+        return client.getCoords(from).distance(client.getCoords(to));
+    }
+    
     protected void updateFScore(Id id) {
         fScore.put(id, gScore.get(id) + heuristicDistance(client.getCoords(id)));
     }
@@ -77,8 +81,7 @@ public class AStar<Id extends Comparable<Id>> {
                 if (closedSet.contains(neighbor))
                     continue;
                 
-                double dist = client.getCoords(current).distance(
-                        client.getCoords(neighbor));
+                double dist = edgeCost(current, neighbor);
                 double g = gScore.get(current) + dist;
                 
                 if (!openSet.contains(neighbor) || g < gScore.get(neighbor)) {
