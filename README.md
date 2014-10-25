@@ -30,6 +30,7 @@ Controls:
 * Pass -space=spacemaps/skull.png to generate a grid dungeon in a specific shape.
 * Pass -switches to generate dungeons with switch puzzles. This will turn off
   linearity optimization.
+* Pass -no-goal to tell the generator not to make a goal room.
 
 Reading the graph:
 

@@ -118,12 +118,17 @@ public class Main extends JPanel {
             constraints = cons;
         }
         
+        DungeonGenerator generator;
         if (getArg("switches") != null) {
-            return new DungeonGenerator(new StdoutLogger(), seed, constraints);
+            generator = new DungeonGenerator(new StdoutLogger(), seed, constraints);
         } else {
-            return new LinearDungeonGenerator(new StdoutLogger(), seed,
+            generator = new LinearDungeonGenerator(new StdoutLogger(), seed,
                     constraints);
         }
+        if (getArg("no-goal") != null) {
+            generator.setGenerateGoal(false);
+        }
+        return generator;
     }
     
     public void regenerate(final long seed) {
