@@ -2,7 +2,7 @@
 
 ## Introduction
 
-**I'm currently working on version 3.0 of Metazelda on this branch. The documentation will be out of date and there will be many bugs in the code! If you want something you can rely on, please see the branch 'version2'.**
+**I'm currently working on version 3.0 of Metazelda on this branch. The documentation is a little out of date right now. The branch 'version2' has documentation that matches the code.**
 
 Implementation of an algorithm for procedurally-generating dungeons with
 Zelda-like item-based puzzles.
