@@ -19,7 +19,7 @@ import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.constraints.IDungeonConstraints;
 import net.bytten.metazelda.util.GenerationFailureException;
-import net.bytten.metazelda.util.ILogger;
+import net.bytten.gameutil.logging.ILogger;
 
 /**
  * The default and reference implementation of an {@link IDungeonGenerator}.

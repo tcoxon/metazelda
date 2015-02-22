@@ -27,7 +27,7 @@ import net.bytten.metazelda.constraints.SpaceMap;
 import net.bytten.metazelda.generators.DungeonGenerator;
 import net.bytten.metazelda.generators.IDungeonGenerator;
 import net.bytten.metazelda.generators.LinearDungeonGenerator;
-import net.bytten.metazelda.util.StdoutLogger;
+import net.bytten.gameutil.logging.StdoutLogger;
 
 
 public class Main extends JPanel {

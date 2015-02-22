@@ -13,7 +13,7 @@ import net.bytten.metazelda.Edge;
 import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.constraints.IDungeonConstraints;
-import net.bytten.metazelda.util.ILogger;
+import net.bytten.gameutil.logging.ILogger;
 
 /**
  * Extends DungeonGenerator to choose the least nonlinear one immediately
