@@ -10,6 +10,7 @@ import java.util.Set;
 
 import net.bytten.gameutil.Coords;
 import net.bytten.gameutil.Pair;
+import net.bytten.gameutil.RandUtil;
 import net.bytten.metazelda.Condition;
 import net.bytten.metazelda.Dungeon;
 import net.bytten.metazelda.Edge;
@@ -20,7 +21,6 @@ import net.bytten.metazelda.constraints.IDungeonConstraints;
 import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.GenerationFailureException;
 import net.bytten.metazelda.util.ILogger;
-import net.bytten.metazelda.util.RandomUtil;
 
 /**
  * The default and reference implementation of an {@link IDungeonGenerator}.
@@ -103,9 +103,9 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 constraints.getAdjacentRooms(room.id, keyLevel));
         Collections.shuffle(neighbors, random);
         while (!neighbors.isEmpty()) {
-            Pair<Double,Integer> choice = RandomUtil.choice(random, neighbors);
-            if (dungeon.get(choice.second) == null)
-                return choice.second;
+            Integer choice = RandUtil.choice(random, neighbors);
+            if (dungeon.get(choice) == null)
+                return choice;
             neighbors.remove(choice);
         }
         assert false;
