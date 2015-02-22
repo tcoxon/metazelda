@@ -8,10 +8,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Direction;
 import net.bytten.gameutil.Pair;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Symbol;
-import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.GenerationFailureException;
 import net.bytten.metazelda.util.IntMap;
 
@@ -61,8 +61,8 @@ public class FreeformConstraints implements IDungeonConstraints {
         
         for (Group group: groups.values()) {
             for (Coords xy: group.coords) {
-                for (Direction d: Direction.values()) {
-                    Coords neighbor = xy.add(d.x, d.y);
+                for (Direction d: Direction.COMPASS_DIRECTIONS) {
+                    Coords neighbor = xy.add(d);
                     if (group.coords.contains(neighbor)) continue;
                     Integer val = colorMap.get(neighbor.x, neighbor.y);
                     if (val != null && allowRoomsToBeAdjacent(group.id, val)) {

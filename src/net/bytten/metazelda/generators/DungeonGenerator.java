@@ -18,7 +18,6 @@ import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.constraints.IDungeonConstraints;
-import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.GenerationFailureException;
 import net.bytten.metazelda.util.ILogger;
 

@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.bytten.gameutil.Coords;
-import net.bytten.metazelda.util.Direction;
 
 /**
  * Represents an individual space within the dungeon.

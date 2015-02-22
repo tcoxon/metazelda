@@ -8,11 +8,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Direction;
 import net.bytten.gameutil.CoordsMap;
 import net.bytten.gameutil.Pair;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Symbol;
-import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.IntMap;
 
 /**
@@ -104,10 +104,10 @@ public class CountConstraints implements IDungeonConstraints {
     public List<Pair<Double,Integer>> getAdjacentRooms(int id, int keyLevel) {
         Coords xy = gridCoords.get(id);
         List<Pair<Double,Integer>> ids = new ArrayList<Pair<Double,Integer>>();
-        for (Direction d: Direction.values()) {
-            Coords neighbor = xy.add(d.x, d.y);
-            if (validRoomCoords(neighbor)) ids.add(
-                    new Pair<Double,Integer>(1.0,getRoomId(neighbor)));
+        for (Direction d: Direction.COMPASS_DIRECTIONS) {
+            Coords neighbor = xy.add(d);
+            if (validRoomCoords(neighbor))
+                ids.add(new Pair<Double,Integer>(1.0,getRoomId(neighbor)));
         }
         return ids;
     }

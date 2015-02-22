@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import net.bytten.gameutil.Coords;
-import net.bytten.metazelda.util.Direction;
+import net.bytten.gameutil.Direction;
 import net.bytten.metazelda.util.GenerationFailureException;
 
 public class ColorMap {
@@ -82,8 +82,8 @@ public class ColorMap {
             Coords pos = queue.iterator().next();
             queue.remove(pos);
             
-            for (Direction d: Direction.values()) {
-                Coords neighbor = pos.add(d.x,d.y);
+            for (Direction d: Direction.COMPASS_DIRECTIONS) {
+                Coords neighbor = pos.add(d);
                 
                 if (world.contains(neighbor)) {
                     world.remove(neighbor);
