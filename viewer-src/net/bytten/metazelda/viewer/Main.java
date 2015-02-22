@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import net.bytten.gameutil.Coords;
 import net.bytten.metazelda.constraints.ColorMap;
 import net.bytten.metazelda.constraints.CountConstraints;
 import net.bytten.metazelda.constraints.FreeformConstraints;
@@ -26,7 +27,6 @@ import net.bytten.metazelda.constraints.SpaceMap;
 import net.bytten.metazelda.generators.DungeonGenerator;
 import net.bytten.metazelda.generators.IDungeonGenerator;
 import net.bytten.metazelda.generators.LinearDungeonGenerator;
-import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.StdoutLogger;
 
 

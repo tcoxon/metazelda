@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.bytten.metazelda.util.Coords;
+import net.bytten.gameutil.Coords;
 import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.GenerationFailureException;
 

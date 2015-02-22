@@ -2,7 +2,8 @@ package net.bytten.metazelda;
 
 import java.util.Collection;
 
-import net.bytten.metazelda.util.Coords;
+import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Rect2dI;
 import net.bytten.metazelda.util.IntMap;
 
 /**
@@ -15,16 +16,16 @@ public class Dungeon implements IDungeon {
 
     protected int itemCount;
     protected IntMap<Room> rooms;
-    protected Bounds bounds;
+    protected Rect2dI bounds;
     
     public Dungeon() {
         rooms = new IntMap<Room>();
-        bounds = new Bounds(Integer.MAX_VALUE,Integer.MAX_VALUE,
+        bounds = Rect2dI.fromExtremes(Integer.MAX_VALUE,Integer.MAX_VALUE,
                 Integer.MIN_VALUE,Integer.MIN_VALUE);
     }
     
     @Override
-    public Bounds getExtentBounds() {
+    public Rect2dI getExtentBounds() {
         return bounds;
     }
     
@@ -48,21 +49,21 @@ public class Dungeon implements IDungeon {
         rooms.put(room.id, room);
         
         for (Coords xy: room.getCoords()) {
-            if (xy.x < bounds.left) {
-                bounds = new Bounds(xy.x, bounds.top,
-                        bounds.right, bounds.bottom);
+            if (xy.x < bounds.left()) {
+                bounds = Rect2dI.fromExtremes(xy.x, bounds.top(),
+                        bounds.right(), bounds.bottom());
             }
-            if (xy.x > bounds.right) {
-                bounds = new Bounds(bounds.left, bounds.top,
-                        xy.x, bounds.bottom);
+            if (xy.x >= bounds.right()) {
+                bounds = Rect2dI.fromExtremes(bounds.left(), bounds.top(),
+                        xy.x+1, bounds.bottom());
             }
-            if (xy.y < bounds.top) {
-                bounds = new Bounds(bounds.left, xy.y,
-                        bounds.right, bounds.bottom);
+            if (xy.y < bounds.top()) {
+                bounds = Rect2dI.fromExtremes(bounds.left(), xy.y,
+                        bounds.right(), bounds.bottom());
             }
-            if (xy.y > bounds.bottom) {
-                bounds = new Bounds(bounds.left, bounds.top,
-                        bounds.right, xy.y);
+            if (xy.y >= bounds.bottom()) {
+                bounds = Rect2dI.fromExtremes(bounds.left(), bounds.top(),
+                        bounds.right(), xy.y+1);
             }
         }
     }

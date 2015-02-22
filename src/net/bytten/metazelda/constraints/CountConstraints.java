@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.CoordsMap;
+import net.bytten.gameutil.Pair;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Symbol;
-import net.bytten.metazelda.util.Coords;
-import net.bytten.metazelda.util.CoordsMap;
 import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.IntMap;
-import net.bytten.metazelda.util.Pair;
 
 /**
  * Limits the {@link net.bytten.metazelda.generators.IDungeonGenerator} in

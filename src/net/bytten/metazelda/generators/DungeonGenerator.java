@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Pair;
 import net.bytten.metazelda.Condition;
 import net.bytten.metazelda.Dungeon;
 import net.bytten.metazelda.Edge;
@@ -15,11 +17,9 @@ import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.constraints.IDungeonConstraints;
-import net.bytten.metazelda.util.Coords;
 import net.bytten.metazelda.util.Direction;
 import net.bytten.metazelda.util.GenerationFailureException;
 import net.bytten.metazelda.util.ILogger;
-import net.bytten.metazelda.util.Pair;
 import net.bytten.metazelda.util.RandomUtil;
 
 /**

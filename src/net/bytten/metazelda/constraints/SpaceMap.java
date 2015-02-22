@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.bytten.metazelda.util.Coords;
+import net.bytten.gameutil.Coords;
 
 /**
  * Controls which spaces are valid for an

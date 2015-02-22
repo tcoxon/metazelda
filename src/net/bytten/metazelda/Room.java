@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.bytten.metazelda.util.Coords;
+import net.bytten.gameutil.Coords;
 import net.bytten.metazelda.util.Direction;
 
 /**

@@ -3,6 +3,8 @@ package net.bytten.metazelda.util;
 import java.util.List;
 import java.util.Random;
 
+import net.bytten.gameutil.Pair;
+
 public class RandomUtil {
 
     public static<T> Pair<Double, T> choice(Random random,

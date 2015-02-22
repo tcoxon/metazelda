@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import net.bytten.gameutil.Coords;
+
 /**
  * Horribly messy (but compact and generic) A* implementation.
  */

@@ -2,6 +2,8 @@ package net.bytten.metazelda;
 
 import java.util.Collection;
 
+import net.bytten.gameutil.Rect2dI;
+
 /**
  * Represents the spacial layout of a lock-and-key puzzle and contains all
  * {@link Symbol}s, {@link Room}s and {@link Edge}s within the puzzle.
@@ -94,7 +96,7 @@ public interface IDungeon {
     public abstract Room findSwitch();
     
     /**
-     * Gets the {@link Bounds} that encloses every room within the dungeon.
+     * Gets the {@link Rect2dI} that encloses every room within the dungeon.
      * <p>
      * The Bounds object has the X coordinate of the West-most room, the Y
      * coordinate of the North-most room, the 'right' coordinate of the
@@ -102,6 +104,6 @@ public interface IDungeon {
      * 
      * @return  the rectangle enclosing every room within the dungeon
      */
-    public abstract Bounds getExtentBounds();
+    public abstract Rect2dI getExtentBounds();
 
 }

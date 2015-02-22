@@ -3,6 +3,7 @@
 	<name>metazelda</name>
 	<comment></comment>
 	<projects>
+		<project>gameutil</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

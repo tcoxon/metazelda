@@ -15,6 +15,11 @@ I plan to use this in my game,
 See also:
 [my posts on metazelda on my devlog](http://bytten.net/devlog/tags.html#metazelda-ref)
 
+## Building
+
+Build using [eclipse](https://eclipse.org). Also requires my gameutil library,
+which [you can find the source for on github](https://github.com/tcoxon/gameutil).
+
 ## Usage
 
 To run after building:

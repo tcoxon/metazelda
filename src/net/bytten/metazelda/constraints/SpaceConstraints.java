@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.bytten.metazelda.util.Coords;
+import net.bytten.gameutil.Coords;
 
 /**
  * Constrains the coordinates where Rooms may be placed to be only those within

@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Pair;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Symbol;
-import net.bytten.metazelda.util.Coords;
-import net.bytten.metazelda.util.Pair;
 
 /**
  * Implementing classes may specify constraints to be placed on Dungeon

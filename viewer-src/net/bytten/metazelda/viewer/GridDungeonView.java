@@ -5,12 +5,12 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
-import net.bytten.metazelda.Bounds;
+import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Rect2dI;
 import net.bytten.metazelda.Edge;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
-import net.bytten.metazelda.util.Coords;
 
 public class GridDungeonView implements IDungeonView {
 
@@ -148,7 +148,7 @@ public class GridDungeonView implements IDungeonView {
     }
     
     protected double getScale(Dimension dim, IDungeon dungeon) {
-        Bounds bounds = dungeon.getExtentBounds();
+        Rect2dI bounds = dungeon.getExtentBounds();
         return Math.min(((double)dim.width) / bounds.width(),
                 ((double)dim.height) / bounds.height());
     }
@@ -171,12 +171,12 @@ public class GridDungeonView implements IDungeonView {
         
         // Figure out scale & translation to draw the dungeon at
         synchronized (dungeon) {
-            Bounds bounds = dungeon.getExtentBounds();
+            Rect2dI bounds = dungeon.getExtentBounds();
             double scale = getScale(dim, dungeon),
                    roomSize = getRoomSize(dim, dungeon);
             
             // move the graph into view
-            g.translate(-scale * bounds.left, -scale * bounds.top);
+            g.translate(-scale * bounds.left(), -scale * bounds.top());
             
             for (Room room: dungeon.getRooms()) {
                 // draw the edges between rooms
