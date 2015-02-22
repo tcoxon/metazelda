@@ -7,12 +7,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.algorithms.AStar;
 import net.bytten.metazelda.Dungeon;
 import net.bytten.metazelda.Edge;
 import net.bytten.metazelda.Room;
 import net.bytten.metazelda.Symbol;
 import net.bytten.metazelda.constraints.IDungeonConstraints;
-import net.bytten.metazelda.util.AStar;
 import net.bytten.metazelda.util.ILogger;
 
 /**
