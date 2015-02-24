@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
 import net.bytten.gameutil.Vec2I;
-import net.bytten.gameutil.Rect2dI;
+import net.bytten.gameutil.Rect2I;
 import net.bytten.metazelda.Edge;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Room;
@@ -148,7 +148,7 @@ public class GridDungeonView implements IDungeonView {
     }
     
     protected double getScale(Dimension dim, IDungeon dungeon) {
-        Rect2dI bounds = dungeon.getExtentBounds();
+        Rect2I bounds = dungeon.getExtentBounds();
         return Math.min(((double)dim.width) / bounds.width(),
                 ((double)dim.height) / bounds.height());
     }
@@ -171,7 +171,7 @@ public class GridDungeonView implements IDungeonView {
         
         // Figure out scale & translation to draw the dungeon at
         synchronized (dungeon) {
-            Rect2dI bounds = dungeon.getExtentBounds();
+            Rect2I bounds = dungeon.getExtentBounds();
             double scale = getScale(dim, dungeon),
                    roomSize = getRoomSize(dim, dungeon);
             

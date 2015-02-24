@@ -3,7 +3,7 @@ package net.bytten.metazelda;
 import java.util.Collection;
 
 import net.bytten.gameutil.Vec2I;
-import net.bytten.gameutil.Rect2dI;
+import net.bytten.gameutil.Rect2I;
 import net.bytten.metazelda.util.IntMap;
 
 /**
@@ -16,16 +16,16 @@ public class Dungeon implements IDungeon {
 
     protected int itemCount;
     protected IntMap<Room> rooms;
-    protected Rect2dI bounds;
+    protected Rect2I bounds;
     
     public Dungeon() {
         rooms = new IntMap<Room>();
-        bounds = Rect2dI.fromExtremes(Integer.MAX_VALUE,Integer.MAX_VALUE,
+        bounds = Rect2I.fromExtremes(Integer.MAX_VALUE,Integer.MAX_VALUE,
                 Integer.MIN_VALUE,Integer.MIN_VALUE);
     }
     
     @Override
-    public Rect2dI getExtentBounds() {
+    public Rect2I getExtentBounds() {
         return bounds;
     }
     
@@ -50,19 +50,19 @@ public class Dungeon implements IDungeon {
         
         for (Vec2I xy: room.getCoords()) {
             if (xy.x < bounds.left()) {
-                bounds = Rect2dI.fromExtremes(xy.x, bounds.top(),
+                bounds = Rect2I.fromExtremes(xy.x, bounds.top(),
                         bounds.right(), bounds.bottom());
             }
             if (xy.x >= bounds.right()) {
-                bounds = Rect2dI.fromExtremes(bounds.left(), bounds.top(),
+                bounds = Rect2I.fromExtremes(bounds.left(), bounds.top(),
                         xy.x+1, bounds.bottom());
             }
             if (xy.y < bounds.top()) {
-                bounds = Rect2dI.fromExtremes(bounds.left(), xy.y,
+                bounds = Rect2I.fromExtremes(bounds.left(), xy.y,
                         bounds.right(), bounds.bottom());
             }
             if (xy.y >= bounds.bottom()) {
-                bounds = Rect2dI.fromExtremes(bounds.left(), bounds.top(),
+                bounds = Rect2I.fromExtremes(bounds.left(), bounds.top(),
                         bounds.right(), xy.y+1);
             }
         }
