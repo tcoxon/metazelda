@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 import net.bytten.gameutil.Pair;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Symbol;
@@ -68,7 +68,7 @@ public interface IDungeonConstraints {
     /**
      * @return a set of Coords which the room with the given id occupies.
      */
-    public Set<Coords> getCoords(int id);
+    public Set<Vec2I> getCoords(int id);
     
     /**
      * Runs post-generation checks to determine the suitability of the dungeon.

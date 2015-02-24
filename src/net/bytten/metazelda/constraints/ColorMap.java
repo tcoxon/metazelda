@@ -5,23 +5,23 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 import net.bytten.gameutil.Direction;
 import net.bytten.metazelda.util.GenerationFailureException;
 
 public class ColorMap {
     
     protected int xsum, ysum, xmin, xmax, ymin, ymax;
-    protected Map<Coords, Integer> map;
+    protected Map<Vec2I, Integer> map;
 
     public ColorMap() {
-        map = new TreeMap<Coords,Integer>();
+        map = new TreeMap<Vec2I,Integer>();
         ymin = xmin = Integer.MAX_VALUE;
         ymax = xmax = Integer.MIN_VALUE;
     }
     
     public void set(int x, int y, int color) {
-        Coords xy = new Coords(x,y);
+        Vec2I xy = new Vec2I(x,y);
         if (map.get(xy) == null) {
             xsum += x;
             ysum += y;
@@ -35,11 +35,11 @@ public class ColorMap {
     }
     
     public Integer get(int x, int y) {
-        return map.get(new Coords(x,y));
+        return map.get(new Vec2I(x,y));
     }
     
-    public Coords getCenter() {
-        return new Coords(xsum/map.size(), ysum/map.size());
+    public Vec2I getCenter() {
+        return new Vec2I(xsum/map.size(), ysum/map.size());
     }
     
     public int getWidth() {
@@ -71,19 +71,19 @@ public class ColorMap {
         
         // Do a breadth first search starting at the top left to check if
         // every position is reachable.
-        Set<Coords> world = new TreeSet<Coords>(map.keySet()),
-                    queue = new TreeSet<Coords>();
+        Set<Vec2I> world = new TreeSet<Vec2I>(map.keySet()),
+                    queue = new TreeSet<Vec2I>();
         
-        Coords first = world.iterator().next();
+        Vec2I first = world.iterator().next();
         world.remove(first);
         queue.add(first);
         
         while (!queue.isEmpty()) {
-            Coords pos = queue.iterator().next();
+            Vec2I pos = queue.iterator().next();
             queue.remove(pos);
             
             for (Direction d: Direction.CARDINALS) {
-                Coords neighbor = pos.add(d);
+                Vec2I neighbor = pos.add(d);
                 
                 if (world.contains(neighbor)) {
                     world.remove(neighbor);

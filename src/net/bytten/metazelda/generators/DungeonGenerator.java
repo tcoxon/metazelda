@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 import net.bytten.gameutil.Pair;
 import net.bytten.gameutil.RandUtil;
 import net.bytten.metazelda.Condition;
@@ -248,7 +248,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             // Decide which direction to put the new room in relative to the
             // parent
             int nextId = chooseFreeEdge(parentRoom, keyLevel);
-            Set<Coords> coords = constraints.getCoords(nextId);
+            Set<Vec2I> coords = constraints.getCoords(nextId);
             Room room = new Room(nextId, coords, parentRoom, null, cond);
             
             // Add the room to the dungeon

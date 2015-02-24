@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 import net.bytten.gameutil.Direction;
-import net.bytten.gameutil.CoordsMap;
+import net.bytten.gameutil.Vec2IMap;
 import net.bytten.gameutil.Pair;
 import net.bytten.metazelda.IDungeon;
 import net.bytten.metazelda.Symbol;
@@ -27,8 +27,8 @@ public class CountConstraints implements IDungeonConstraints {
 
     protected int maxSpaces, maxKeys, maxSwitches;
     
-    protected IntMap<Coords> gridCoords;
-    protected CoordsMap<Integer> roomIds;
+    protected IntMap<Vec2I> gridCoords;
+    protected Vec2IMap<Integer> roomIds;
     protected int firstRoomId;
     
     public CountConstraints(int maxSpaces, int maxKeys, int maxSwitches) {
@@ -36,13 +36,13 @@ public class CountConstraints implements IDungeonConstraints {
         this.maxKeys = maxKeys;
         this.maxSwitches = maxSwitches;
 
-        gridCoords = new IntMap<Coords>();
-        roomIds = new CoordsMap<Integer>();
-        Coords first = new Coords(0,0);
+        gridCoords = new IntMap<Vec2I>();
+        roomIds = new Vec2IMap<Integer>();
+        Vec2I first = new Vec2I(0,0);
         firstRoomId = getRoomId(first);
     }
     
-    public int getRoomId(Coords xy) {
+    public int getRoomId(Vec2I xy) {
         if (roomIds.containsKey(xy)) {
             assert gridCoords.get(roomIds.get(xy)).equals(xy);
             return roomIds.get(xy);
@@ -54,7 +54,7 @@ public class CountConstraints implements IDungeonConstraints {
         }
     }
     
-    public Coords getRoomCoords(int id) {
+    public Vec2I getRoomCoords(int id) {
         assert gridCoords.containsKey(id);
         return gridCoords.get(id);
     }
@@ -96,16 +96,16 @@ public class CountConstraints implements IDungeonConstraints {
         this.maxSwitches = maxSwitches;
     }
 
-    protected boolean validRoomCoords(Coords c) {
+    protected boolean validRoomCoords(Vec2I c) {
         return c.y <= 0;
     }
     
     @Override
     public List<Pair<Double,Integer>> getAdjacentRooms(int id, int keyLevel) {
-        Coords xy = gridCoords.get(id);
+        Vec2I xy = gridCoords.get(id);
         List<Pair<Double,Integer>> ids = new ArrayList<Pair<Double,Integer>>();
         for (Direction d: Direction.CARDINALS) {
-            Coords neighbor = xy.add(d);
+            Vec2I neighbor = xy.add(d);
             if (validRoomCoords(neighbor))
                 ids.add(new Pair<Double,Integer>(1.0,getRoomId(neighbor)));
         }
@@ -113,8 +113,8 @@ public class CountConstraints implements IDungeonConstraints {
     }
 
     @Override
-    public Set<Coords> getCoords(int id) {
-        return new TreeSet<Coords>(Arrays.asList(getRoomCoords(id)));
+    public Set<Vec2I> getCoords(int id) {
+        return new TreeSet<Vec2I>(Arrays.asList(getRoomCoords(id)));
     }
 
     @Override

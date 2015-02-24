@@ -17,7 +17,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 import net.bytten.metazelda.constraints.ColorMap;
 import net.bytten.metazelda.constraints.CountConstraints;
 import net.bytten.metazelda.constraints.FreeformConstraints;
@@ -97,7 +97,7 @@ public class Main extends JPanel {
                     for (int x = 0; x < img.getWidth(); ++x)
                     for (int y = 0; y < img.getHeight(); ++y) {
                         if ((img.getRGB(x,y) & 0xFFFFFF) != 0) {
-                            spaceMap.set(new Coords(x,y), true);
+                            spaceMap.set(new Vec2I(x,y), true);
                         }
                     }
                     

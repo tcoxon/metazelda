@@ -5,7 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 import net.bytten.gameutil.Rect2dI;
 import net.bytten.metazelda.Edge;
 import net.bytten.metazelda.IDungeon;
@@ -94,7 +94,7 @@ public class GridDungeonView implements IDungeonView {
         
         for (Edge edge: room.getEdges()) {
             Room nextRoom = dungeon.get(edge.getTargetRoomId());
-            Coords coords = room.getCenter(),
+            Vec2I coords = room.getCenter(),
                    nextCoords = nextRoom.getCenter();
             
             if (nextRoom.getParent() == room) {

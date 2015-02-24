@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 
 /**
  * Constrains the coordinates where Rooms may be placed to be only those within
@@ -27,14 +27,14 @@ public class SpaceConstraints extends CountConstraints {
     }
 
     @Override
-    protected boolean validRoomCoords(Coords c) {
+    protected boolean validRoomCoords(Vec2I c) {
         return spaceMap.get(c);
     }
 
     @Override
     public Collection<Integer> initialRooms() {
         List<Integer> ids = new ArrayList<Integer>();
-        for (Coords xy: spaceMap.getBottomSpaces()) {
+        for (Vec2I xy: spaceMap.getBottomSpaces()) {
             ids.add(getRoomId(xy));
         }
         return ids;

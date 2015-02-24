@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 import net.bytten.gameutil.Direction;
 import net.bytten.gameutil.Pair;
 import net.bytten.metazelda.IDungeon;
@@ -21,12 +21,12 @@ public class FreeformConstraints implements IDungeonConstraints {
     
     protected static class Group {
         public int id;
-        public Set<Coords> coords;
+        public Set<Vec2I> coords;
         public Set<Integer> adjacentGroups;
         
         public Group(int id) {
             this.id = id;
-            this.coords = new TreeSet<Coords>();
+            this.coords = new TreeSet<Vec2I>();
             this.adjacentGroups = new TreeSet<Integer>();
         }
     }
@@ -55,14 +55,14 @@ public class FreeformConstraints implements IDungeonConstraints {
                     group = new Group(val);
                     groups.put(val, group);
                 }
-                group.coords.add(new Coords(x,y));
+                group.coords.add(new Vec2I(x,y));
             }
         System.out.println(groups.size() + " groups");
         
         for (Group group: groups.values()) {
-            for (Coords xy: group.coords) {
+            for (Vec2I xy: group.coords) {
                 for (Direction d: Direction.CARDINALS) {
-                    Coords neighbor = xy.add(d);
+                    Vec2I neighbor = xy.add(d);
                     if (group.coords.contains(neighbor)) continue;
                     Integer val = colorMap.get(neighbor.x, neighbor.y);
                     if (val != null && allowRoomsToBeAdjacent(group.id, val)) {
@@ -161,7 +161,7 @@ public class FreeformConstraints implements IDungeonConstraints {
     }
     
     @Override
-    public Set<Coords> getCoords(int id) {
+    public Set<Vec2I> getCoords(int id) {
         return Collections.unmodifiableSet(groups.get(id).coords);
     }
 

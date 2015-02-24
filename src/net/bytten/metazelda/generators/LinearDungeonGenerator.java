@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 import net.bytten.gameutil.algorithms.AStar;
 import net.bytten.metazelda.Dungeon;
 import net.bytten.metazelda.Edge;
@@ -54,7 +54,7 @@ public class LinearDungeonGenerator extends DungeonGenerator {
         }
 
         @Override
-        public Coords getCoords(Integer roomId) {
+        public Vec2I getVec2I(Integer roomId) {
             return dungeon.get(roomId).getCenter();
         }
     }

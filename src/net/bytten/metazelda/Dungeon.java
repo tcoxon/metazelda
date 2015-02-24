@@ -2,7 +2,7 @@ package net.bytten.metazelda;
 
 import java.util.Collection;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 import net.bytten.gameutil.Rect2dI;
 import net.bytten.metazelda.util.IntMap;
 
@@ -48,7 +48,7 @@ public class Dungeon implements IDungeon {
     public void add(Room room) {
         rooms.put(room.id, room);
         
-        for (Coords xy: room.getCoords()) {
+        for (Vec2I xy: room.getCoords()) {
             if (xy.x < bounds.left()) {
                 bounds = Rect2dI.fromExtremes(xy.x, bounds.top(),
                         bounds.right(), bounds.bottom());

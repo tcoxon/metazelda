@@ -6,48 +6,48 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 
 /**
  * Controls which spaces are valid for an
  * {@link net.bytten.metazelda.generators.IDungeonGenerator} to create
  * {@link Room}s in.
  * <p>
- * Essentially just a Set<{@link Coords}> with some convenience methods.
+ * Essentially just a Set<{@link Vec2I}> with some convenience methods.
  * 
- * @see Coords
+ * @see Vec2I
  * @see SpaceConstraints
  */
 public class SpaceMap {
-    protected Set<Coords> spaces = new TreeSet<Coords>();
+    protected Set<Vec2I> spaces = new TreeSet<Vec2I>();
     
     public int numberSpaces() {
         return spaces.size();
     }
     
-    public boolean get(Coords c) {
+    public boolean get(Vec2I c) {
         return spaces.contains(c);
     }
     
-    public void set(Coords c, boolean val) {
+    public void set(Vec2I c, boolean val) {
         if (val)
             spaces.add(c);
         else
             spaces.remove(c);
     }
     
-    private Coords getFirst() {
+    private Vec2I getFirst() {
         return spaces.iterator().next();
     }
     
-    public Collection<Coords> getBottomSpaces() {
-        List<Coords> bottomRow = new ArrayList<Coords>();
+    public Collection<Vec2I> getBottomSpaces() {
+        List<Vec2I> bottomRow = new ArrayList<Vec2I>();
         bottomRow.add(getFirst());
         int bottomY = getFirst().y;
-        for (Coords space: spaces) {
+        for (Vec2I space: spaces) {
             if (space.y > bottomY) {
                 bottomY = space.y;
-                bottomRow = new ArrayList<Coords>();
+                bottomRow = new ArrayList<Vec2I>();
                 bottomRow.add(space);
             } else if (space.y == bottomY) {
                 bottomRow.add(space);

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.bytten.gameutil.Coords;
+import net.bytten.gameutil.Vec2I;
 
 /**
  * Represents an individual space within the dungeon.
@@ -25,8 +25,8 @@ public class Room {
 
     protected Condition precond;
     public final int id;
-    protected Set<Coords> coords;
-    protected Coords center;
+    protected Set<Vec2I> coords;
+    protected Vec2I center;
     protected Symbol item;
     protected List<Edge> edges;
     protected double intensity;
@@ -49,7 +49,7 @@ public class Room {
      * @param precond   the precondition of the room
      * @see Condition
      */
-    public Room(int id, Set<Coords> coords, Room parent, Symbol item, Condition precond) {
+    public Room(int id, Set<Vec2I> coords, Room parent, Symbol item, Condition precond) {
         this.id = id;
         this.coords = coords;
         this.item = item;
@@ -61,14 +61,14 @@ public class Room {
         // all edges initially null
         
         int x = 0, y = 0;
-        for (Coords xy: coords) {
+        for (Vec2I xy: coords) {
             x += xy.x; y += xy.y;
         }
-        center = new Coords(x/coords.size(), y/coords.size());
+        center = new Vec2I(x/coords.size(), y/coords.size());
     }
     
-    public Room(int id, Coords coords, Room parent, Symbol item, Condition precond) {
-        this(id, new TreeSet<Coords>(Arrays.asList(coords)), parent, item,
+    public Room(int id, Vec2I coords, Room parent, Symbol item, Condition precond) {
+        this(id, new TreeSet<Vec2I>(Arrays.asList(coords)), parent, item,
                 precond);
     }
     
@@ -227,11 +227,11 @@ public class Room {
         children.add(child);
     }
     
-    public Set<Coords> getCoords() {
+    public Set<Vec2I> getCoords() {
         return coords;
     }
     
-    public Coords getCenter() {
+    public Vec2I getCenter() {
         return center;
     }
     
