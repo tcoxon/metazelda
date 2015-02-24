@@ -82,7 +82,7 @@ public class ColorMap {
             Coords pos = queue.iterator().next();
             queue.remove(pos);
             
-            for (Direction d: Direction.COMPASS_DIRECTIONS) {
+            for (Direction d: Direction.CARDINALS) {
                 Coords neighbor = pos.add(d);
                 
                 if (world.contains(neighbor)) {

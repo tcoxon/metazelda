@@ -61,7 +61,7 @@ public class FreeformConstraints implements IDungeonConstraints {
         
         for (Group group: groups.values()) {
             for (Coords xy: group.coords) {
-                for (Direction d: Direction.COMPASS_DIRECTIONS) {
+                for (Direction d: Direction.CARDINALS) {
                     Coords neighbor = xy.add(d);
                     if (group.coords.contains(neighbor)) continue;
                     Integer val = colorMap.get(neighbor.x, neighbor.y);

@@ -104,7 +104,7 @@ public class CountConstraints implements IDungeonConstraints {
     public List<Pair<Double,Integer>> getAdjacentRooms(int id, int keyLevel) {
         Coords xy = gridCoords.get(id);
         List<Pair<Double,Integer>> ids = new ArrayList<Pair<Double,Integer>>();
-        for (Direction d: Direction.COMPASS_DIRECTIONS) {
+        for (Direction d: Direction.CARDINALS) {
             Coords neighbor = xy.add(d);
             if (validRoomCoords(neighbor))
                 ids.add(new Pair<Double,Integer>(1.0,getRoomId(neighbor)));
