@@ -3,3 +3,4 @@ viewer-bin
 .settings
 *~
 /nbproject/private/
+/target/
