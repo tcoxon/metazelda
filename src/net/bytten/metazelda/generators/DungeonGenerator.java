@@ -194,6 +194,23 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         
         levels.addRoom(0, entry);
     }
+
+    /**
+     * Decides whether to add a new lock (and keyLevel) at this point.
+     *
+     * @param keyLevel the number of distinct locks that have been placed into
+     *      the map so far
+     * @param numRooms the number of rooms at the current keyLevel
+     * @param targetRoomsPerLock the number of rooms the generator has chosen
+     *      as the target number of rooms to place at each keyLevel (which
+     *      subclasses can ignore, if desired).
+     */
+    protected boolean shouldAddNewLock(int keyLevel, int numRooms, int targetRoomsPerLock) {
+        int usableKeys = constraints.getMaxKeys();
+        if (isBossRoomLocked())
+            usableKeys -= 1;
+        return numRooms >= targetRoomsPerLock && keyLevel < usableKeys;
+    }
     
     /**
      * Fill the dungeon's space with rooms and doors (some locked).
@@ -213,10 +230,6 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         // (the set of keys they must have).
         Condition cond = new Condition();
         
-        int usableKeys = constraints.getMaxKeys();
-        if (isBossRoomLocked())
-            usableKeys -= 1;
-        
         // Loop to place rooms and link them
         while (dungeon.roomCount() < constraints.getMaxRooms()) {
             
@@ -224,8 +237,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             
             // Decide whether we need to place a new lock
             // (Don't place the last lock, since that's reserved for the boss)
-            if (levels.getRooms(keyLevel).size() >= roomsPerLock &&
-                    keyLevel < usableKeys) {
+            if (shouldAddNewLock(keyLevel, levels.getRooms(keyLevel).size(), roomsPerLock)) {
                 latestKey = new Symbol(keyLevel++);
                 cond = cond.and(latestKey);
                 doLock = true;
@@ -696,6 +708,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                         // map, the keyLevel for rooms in the river > 0 because
                         // crossing water requires a key. If there are not
                         // enough rooms before the river to build up to the
+                        // key for the river, we've run out of rooms.
                         log("Ran out of rooms. roomsPerLock was "+roomsPerLock);
                         roomsPerLock = roomsPerLock * constraints.getMaxKeys() /
                                 (constraints.getMaxKeys() + 1);
