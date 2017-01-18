@@ -39,7 +39,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Creates a DungeonGenerator with a given random seed and places
      * specific constraints on {@link IDungeon}s it generates.
-     * 
+     *
      * @param seed          the random seed to use
      * @param constraints   the constraints to place on generation
      * @see net.bytten.metazelda.constraints.IDungeonConstraints
@@ -68,7 +68,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Randomly chooses a {@link Room} within the given collection that has at
      * least one adjacent empty space.
-     * 
+     *
      * @param roomCollection    the collection of rooms to choose from
      * @return  the room that was chosen, or null if there are no rooms with
      *          adjacent empty spaces
@@ -92,7 +92,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Randomly chooses a {@link Direction} in which the given {@link Room} has
      * an adjacent empty space.
-     * 
+     *
      * @param room  the room
      * @return  the Direction of the empty space chosen adjacent to the Room or
      *          null if there are no adjacent empty spaces
@@ -155,7 +155,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      * Comparator objects for sorting {@link Room}s in a couple of different
      * ways. These are used to determine in which rooms of a given keyLevel it
      * is best to place the next key.
-     * 
+     *
      * @see #placeKeys
      */
     protected static final Comparator<Room>
@@ -176,9 +176,9 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     
     /**
      * Sets up the dungeon's entrance room.
-     * 
+     *
      * @param levels    the keyLevel -> room-set mapping to update
-     * @see KeyLevelRoomMapping 
+     * @see KeyLevelRoomMapping
      */
     protected void initEntranceRoom(KeyLevelRoomMapping levels)
             throws RetryException {
@@ -215,7 +215,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Fill the dungeon's space with rooms and doors (some locked).
      * Keys are not inserted at this point.
-     * 
+     *
      * @param levels    the keyLevel -> room-set mapping to update
      * @throws RetryException if it fails
      * @see KeyLevelRoomMapping
@@ -277,7 +277,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Places the BOSS and GOAL rooms within the dungeon, in existing rooms.
      * These rooms are moved into the next keyLevel.
-     * 
+     *
      * @param levels    the keyLevel -> room-set mapping to update
      * @throws RetryException if it fails
      * @see KeyLevelRoomMapping
@@ -322,10 +322,10 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         if (goalRoom != null) goalRoom.setItem(goalSym);
         bossRoom.setItem(bossSym);
         
-        if (isBossRoomLocked()) {
-            int oldKeyLevel = bossRoom.getPrecond().getKeyLevel(),
-                newKeyLevel = Math.min(levels.keyCount(), constraints.getMaxKeys());
+        int oldKeyLevel = bossRoom.getPrecond().getKeyLevel(),
+            newKeyLevel = Math.min(levels.keyCount(), constraints.getMaxKeys());
             
+        if (oldKeyLevel != newKeyLevel) {
             List<Room> oklRooms = levels.getRooms(oldKeyLevel);
             if (goalRoom != null) oklRooms.remove(goalRoom);
             oklRooms.remove(bossRoom);
@@ -350,10 +350,10 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Removes the given {@link Room} and all its descendants from the given
      * list.
-     * 
+     *
      * @param rooms the list of Rooms to remove nodes from
      * @param room  the Room whose descendants to remove from the list
-     */ 
+     */
     protected void removeDescendantsFromList(List<Room> rooms, Room room) {
         rooms.remove(room);
         for (Room child: room.getChildren()) {
@@ -364,7 +364,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Adds extra conditions to the given {@link Room}'s preconditions and all
      * of its descendants.
-     * 
+     *
      * @param room  the Room to add extra preconditions to
      * @param cond  the extra preconditions to add
      */
@@ -380,7 +380,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      * {@link Edge}s that require the switch to be in the given state.
      * <p>
      * If the given state is EITHER, the required states will be random.
-     * 
+     *
      * @param room          the room whose child to lock
      * @param givenState    the state to require the switch to be in for the
      *                      child rooms to be accessible
@@ -422,7 +422,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Returns a path from the goal to the dungeon entrance, along the 'parent'
      * relations.
-     * 
+     *
      * @return  a list of linked {@link Room}s starting with the goal room and
      *          ending with the start room.
      */
@@ -440,7 +440,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      * Makes some {@link Edge}s within the dungeon require the dungeon's switch
      * to be in a particular state, and places the switch in a room in the
      * dungeon.
-     * 
+     *
      * @throws RetryException if it fails
      */
     protected void placeSwitches() throws RetryException {
@@ -494,7 +494,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Randomly links up some adjacent rooms to make the dungeon graph less of
      * a tree.
-     * 
+     *
      * @throws RetryException if it fails
      */
     protected void graphify() throws RetryException {
@@ -538,7 +538,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Places keys within the dungeon in such a way that the dungeon is
      * guaranteed to be solvable.
-     * 
+     *
      * @param levels    the keyLevel -> room-set mapping to use
      * @throws RetryException if it fails
      * @see KeyLevelRoomMapping
@@ -584,7 +584,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      * <p>
      * Intensities set by this method may (will) be outside of the normal range
      * from 0.0 to 1.0. See {@link #normalizeIntensity} to correct this.
-     * 
+     *
      * @param room      the room to set the intensity of
      * @param intensity the value to set intensity to (some randomn variance is
      *                  added)
@@ -610,7 +610,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Scales intensities within the dungeon down so that they all fit within
      * the range 0 <= intensity < 1.0.
-     * 
+     *
      * @see Room
      */
     protected void normalizeIntensity() {
@@ -626,7 +626,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     /**
      * Computes the 'intensity' of each {@link Room}. Rooms generally get more
      * intense the deeper they are into the dungeon.
-     * 
+     *
      * @param levels    the keyLevel -> room-set mapping to update
      * @throws RetryException if it fails
      * @see KeyLevelRoomMapping
@@ -664,7 +664,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      * Checks with the
      * {@link net.bytten.metazelda.constraints.IDungeonConstraints} that the
      * dungeon is OK to use.
-     * 
+     *
      * @throws RetryException if the IDungeonConstraints decided generation must
      *                        be re-attempted
      * @see net.bytten.metazelda.constraints.IDungeonConstraints
