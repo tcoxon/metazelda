@@ -25,17 +25,16 @@ import net.bytten.gameutil.logging.ILogger;
  * The default and reference implementation of an {@link IDungeonGenerator}.
  */
 public class DungeonGenerator implements IDungeonGenerator, ILogger {
-    
-    public static final int MAX_RETRIES = 20;
 
     protected ILogger logger;
     protected long seed;
     protected Random random;
     protected Dungeon dungeon;
     protected IDungeonConstraints constraints;
-    
+    protected int maxRetries = 20;
+
     protected boolean bossRoomLocked, generateGoal;
-    
+
     /**
      * Creates a DungeonGenerator with a given random seed and places
      * specific constraints on {@link IDungeon}s it generates.
@@ -52,19 +51,23 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         this.random = new Random(seed);
         assert constraints != null;
         this.constraints = constraints;
-        
+
         bossRoomLocked = generateGoal = true;
     }
-    
+
     public DungeonGenerator(long seed, IDungeonConstraints constraints) {
         this(null, seed, constraints);
     }
-    
+
     @Override
     public void log(String msg) {
         if (logger != null) logger.log(msg);
     }
-    
+
+    public void setMaxRetries(int maxRetries) {
+        this.maxRetries = maxRetries;
+    }
+
     /**
      * Randomly chooses a {@link Room} within the given collection that has at
      * least one adjacent empty space.
@@ -88,7 +91,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         }
         return null;
     }
-    
+
     /**
      * Randomly chooses a {@link Direction} in which the given {@link Room} has
      * an adjacent empty space.
@@ -110,7 +113,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         assert false;
         throw new GenerationFailureException("Internal error: Room doesn't have a free edge");
     }
-    
+
     /**
      * Maps 'keyLevel' to the set of rooms within that keyLevel.
      * <p>
@@ -122,23 +125,23 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     protected class KeyLevelRoomMapping {
         protected List<List<Room>> map = new ArrayList<List<Room>>(
                 constraints.getMaxKeys());
-        
+
         List<Room> getRooms(int keyLevel) {
             while (keyLevel >= map.size()) map.add(null);
             if (map.get(keyLevel) == null)
                 map.set(keyLevel, new ArrayList<Room>());
             return map.get(keyLevel);
         }
-        
+
         void addRoom(int keyLevel, Room room) {
             getRooms(keyLevel).add(room);
         }
-        
+
         int keyCount() {
             return map.size();
         }
     }
-    
+
     /**
      * Thrown by several IDungeonGenerator methods that can fail.
      * Should be caught and handled in {@link #generate}.
@@ -146,11 +149,11 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     protected static class RetryException extends Exception {
         private static final long serialVersionUID = 1L;
     }
-    
+
     protected static class OutOfRoomsException extends Exception {
         private static final long serialVersionUID = 1L;
     }
-    
+
     /**
      * Comparator objects for sorting {@link Room}s in a couple of different
      * ways. These are used to determine in which rooms of a given keyLevel it
@@ -173,7 +176,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                             : 0;
         }
     };
-    
+
     /**
      * Sets up the dungeon's entrance room.
      *
@@ -187,11 +190,11 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 constraints.initialRooms());
         assert possibleEntries.size() > 0;
         id = possibleEntries.get(random.nextInt(possibleEntries.size()));
-        
+
         Room entry = new Room(id, constraints.getCoords(id), null,
                 new Symbol(Symbol.START), new Condition());
         dungeon.add(entry);
-        
+
         levels.addRoom(0, entry);
     }
 
@@ -211,7 +214,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             usableKeys -= 1;
         return numRooms >= targetRoomsPerLock && keyLevel < usableKeys;
     }
-    
+
     /**
      * Fill the dungeon's space with rooms and doors (some locked).
      * Keys are not inserted at this point.
@@ -222,19 +225,19 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      */
     protected void placeRooms(KeyLevelRoomMapping levels, int roomsPerLock)
             throws RetryException, OutOfRoomsException {
-        
+
         // keyLevel: the number of keys required to get to the new room
         int keyLevel = 0;
         Symbol latestKey = null;
         // condition that must hold true for the player to reach the new room
         // (the set of keys they must have).
         Condition cond = new Condition();
-        
+
         // Loop to place rooms and link them
         while (dungeon.roomCount() < constraints.getMaxRooms()) {
-            
+
             boolean doLock = false;
-            
+
             // Decide whether we need to place a new lock
             // (Don't place the last lock, since that's reserved for the boss)
             if (shouldAddNewLock(keyLevel, levels.getRooms(keyLevel).size(), roomsPerLock)) {
@@ -242,7 +245,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 cond = cond.and(latestKey);
                 doLock = true;
             }
-            
+
             // Find an existing room with a free edge:
             Room parentRoom = null;
             if (!doLock && random.nextInt(10) > 0)
@@ -253,16 +256,16 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                         keyLevel);
                 doLock = true;
             }
-            
+
             if (parentRoom == null)
                 throw new OutOfRoomsException();
-            
+
             // Decide which direction to put the new room in relative to the
             // parent
             int nextId = chooseFreeEdge(parentRoom, keyLevel);
             Set<Vec2I> coords = constraints.getCoords(nextId);
             Room room = new Room(nextId, coords, parentRoom, null, cond);
-            
+
             // Add the room to the dungeon
             assert dungeon.get(room.id) == null;
             synchronized (dungeon) {
@@ -273,7 +276,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             levels.addRoom(keyLevel, room);
         }
     }
-    
+
     /**
      * Places the BOSS and GOAL rooms within the dungeon, in existing rooms.
      * These rooms are moved into the next keyLevel.
@@ -307,37 +310,37 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             }
             possibleGoalRooms.add(room);
         }
-        
+
         if (possibleGoalRooms.size() == 0) throw new RetryException();
-        
+
         Room goalRoom = possibleGoalRooms.get(random.nextInt(
                 possibleGoalRooms.size())),
              bossRoom = goalRoom.getParent();
-        
+
         if (!isGenerateGoal()) {
             bossRoom = goalRoom;
             goalRoom = null;
         }
-        
+
         if (goalRoom != null) goalRoom.setItem(goalSym);
         bossRoom.setItem(bossSym);
-        
+
         int oldKeyLevel = bossRoom.getPrecond().getKeyLevel(),
             newKeyLevel = Math.min(levels.keyCount(), constraints.getMaxKeys());
-            
+
         if (oldKeyLevel != newKeyLevel) {
             List<Room> oklRooms = levels.getRooms(oldKeyLevel);
             if (goalRoom != null) oklRooms.remove(goalRoom);
             oklRooms.remove(bossRoom);
-            
+
             if (goalRoom != null) levels.addRoom(newKeyLevel, goalRoom);
             levels.addRoom(newKeyLevel, bossRoom);
-            
+
             Symbol bossKey = new Symbol(newKeyLevel-1);
             Condition precond = bossRoom.getPrecond().and(bossKey);
             bossRoom.setPrecond(precond);
             if (goalRoom != null) goalRoom.setPrecond(precond);
-            
+
             if (newKeyLevel == 0) {
                 dungeon.link(bossRoom.getParent(), bossRoom);
             } else {
@@ -346,7 +349,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             if (goalRoom != null) dungeon.link(bossRoom, goalRoom);
         }
     }
-    
+
     /**
      * Removes the given {@link Room} and all its descendants from the given
      * list.
@@ -360,7 +363,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             removeDescendantsFromList(rooms, child);
         }
     }
-    
+
     /**
      * Adds extra conditions to the given {@link Room}'s preconditions and all
      * of its descendants.
@@ -374,7 +377,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             addPrecond(child, cond);
         }
     }
-    
+
     /**
      * Randomly locks descendant rooms of the given {@link Room} with
      * {@link Edge}s that require the switch to be in the given state.
@@ -397,7 +400,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 : (random.nextInt(2) == 0
                     ? Condition.SwitchState.ON
                     : Condition.SwitchState.OFF);
-        
+
         for (Edge edge: room.getEdges()) {
             int neighborId = edge.getTargetRoomId();
             Room nextRoom = dungeon.get(neighborId);
@@ -410,7 +413,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 } else {
                     anyLocks |= switchLockChildRooms(nextRoom, state);
                 }
-                
+
                 if (givenState == Condition.SwitchState.EITHER) {
                     state = state.invert();
                 }
@@ -418,7 +421,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         }
         return anyLocks;
     }
-    
+
     /**
      * Returns a path from the goal to the dungeon entrance, along the 'parent'
      * relations.
@@ -435,7 +438,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         }
         return solution;
     }
-    
+
     /**
      * Makes some {@link Edge}s within the dungeon require the dungeon's switch
      * to be in a particular state, and places the switch in a room in the
@@ -447,15 +450,15 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         // Possible TODO: have multiple switches on separate circuits
         // At the moment, we only have one switch per dungeon.
         if (constraints.getMaxSwitches() <= 0) return;
-        
+
         List<Room> solution = getSolutionPath();
-        
+
         for (int attempt = 0; attempt < 10; ++attempt) {
-            
+
             List<Room> rooms = new ArrayList<Room>(dungeon.getRooms());
             Collections.shuffle(rooms, random);
             Collections.shuffle(solution, random);
-            
+
             // Pick a base room from the solution path so that the player
             // will have to encounter a switch-lock to solve the dungeon.
             Room baseRoom = null;
@@ -467,11 +470,11 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             }
             if (baseRoom == null) throw new RetryException();
             Condition baseRoomCond = baseRoom.getPrecond();
-            
+
             removeDescendantsFromList(rooms, baseRoom);
-            
+
             Symbol switchSym = new Symbol(Symbol.SWITCH);
-            
+
             Room switchRoom = null;
             for (Room room: rooms) {
                 if (room.getItem() == null &&
@@ -482,7 +485,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 }
             }
             if (switchRoom == null) continue;
-            
+
             if (switchLockChildRooms(baseRoom, Condition.SwitchState.EITHER)) {
                 switchRoom.setItem(switchSym);
                 return;
@@ -490,7 +493,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         }
         throw new RetryException();
     }
-    
+
     /**
      * Randomly links up some adjacent rooms to make the dungeon graph less of
      * a tree.
@@ -499,20 +502,20 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      */
     protected void graphify() throws RetryException {
         for (Room room: dungeon.getRooms()) {
-            
+
             if (room.isGoal() || room.isBoss()) continue;
-            
+
             for (Pair<Double,Integer> next:
                     // Doesn't matter what the keyLevel is; later checks about
                     // preconds ensure linkage doesn't trivialize the puzzle.
                     constraints.getAdjacentRooms(room.id, Integer.MAX_VALUE)) {
                 int nextId = next.second;
                 if (room.getEdge(nextId) != null) continue;
-                
+
                 Room nextRoom = dungeon.get(nextId);
                 if (nextRoom == null || nextRoom.isGoal() || nextRoom.isBoss())
                     continue;
-                
+
                 boolean forwardImplies = room.getPrecond().implies(nextRoom.getPrecond()),
                         backwardImplies = nextRoom.getPrecond().implies(room.getPrecond());
                 if (forwardImplies && backwardImplies) {
@@ -520,7 +523,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                     if (random.nextDouble() >=
                             constraints.edgeGraphifyProbability(room.id, nextRoom.id))
                         continue;
-                    
+
                     dungeon.link(room, nextRoom);
                 } else {
                     Symbol difference = room.getPrecond().singleSymbolDifference(
@@ -534,7 +537,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             }
         }
     }
-    
+
     /**
      * Places keys within the dungeon in such a way that the dungeon is
      * guaranteed to be solvable.
@@ -549,16 +552,16 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         // (dead end rooms).
         for (int key = 0; key < levels.keyCount()-1; ++key) {
             List<Room> rooms = levels.getRooms(key);
-            
+
             Collections.shuffle(rooms, random);
             // Collections.sort is stable: it doesn't reorder "equal" elements,
             // which means the shuffling we just did is still useful.
             Collections.sort(rooms, INTENSITY_COMPARATOR);
             // Alternatively, use the EDGE_COUNT_COMPARATOR to put keys at
             // 'dead end' rooms.
-            
+
             Symbol keySym = new Symbol(key);
-            
+
             boolean placedKey = false;
             for (Room room: rooms) {
                 if (room.getItem() == null && constraints.roomCanFitItem(room.id, keySym)) {
@@ -572,11 +575,11 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 throw new RetryException();
         }
     }
-    
+
     protected static final double
             INTENSITY_GROWTH_JITTER = 0.1,
             INTENSITY_EASE_OFF = 0.2;
-    
+
     /**
      * Recursively applies the given intensity to the given {@link Room}, and
      * higher intensities to each of its descendants that are within the same
@@ -593,9 +596,9 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     protected double applyIntensity(Room room, double intensity) {
         intensity *= 1.0 - INTENSITY_GROWTH_JITTER/2.0 +
                 INTENSITY_GROWTH_JITTER * random.nextDouble();
-        
+
         room.setIntensity(intensity);
-        
+
         double maxIntensity = intensity;
         for (Room child: room.getChildren()) {
             if (room.getPrecond().implies(child.getPrecond())) {
@@ -603,7 +606,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                         intensity + 1.0));
             }
         }
-        
+
         return maxIntensity;
     }
 
@@ -622,7 +625,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
             room.setIntensity(room.getIntensity() * 0.99 / maxIntensity);
         }
     }
-    
+
     /**
      * Computes the 'intensity' of each {@link Room}. Rooms generally get more
      * intense the deeper they are into the dungeon.
@@ -634,13 +637,13 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      */
     protected void computeIntensity(KeyLevelRoomMapping levels)
             throws RetryException {
-        
+
         double nextLevelBaseIntensity = 0.0;
         for (int level = 0; level < levels.keyCount(); ++level) {
-            
+
             double intensity = nextLevelBaseIntensity *
                     (1.0 - INTENSITY_EASE_OFF);
-            
+
             for (Room room: levels.getRooms(level)) {
                 if (room.getParent() == null ||
                         !room.getParent().getPrecond().
@@ -651,15 +654,15 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 }
             }
         }
-        
+
         normalizeIntensity();
-        
+
         dungeon.findBoss().setIntensity(1.0);
         Room goalRoom = dungeon.findGoal();
         if (goalRoom != null)
             goalRoom.setIntensity(0.0);
     }
-    
+
     /**
      * Checks with the
      * {@link net.bytten.metazelda.constraints.IDungeonConstraints} that the
@@ -673,7 +676,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
         if (!constraints.isAcceptable(dungeon))
             throw new RetryException();
     }
-    
+
     @Override
     public void generate() {
         int attempt = 0;
@@ -690,14 +693,14 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 }
                 while (true) {
                     dungeon = new Dungeon();
-                    
+
                     // Maps keyLevel -> Rooms that were created when lockCount had that
                     // value
                     levels = new KeyLevelRoomMapping();
-                    
+
                     // Create the entrance to the dungeon:
                     initEntranceRoom(levels);
-                
+
                     try {
                         // Fill the dungeon with rooms:
                         placeRooms(levels, roomsPerLock);
@@ -713,7 +716,7 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                         roomsPerLock = roomsPerLock * constraints.getMaxKeys() /
                                 (constraints.getMaxKeys() + 1);
                         log("roomsPerLock is now "+roomsPerLock);
-                        
+
                         if (roomsPerLock == 0) {
                             throw new GenerationFailureException(
                                     "Failed to place rooms. Have you forgotten to disable boss-locking?");
@@ -724,36 +727,36 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                         }
                     }
                 }
-                
+
                 // Place the boss and goal rooms:
                 placeBossGoalRooms(levels);
-                
+
                 // Place switches and the locks that require it:
                 placeSwitches();
-        
+
                 // Make the dungeon less tree-like:
                 graphify();
-                
+
                 computeIntensity(levels);
-                
+
                 // Place the keys within the dungeon:
                 placeKeys(levels);
-                
+
                 if (levels.keyCount()-1 != constraints.getMaxKeys())
                     throw new RetryException();
 
                 checkAcceptable();
-                
+
                 return;
-            
+
             } catch (RetryException e) {
-                if (++ attempt > MAX_RETRIES) {
+                if (++ attempt > maxRetries) {
                     throw new GenerationFailureException("Dungeon generator failed", e);
                 }
                 log("Retrying dungeon generation...");
             }
         }
-        
+
     }
 
     @Override
