@@ -288,17 +288,18 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
     protected void placeBossGoalRooms(KeyLevelRoomMapping levels)
             throws RetryException {
         List<Room> possibleGoalRooms = new ArrayList<Room>(dungeon.roomCount());
-        
+
         Symbol goalSym = new Symbol(Symbol.GOAL),
                bossSym = new Symbol(Symbol.BOSS);
-        
+
         for (Room room: dungeon.getRooms()) {
             if (room.getChildren().size() > 0 || room.getItem() != null)
                 continue;
             Room parent = room.getParent();
-            if (parent == null || parent.getChildren().size() != 1 ||
-                    room.getItem() != null ||
-                    !parent.getPrecond().implies(room.getPrecond()))
+            if (parent == null)
+                continue;
+            if (isGenerateGoal() && (parent.getChildren().size() != 1 ||
+                    !parent.getPrecond().implies(room.getPrecond())))
                 continue;
             if (isGenerateGoal()) {
                 if (!constraints.roomCanFitItem(room.id, goalSym) ||
