@@ -735,9 +735,6 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
                 // Place switches and the locks that require it:
                 placeSwitches();
 
-                // Make the dungeon less tree-like:
-                graphify();
-
                 computeIntensity(levels);
 
                 // Place the keys within the dungeon:
@@ -745,6 +742,9 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
 
                 if (levels.keyCount()-1 != constraints.getMaxKeys())
                     throw new RetryException();
+
+                // Make the dungeon less tree-like:
+                graphify();
 
                 checkAcceptable();
 
