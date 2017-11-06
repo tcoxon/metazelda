@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import net.bytten.gameutil.Vec2I;
+import net.bytten.gameutil.Vec2ISet;
 
 /**
  * Controls which spaces are valid for an
@@ -14,12 +14,12 @@ import net.bytten.gameutil.Vec2I;
  * {@link Room}s in.
  * <p>
  * Essentially just a Set<{@link Vec2I}> with some convenience methods.
- * 
+ *
  * @see Vec2I
  * @see SpaceConstraints
  */
 public class SpaceMap {
-    protected Set<Vec2I> spaces = new TreeSet<Vec2I>();
+    protected Set<Vec2I> spaces = new Vec2ISet();
     
     public int numberSpaces() {
         return spaces.size();

@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.bytten.gameutil.Vec2I;
+import net.bytten.gameutil.Vec2ISet;
 import net.bytten.gameutil.Direction;
 import net.bytten.gameutil.Pair;
 import net.bytten.metazelda.IDungeon;
@@ -26,7 +27,7 @@ public class FreeformConstraints implements IDungeonConstraints {
         
         public Group(int id) {
             this.id = id;
-            this.coords = new TreeSet<Vec2I>();
+            this.coords = new Vec2ISet();
             this.adjacentGroups = new TreeSet<Integer>();
         }
     }

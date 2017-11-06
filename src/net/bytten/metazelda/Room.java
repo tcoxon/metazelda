@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import net.bytten.gameutil.Vec2I;
+import net.bytten.gameutil.Vec2ISet;
 
 /**
  * Represents an individual space within the dungeon.
@@ -42,7 +42,7 @@ public class Room {
      * {@link net.bytten.metazelda.generators.DungeonGenerator#generate()}, and
      * before
      * {@link net.bytten.metazelda.generators.DungeonGenerator#graphify()}.
-     * 
+     *
      * @param coords    the coordinates of the new room
      * @param parent    the parent room or null if it is the root / entry room
      * @param item      the symbol to place in the room or null if no item
@@ -68,7 +68,7 @@ public class Room {
     }
     
     public Room(int id, Vec2I coords, Room parent, Symbol item, Condition precond) {
-        this(id, new TreeSet<Vec2I>(Arrays.asList(coords)), parent, item,
+        this(id, new Vec2ISet(Arrays.asList(coords)), parent, item,
                 precond);
     }
     
@@ -106,7 +106,7 @@ public class Room {
      * Gets the array of {@link Edge} slots this Room has. There is one slot
      * for each compass {@link Direction}. Non-null slots in this array
      * represent links between this Room and adjacent Rooms.
-     * 
+     *
      * @return the array of Edges
      */
     public List<Edge> getEdges() {
@@ -115,7 +115,7 @@ public class Room {
     
     /**
      * Gets the Edge object for a link in a given direction.
-     * 
+     *
      * @param d the compass {@link Direction} of the Edge for the link from this
      *          Room to an adjacent Room
      * @return  the {@link Edge} for the link in the given direction, or null if
@@ -142,7 +142,7 @@ public class Room {
     
     /**
      * Gets the number of Rooms this Room is linked to.
-     * 
+     *
      * @return  the number of links
      */
     public int linkCount() {
@@ -220,7 +220,7 @@ public class Room {
     /**
      * Registers this Room as a parent of another.
      * Does not modify the child room's parent property.
-     * 
+     *
      * @param child the room to parent
      */
     public void addChild(Room child) {

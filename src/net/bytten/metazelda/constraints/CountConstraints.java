@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
-import net.bytten.gameutil.Vec2I;
 import net.bytten.gameutil.Direction;
+import net.bytten.gameutil.Vec2I;
+import net.bytten.gameutil.Vec2ISet;
 import net.bytten.gameutil.Vec2IMap;
 import net.bytten.gameutil.Pair;
 import net.bytten.metazelda.IDungeon;
@@ -18,9 +18,9 @@ import net.bytten.metazelda.util.IntMap;
 /**
  * Limits the {@link net.bytten.metazelda.generators.IDungeonGenerator} in
  * the <i>number</i> of keys, switches and rooms it is allowed to place.
- * 
+ *
  * Also restrict to a grid of 1x1 rooms.
- * 
+ *
  * @see IDungeonConstraints
  */
 public class CountConstraints implements IDungeonConstraints {
@@ -114,7 +114,7 @@ public class CountConstraints implements IDungeonConstraints {
 
     @Override
     public Set<Vec2I> getCoords(int id) {
-        return new TreeSet<Vec2I>(Arrays.asList(getRoomCoords(id)));
+        return new Vec2ISet(Arrays.asList(getRoomCoords(id)));
     }
 
     @Override

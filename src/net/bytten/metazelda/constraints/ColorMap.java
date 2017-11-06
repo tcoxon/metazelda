@@ -2,10 +2,10 @@ package net.bytten.metazelda.constraints;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import net.bytten.gameutil.Vec2I;
+import net.bytten.gameutil.Vec2IMap;
+import net.bytten.gameutil.Vec2ISet;
 import net.bytten.gameutil.Direction;
 import net.bytten.metazelda.util.GenerationFailureException;
 
@@ -15,7 +15,7 @@ public class ColorMap {
     protected Map<Vec2I, Integer> map;
 
     public ColorMap() {
-        map = new TreeMap<Vec2I,Integer>();
+        map = new Vec2IMap<Integer>();
         ymin = xmin = Integer.MAX_VALUE;
         ymax = xmax = Integer.MIN_VALUE;
     }
@@ -71,8 +71,8 @@ public class ColorMap {
         
         // Do a breadth first search starting at the top left to check if
         // every position is reachable.
-        Set<Vec2I> world = new TreeSet<Vec2I>(map.keySet()),
-                    queue = new TreeSet<Vec2I>();
+        Set<Vec2I> world = new Vec2ISet(map.keySet()),
+                    queue = new Vec2ISet();
         
         Vec2I first = world.iterator().next();
         world.remove(first);
