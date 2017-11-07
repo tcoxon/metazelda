@@ -432,7 +432,12 @@ public class DungeonGenerator implements IDungeonGenerator, ILogger {
      */
     protected List<Room> getSolutionPath() {
         List<Room> solution = new ArrayList<Room>();
-        Room room = dungeon.findGoal();
+        Room room;
+        if (isGenerateGoal()) {
+            room = dungeon.findGoal();
+        } else {
+            room = dungeon.findBoss();
+        }
         while (room != null) {
             solution.add(room);
             room = room.getParent();
